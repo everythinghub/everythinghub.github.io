@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Skycast — Weather</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== SYSTEM LIGHT / DARK ===== */
+:root {
+  --bg:            #f2f2f7;
+  --bg2:           #ffffff;
+  --bg3:           #f2f2f7;
+  --glass:         rgba(255,255,255,0.72);
+  --glass-border:  rgba(0,0,0,0.08);
+  --text:          #1c1c1e;
+  --text2:         #3c3c43;
+  --text3:         #8e8e93;
+  --accent:        #007aff;
+  --accent-bg:     rgba(0,122,255,0.12);
+  --card-shadow:   0 2px 20px rgba(0,0,0,0.08);
+  --sep:           rgba(60,60,67,0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:            #000000;
+    --bg2:           #1c1c1e;
+    --bg3:           #2c2c2e;
+    --glass:         rgba(28,28,30,0.82);
+    --glass-border:  rgba(255,255,255,0.1);
+    --text:          #ffffff;
+    --text2:         #ebebf5;
+    --text3:         #8e8e93;
+    --accent:        #0a84ff;
+    --accent-bg:     rgba(10,132,255,0.18);
+    --card-shadow:   0 2px 20px rgba(0,0,0,0.45);
+    --sep:           rgba(84,84,88,0.45);
+  }
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.4s, color 0.4s;
+}
+
+/* ===== HERO BG GRADIENT ===== */
+.hero-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(160deg, #74aadf 0%, #a8d5f0 40%, #f2f2f7 70%);
+  opacity: 1;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+@media (prefers-color-scheme: dark) {
+  .hero-bg { background: linear-gradient(160deg, #0a1628 0%, #0d2045 40%, #000000 70%); }
+}
+
+/* ===== LAYOUT ===== */
+.page { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 60px 20px 80px; }
+
+/* ===== SEARCH BAR ===== */
+.search-wrap {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.search-box {
+  flex: 1;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 0 18px;
+  height: 50px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-box::placeholder { color: var(--text3); }
+.search-box:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.search-btn {
+  height: 50px;
+  padding: 0 22px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.15s, transform 0.12s;
+  white-space: nowrap;
+}
+.search-btn:hover { opacity: 0.88; }
+.search-btn:active { transform: scale(0.96); }
+.search-btn svg { width: 18px; height: 18px; }
+
+/* ===== UNIT TOGGLE ===== */
+.unit-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.unit-pill {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  display: flex;
+  overflow: hidden;
+}
+.unit-btn {
+  padding: 7px 18px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  border-radius: 999px;
+}
+.unit-btn.active { background: var(--accent); color: #fff; }
+
+/* ===== MAIN CARD ===== */
+.main-card {
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 32px 30px 28px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 16px;
+  animation: fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.location-name {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+.location-sub {
+  font-size: 14px;
+  color: var(--text3);
+  margin-top: 3px;
+}
+
+.condition-pill {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.temp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0 24px;
+}
+
+.big-temp {
+  font-size: 88px;
+  font-weight: 300;
+  letter-spacing: -4px;
+  line-height: 1;
+}
+
+.weather-icon-wrap img {
+  width: 110px;
+  height: 110px;
+}
+
+.feels-hi-lo {
+  display: flex;
+  gap: 20px;
+  color: var(--text3);
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: -12px;
+  margin-bottom: 24px;
+}
+
+/* ===== STATS GRID ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stat-cell {
+  background: var(--bg3);
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+}
+@media (prefers-color-scheme: dark) {
+  .stat-cell { background: rgba(255,255,255,0.06); }
+}
+
+.stat-cell-icon { margin-bottom: 6px; }
+.stat-cell-icon img { width: 28px; height: 28px; }
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text3);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.stat-val {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+}
+.stat-unit { font-size: 12px; font-weight: 500; color: var(--text3); }
+
+/* ===== FORECAST STRIP ===== */
+.forecast-card {
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 20px 22px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 16px;
+  animation: fadeUp 0.55s ease both;
+}
+
+.forecast-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.forecast-list { display: flex; flex-direction: column; gap: 0; }
+
+.forecast-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--sep);
+}
+.forecast-row:last-child { border-bottom: none; }
+
+.fc-day { width: 64px; font-size: 15px; font-weight: 600; color: var(--text); }
+.fc-icon { width: 40px; display: flex; align-items: center; }
+.fc-icon img { width: 34px; height: 34px; }
+.fc-cond { flex: 1; font-size: 14px; color: var(--text3); padding: 0 10px; }
+.fc-temps { display: flex; gap: 10px; font-size: 15px; font-weight: 600; }
+.fc-hi { color: var(--text); }
+.fc-lo { color: var(--text3); }
+
+/* ===== HOURLY STRIP ===== */
+.hourly-card {
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 20px 22px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 16px;
+  animation: fadeUp 0.6s ease both;
+}
+
+.hourly-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.hourly-scroll::-webkit-scrollbar { display: none; }
+
+.hour-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 54px;
+}
+.hour-time { font-size: 12px; color: var(--text3); font-weight: 600; }
+.hour-icon img { width: 36px; height: 36px; }
+.hour-temp { font-size: 15px; font-weight: 700; }
+.hour-rain { font-size: 11px; color: var(--accent); font-weight: 600; }
+
+/* ===== STATES ===== */
+.welcome, .loading-state, .error-state {
+  text-align: center;
+  padding: 60px 20px;
+  animation: fadeUp 0.4s ease both;
+}
+.welcome img { width: 120px; height: 120px; margin-bottom: 16px; }
+.welcome h2 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+.welcome p { color: var(--text3); font-size: 15px; }
+
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid var(--sep);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-state { color: #ff3b30; }
+
+/* ===== HIDDEN ===== */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="hero-bg"></div>
+
+<div class="page">
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <input class="search-box" id="searchInput" type="text" placeholder="Search city or zip code…" autocomplete="off" />
+    <button class="search-btn" id="searchBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      Search
+    </button>
+  </div>
+
+  <!-- UNIT TOGGLE -->
+  <div class="unit-row" id="unitRow" style="display:none;">
+    <div class="unit-pill">
+      <button class="unit-btn active" id="btnF">°F</button>
+      <button class="unit-btn" id="btnC">°C</button>
+    </div>
+  </div>
+
+  <!-- WELCOME STATE -->
+  <div class="welcome" id="welcomeState">
+    <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/day-sunny.svg" alt="sunny" />
+    <h2>Check the weather anywhere</h2>
+    <p>Search a city or zip code to see live conditions.</p>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div class="loading-state hidden" id="loadingState">
+    <div class="spinner"></div>
+    <p style="color:var(--text3); font-size:15px;">Fetching weather…</p>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div class="error-state hidden" id="errorState">
+    <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/not-available.svg" alt="error" style="width:80px;height:80px;margin-bottom:12px;" />
+    <p id="errorMsg">City not found. Try again.</p>
+  </div>
+
+  <!-- WEATHER CONTENT -->
+  <div id="weatherContent" class="hidden">
+
+    <!-- MAIN CARD -->
+    <div class="main-card">
+      <div class="card-top">
+        <div>
+          <div class="location-name" id="locName">—</div>
+          <div class="location-sub" id="locSub">—</div>
+        </div>
+        <div class="condition-pill" id="condPill">—</div>
+      </div>
+
+      <div class="temp-row">
+        <div class="big-temp" id="bigTemp">—</div>
+        <div class="weather-icon-wrap">
+          <img id="mainIcon" src="" alt="weather icon" />
+        </div>
+      </div>
+
+      <div class="feels-hi-lo">
+        <span id="feelsLike">Feels like —</span>
+        <span id="hiLo">H:— L:—</span>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-cell">
+          <div class="stat-cell-icon">
+            <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/humidity.svg" alt="">
+          </div>
+          <div class="stat-label">Humidity</div>
+          <div class="stat-val" id="statHumidity">—<span class="stat-unit">%</span></div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-icon">
+            <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/wind.svg" alt="">
+          </div>
+          <div class="stat-label">Wind</div>
+          <div class="stat-val" id="statWind">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-icon">
+            <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/fog.svg" alt="">
+          </div>
+          <div class="stat-label">Visibility</div>
+          <div class="stat-val" id="statVis">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-icon">
+            <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/uv-index.svg" alt="">
+          </div>
+          <div class="stat-label">UV Index</div>
+          <div class="stat-val" id="statUV">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-icon">
+            <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/pressure-low.svg" alt="">
+          </div>
+          <div class="stat-label">Pressure</div>
+          <div class="stat-val" id="statPressure">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-icon">
+            <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/raindrop.svg" alt="">
+          </div>
+          <div class="stat-label">Dew Point</div>
+          <div class="stat-val" id="statDew">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOURLY CARD -->
+    <div class="hourly-card">
+      <div class="forecast-label">Hourly forecast</div>
+      <div class="hourly-scroll" id="hourlyList"></div>
+    </div>
+
+    <!-- 5-DAY FORECAST -->
+    <div class="forecast-card">
+      <div class="forecast-label">5-day forecast</div>
+      <div class="forecast-list" id="forecastList"></div>
+    </div>
+
+  </div><!-- /weatherContent -->
+</div><!-- /page -->
+
+<script>
+const API_KEY = 'de79a25f0c164eb6921125412240612';
+let unitF = true;
+let rawData = null;
+
+/* ========== ICON MAPPING ========== */
+function iconSlug(code, isDay) {
+  const d = isDay ? 'day' : 'night';
+  const map = {
+    1000: isDay ? 'clear-day' : 'clear-night',
+    1003: isDay ? 'partly-cloudy-day' : 'partly-cloudy-night',
+    1006: 'cloudy',
+    1009: 'overcast',
+    1030: 'fog',
+    1063: isDay ? 'partly-cloudy-day-rain' : 'partly-cloudy-night-rain',
+    1066: isDay ? 'partly-cloudy-day-snow' : 'partly-cloudy-night-snow',
+    1069: isDay ? 'partly-cloudy-day-sleet' : 'partly-cloudy-night-sleet',
+    1072: 'sleet',
+    1087: 'thunderstorms',
+    1114: 'blizzard',
+    1117: 'blizzard',
+    1135: 'fog',
+    1147: 'fog',
+    1150: 'drizzle',
+    1153: 'drizzle',
+    1168: 'sleet',
+    1171: 'sleet',
+    1180: 'rain',
+    1183: 'rain',
+    1186: 'rain',
+    1189: 'rain',
+    1192: 'extreme-rain',
+    1195: 'extreme-rain',
+    1198: 'sleet',
+    1201: 'sleet',
+    1204: 'sleet',
+    1207: 'sleet',
+    1210: 'snow',
+    1213: 'snow',
+    1216: 'snow',
+    1219: 'snow',
+    1222: 'extreme-snow',
+    1225: 'extreme-snow',
+    1237: 'hail',
+    1240: isDay ? 'partly-cloudy-day-rain' : 'partly-cloudy-night-rain',
+    1243: 'rain',
+    1246: 'extreme-rain',
+    1249: 'sleet',
+    1252: 'sleet',
+    1255: 'snow',
+    1258: 'extreme-snow',
+    1261: 'hail',
+    1264: 'hail',
+    1273: isDay ? 'thunderstorms-day-rain' : 'thunderstorms-night-rain',
+    1276: 'thunderstorms-rain',
+    1279: isDay ? 'thunderstorms-day-snow' : 'thunderstorms-night-snow',
+    1282: 'thunderstorms-snow',
+  };
+  return map[code] || (isDay ? 'partly-cloudy-day' : 'partly-cloudy-night');
+}
+
+function iconUrl(code, isDay) {
+  return `https://cdn.jsdelivr.net/gh/basmilius/weather-icons@dev/production/fill/all/${iconSlug(code, isDay)}.svg`;
+}
+
+/* ========== UNIT HELPERS ========== */
+const fToC = f => Math.round((f - 32) * 5/9);
+const kphToMph = k => Math.round(k * 0.621);
+const kmToMi = k => (k * 0.621).toFixed(1);
+
+function fmtTemp(f) { return unitF ? Math.round(f) + '°' : fToC(f) + '°'; }
+function fmtWind(kph) { return unitF ? kphToMph(kph) + ' mph' : Math.round(kph) + ' km/h'; }
+function fmtVis(km) { return unitF ? kmToMi(km) + ' mi' : km + ' km'; }
+function fmtDew(f) { return unitF ? Math.round(f) + '°' : fToC(f) + '°'; }
+
+/* ========== DAY NAME ========== */
+function dayName(str) {
+  const d = new Date(str + 'T12:00:00');
+  const today = new Date();
+  if (d.toDateString() === today.toDateString()) return 'Today';
+  return d.toLocaleDateString('en-US', { weekday: 'short' });
+}
+function hourFmt(str) {
+  const d = new Date(str.replace(' ', 'T'));
+  let h = d.getHours(), ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return h + ' ' + ampm;
+}
+
+/* ========== RENDER ========== */
+function render(data) {
+  const cur = data.current;
+  const loc = data.location;
+  const fore = data.forecast.forecastday;
+  const today = fore[0];
+
+  document.getElementById('locName').textContent = loc.name;
+  document.getElementById('locSub').textContent = loc.region + (loc.region ? ', ' : '') + loc.country;
+  document.getElementById('condPill').textContent = cur.condition.text;
+  document.getElementById('bigTemp').textContent = fmtTemp(cur.temp_f);
+  document.getElementById('mainIcon').src = iconUrl(cur.condition.code, cur.is_day);
+  document.getElementById('mainIcon').alt = cur.condition.text;
+  document.getElementById('feelsLike').textContent = 'Feels like ' + fmtTemp(cur.feelslike_f);
+  document.getElementById('hiLo').textContent = 'H:' + fmtTemp(today.day.maxtemp_f) + '  L:' + fmtTemp(today.day.mintemp_f);
+
+  document.getElementById('statHumidity').innerHTML = cur.humidity + '<span class="stat-unit">%</span>';
+  document.getElementById('statWind').textContent = fmtWind(cur.wind_kph);
+  document.getElementById('statVis').textContent = fmtVis(cur.vis_km);
+  document.getElementById('statUV').textContent = cur.uv;
+  document.getElementById('statPressure').innerHTML = cur.pressure_mb + '<span class="stat-unit"> mb</span>';
+  document.getElementById('statDew').textContent = fmtDew(cur.dewpoint_f);
+
+  /* Hourly */
+  const hourly = document.getElementById('hourlyList');
+  hourly.innerHTML = '';
+  const now = new Date(loc.localtime.replace(' ','T'));
+  const hours = fore.flatMap(d => d.hour).filter(h => new Date(h.time.replace(' ','T')) >= now).slice(0, 24);
+  hours.forEach(h => {
+    const el = document.createElement('div');
+    el.className = 'hour-item';
+    const rainPct = h.chance_of_rain > 0 ? `<div class="hour-rain">${h.chance_of_rain}%</div>` : '';
+    el.innerHTML = `
+      <div class="hour-time">${hourFmt(h.time)}</div>
+      <div class="hour-icon"><img src="${iconUrl(h.condition.code, h.is_day)}" alt="${h.condition.text}" /></div>
+      <div class="hour-temp">${fmtTemp(h.temp_f)}</div>
+      ${rainPct}
+    `;
+    hourly.appendChild(el);
+  });
+
+  /* 5-day forecast */
+  const fl = document.getElementById('forecastList');
+  fl.innerHTML = '';
+  fore.forEach(day => {
+    const row = document.createElement('div');
+    row.className = 'forecast-row';
+    row.innerHTML = `
+      <div class="fc-day">${dayName(day.date)}</div>
+      <div class="fc-icon"><img src="${iconUrl(day.day.condition.code, 1)}" alt="${day.day.condition.text}" /></div>
+      <div class="fc-cond">${day.day.condition.text}</div>
+      <div class="fc-temps">
+        <span class="fc-hi">${fmtTemp(day.day.maxtemp_f)}</span>
+        <span class="fc-lo">${fmtTemp(day.day.mintemp_f)}</span>
+      </div>
+    `;
+    fl.appendChild(row);
+  });
+}
+
+/* ========== FETCH ========== */
+async function fetchWeather(city) {
+  document.getElementById('welcomeState').classList.add('hidden');
+  document.getElementById('errorState').classList.add('hidden');
+  document.getElementById('weatherContent').classList.add('hidden');
+  document.getElementById('loadingState').classList.remove('hidden');
+
+  try {
+    const res = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${encodeURIComponent(city)}&days=5&aqi=no&alerts=no`);
+    const data = await res.json();
+    document.getElementById('loadingState').classList.add('hidden');
+    if (data.error) {
+      document.getElementById('errorMsg').textContent = data.error.message || 'City not found.';
+      document.getElementById('errorState').classList.remove('hidden');
+      return;
+    }
+    rawData = data;
+    render(data);
+    document.getElementById('weatherContent').classList.remove('hidden');
+    document.getElementById('unitRow').style.display = 'flex';
+  } catch(e) {
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('errorMsg').textContent = 'Network error. Please try again.';
+    document.getElementById('errorState').classList.remove('hidden');
+  }
+}
+
+/* ========== EVENTS ========== */
+document.getElementById('searchBtn').addEventListener('click', () => {
+  const v = document.getElementById('searchInput').value.trim();
+  if (v) fetchWeather(v);
+});
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { const v = e.target.value.trim(); if (v) fetchWeather(v); }
+});
+
+document.getElementById('btnF').addEventListener('click', () => {
+  if (unitF) return;
+  unitF = true;
+  document.getElementById('btnF').classList.add('active');
+  document.getElementById('btnC').classList.remove('active');
+  if (rawData) render(rawData);
+});
+document.getElementById('btnC').addEventListener('click', () => {
+  if (!unitF) return;
+  unitF = false;
+  document.getElementById('btnC').classList.add('active');
+  document.getElementById('btnF').classList.remove('active');
+  if (rawData) render(rawData);
+});
+
+/* Auto-load based on rough location */
+fetchWeather('Westmont, IL');
+</script>
+</body>
+</html>
