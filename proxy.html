@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Browser</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: #0a0a0f;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e8e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .glass {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 480px;
+    backdrop-filter: blur(20px);
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .lock-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+
+  .lock-icon svg { width: 28px; height: 28px; color: #0a0a0f; }
+
+  .header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #f0f0ff;
+    margin-bottom: 8px;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    color: #4ade80;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  .url-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.75rem;
+  }
+
+  .url-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-size: 0.93rem;
+    color: #e8e8f0;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .url-input::placeholder { color: #4b5563; }
+
+  .url-input:focus {
+    border-color: rgba(74, 222, 128, 0.45);
+    background: rgba(255,255,255,0.09);
+  }
+
+  .go-btn {
+    background: linear-gradient(135deg, #4ade80, #22d3ee);
+    border: none;
+    border-radius: 10px;
+    padding: 13px 24px;
+    font-size: 0.93rem;
+    font-weight: 600;
+    color: #0a0a0f;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  .go-btn:hover { opacity: 0.88; }
+  .go-btn:active { transform: scale(0.97); }
+
+  .features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1.75rem;
+  }
+
+  .feature {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .feature-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .feature-icon svg { width: 16px; height: 16px; }
+
+  .fi-green  { background: rgba(74,222,128,0.12);  color: #4ade80; }
+  .fi-cyan   { background: rgba(34,211,238,0.12);  color: #22d3ee; }
+
+  .feature-text strong {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #e8e8f0;
+    margin-bottom: 2px;
+  }
+
+  .feature-text span {
+    font-size: 0.73rem;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 0.72rem;
+    color: #374151;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 1.25rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="glass">
+  <div class="header">
+    <div class="lock-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <h1>Secure Browser</h1>
+    <div class="status-pill"><span class="dot"></span> Connection secured &amp; private</div>
+  </div>
+
+  <div class="url-row">
+    <input
+      type="text"
+      class="url-input"
+      id="urlInput"
+      placeholder="https://example.com"
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button class="go-btn" id="goBtn">Go</button>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon fi-green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="feature-text">
+        <strong>Encrypted</strong>
+        <span>Traffic routed through secure proxy</span>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon fi-cyan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </div>
+      <div class="feature-text">
+        <strong>Anonymous</strong>
+        <span>Your IP is hidden from sites</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">All traffic is proxied via Proxyium &bull; Secure &amp; private</div>
+</div>
+
+<script>
+function navigate(rawUrl) {
+  let url = rawUrl.trim();
+  if (!url) return;
+  if (!url.startsWith("http")) url = "https://" + url;
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = "https://cdn.proxyium.com/proxyrequest.php";
+  form.target = "_blank";
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = "url";
+  input.value = url;
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
+document.getElementById("goBtn").addEventListener("click", () => {
+  navigate(document.getElementById("urlInput").value);
+});
+
+document.getElementById("urlInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") navigate(e.target.value);
+});
+</script>
+</body>
+</html>
