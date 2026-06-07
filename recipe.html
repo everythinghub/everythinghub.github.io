@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savour — Real Recipe Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#f5f5f7;
+  --surface:#ffffff;
+  --surface2:#f0f0f2;
+  --text:#1d1d1f;
+  --text2:#6e6e73;
+  --text3:#aeaeb2;
+  --accent:#e8622a;
+  --accent-light:#fff0ea;
+  --border:rgba(0,0,0,0.09);
+  --shadow-sm:0 1px 8px rgba(0,0,0,0.07);
+  --shadow:0 4px 24px rgba(0,0,0,0.09);
+  --shadow-lg:0 12px 48px rgba(0,0,0,0.14);
+  --r:18px;
+  --r-sm:12px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#000;
+    --surface:#1c1c1e;
+    --surface2:#2c2c2e;
+    --text:#f5f5f7;
+    --text2:#aeaeb2;
+    --text3:#636366;
+    --accent-light:#2c1a10;
+    --border:rgba(255,255,255,0.09);
+    --shadow-sm:0 1px 8px rgba(0,0,0,0.4);
+    --shadow:0 4px 24px rgba(0,0,0,0.5);
+    --shadow-lg:0 12px 48px rgba(0,0,0,0.7);
+  }
+}
+
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;
+  background:rgba(245,245,247,0.78);
+  backdrop-filter:saturate(200%) blur(20px);
+  -webkit-backdrop-filter:saturate(200%) blur(20px);
+  border-bottom:0.5px solid var(--border);
+}
+@media(prefers-color-scheme:dark){nav{background:rgba(0,0,0,0.78)}}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;letter-spacing:-0.3px;color:var(--text)}
+.logo span{color:var(--accent)}
+.nav-r{display:flex;align-items:center;gap:6px}
+.nav-btn{background:none;border:0.5px solid var(--border);border-radius:100px;padding:6px 16px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s}
+.nav-btn:hover{background:var(--surface2);color:var(--text)}
+.nav-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:72px 2rem 48px;max-width:680px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:600;padding:5px 14px;border-radius:100px;margin-bottom:22px;letter-spacing:.3px}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(34px,5.5vw,54px);font-weight:400;line-height:1.1;letter-spacing:-1px;margin-bottom:14px}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p{font-size:17px;color:var(--text2);line-height:1.6}
+
+/* ── SEARCH BAR ── */
+.search-wrap{max-width:620px;margin:0 auto 16px;padding:0 1.5rem}
+.search-bar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);
+  border:0.5px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:var(--shadow-lg);
+  padding:7px 7px 7px 18px;
+}
+.search-bar svg{color:var(--text3);flex-shrink:0}
+.search-bar input{
+  flex:1;border:none;background:transparent;
+  font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);outline:none;padding:8px 0;
+}
+.search-bar input::placeholder{color:var(--text3)}
+.search-bar button{
+  background:var(--accent);color:#fff;border:none;border-radius:11px;
+  padding:11px 22px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;
+  cursor:pointer;transition:opacity .15s,transform .15s;white-space:nowrap;flex-shrink:0;
+}
+.search-bar button:hover{opacity:.88}
+.search-bar button:active{transform:scale(.97)}
+.search-bar button:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── QUICK TAGS ── */
+.quick-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:620px;margin:0 auto 52px;padding:0 1.5rem}
+.qtag{
+  background:var(--surface);border:0.5px solid var(--border);border-radius:100px;
+  padding:7px 16px;font-size:14px;color:var(--text2);cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.qtag:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+
+/* ── CATEGORY BROWSE ── */
+.browse{max-width:1060px;margin:0 auto;padding:0 2rem 64px}
+.section-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;margin-bottom:18px}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+.cat-card{
+  background:var(--surface);border:0.5px solid var(--border);border-radius:16px;
+  padding:18px 10px;text-align:center;cursor:pointer;transition:all .2s;
+}
+.cat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--accent)}
+.cat-card:hover .cat-name{color:var(--accent)}
+.cat-icon{font-size:30px;margin-bottom:8px}
+.cat-name{font-size:13px;font-weight:500;color:var(--text)}
+
+/* ── RESULTS ── */
+.results{max-width:1060px;margin:0 auto;padding:0 2rem 80px;display:none}
+.results-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
+.results-hdr h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:400}
+.results-hdr span{font-size:14px;color:var(--text3)}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;background:none;border:0.5px solid var(--border);
+  border-radius:100px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:13px;
+  color:var(--text2);cursor:pointer;transition:all .15s;margin-bottom:20px;
+}
+.back-btn:hover{color:var(--text);background:var(--surface2)}
+
+.meal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.meal-card{
+  background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);
+  overflow:hidden;cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s;
+}
+.meal-card:hover{transform:translateY(-5px) scale(1.01);box-shadow:var(--shadow-lg)}
+.meal-img{width:100%;height:180px;object-fit:cover;display:block;background:var(--surface2)}
+.meal-body{padding:16px 18px 18px}
+.meal-meta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.meal-tag{
+  font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;letter-spacing:.2px;
+}
+.tag-area{background:#e3f2fd;color:#0d47a1}
+.tag-cat{background:#f3e5f5;color:#4a148c}
+@media(prefers-color-scheme:dark){
+  .tag-area{background:#0a2540;color:#90caf9}
+  .tag-cat{background:#200830;color:#ce93d8}
+}
+.meal-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;line-height:1.25;color:var(--text)}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:64px 20px}
+.dots{display:flex;justify-content:center;gap:7px;margin-bottom:18px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:pop 1.1s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.18s}
+.dot:nth-child(3){animation-delay:.36s}
+@keyframes pop{0%,80%,100%{transform:scale(.5);opacity:.35}40%{transform:scale(1);opacity:1}}
+.loading p{color:var(--text2);font-size:15px}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:72px 20px}
+.empty-icon{font-size:52px;margin-bottom:16px}
+.empty h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:var(--text2);margin-bottom:8px}
+.empty p{font-size:15px;color:var(--text3)}
+
+/* ── MODAL ── */
+.overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{
+  background:var(--surface);width:100%;max-width:700px;max-height:92vh;
+  border-radius:22px 22px 0 0;overflow-y:auto;
+  transform:translateY(100%);transition:transform .38s cubic-bezier(.32,.72,0,1);
+}
+.overlay.open .sheet{transform:translateY(0)}
+.sheet-handle{width:38px;height:4px;background:var(--border);border-radius:100px;margin:14px auto 0}
+.sheet-hero{position:relative}
+.sheet-img{width:100%;height:240px;object-fit:cover;display:block}
+.sheet-img-placeholder{width:100%;height:200px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:72px}
+.sheet-body{padding:22px 26px 48px}
+.sheet-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sheet-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;line-height:1.18;margin-bottom:12px}
+.sheet-source{font-size:13px;color:var(--text3);margin-bottom:20px}
+.sheet-source a{color:var(--accent);text-decoration:none}
+.sheet-source a:hover{text-decoration:underline}
+
+.sheet-section{margin-bottom:28px}
+.sheet-section h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:14px;padding-bottom:8px;border-bottom:0.5px solid var(--border)}
+.ing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0}
+.ing-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 0;border-bottom:0.5px solid var(--border);font-size:14px;
+}
+.ing-row:last-child{border-bottom:none}
+.ing-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.ing-measure{color:var(--text3);font-size:13px;margin-left:auto;padding-left:12px;white-space:nowrap}
+
+.steps-list{display:flex;flex-direction:column;gap:16px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-n{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.step-text{font-size:15px;line-height:1.65;color:var(--text)}
+
+.yt-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#ff0000;color:#fff;border:none;border-radius:10px;
+  padding:11px 20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  cursor:pointer;text-decoration:none;margin-top:8px;transition:opacity .15s;
+}
+.yt-btn:hover{opacity:.88}
+
+.close-x{
+  position:fixed;
+  top:calc(8vh + 12px);right:calc(50% - 350px + 16px);
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);
+  border:none;color:#fff;font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;z-index:201;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.overlay.open .close-x{opacity:1;pointer-events:all}
+@media(max-width:700px){
+  .close-x{right:16px}
+  .sheet-body{padding:18px 18px 44px}
+  .sheet-title{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Savour<span>.</span></div>
+  <div class="nav-r">
+    <button class="nav-btn" onclick="showView('home')">Home</button>
+    <button class="nav-btn" onclick="loadRandom()">🎲 Random</button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="homeView">
+  <div class="hero">
+    <div class="hero-badge">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      50,000+ Real Recipes
+    </div>
+    <h1>Cook something <em>extraordinary</em><br>tonight</h1>
+    <p style="margin-top:14px">Search real recipes with exact measurements,<br>step-by-step instructions, and video guides.</p>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="homeSearch" type="text" placeholder="Search any dish, ingredient, or cuisine…" />
+      <button onclick="doSearch()" id="searchBtn">Search</button>
+    </div>
+  </div>
+
+  <div class="quick-tags">
+    <div class="qtag" onclick="doQuick('Pasta')">🍝 Pasta</div>
+    <div class="qtag" onclick="doQuick('Chicken')">🍗 Chicken</div>
+    <div class="qtag" onclick="doQuick('Salmon')">🐟 Salmon</div>
+    <div class="qtag" onclick="doQuick('Chocolate cake')">🎂 Chocolate Cake</div>
+    <div class="qtag" onclick="doQuick('Tacos')">🌮 Tacos</div>
+    <div class="qtag" onclick="doQuick('Curry')">🍛 Curry</div>
+    <div class="qtag" onclick="doQuick('Steak')">🥩 Steak</div>
+    <div class="qtag" onclick="doQuick('Sushi')">🍱 Sushi</div>
+    <div class="qtag" onclick="doQuick('Pizza')">🍕 Pizza</div>
+    <div class="qtag" onclick="doQuick('Soup')">🍲 Soup</div>
+  </div>
+
+  <div class="browse">
+    <div class="section-title">Browse by cuisine</div>
+    <div class="cat-grid" id="catGrid">
+      <div class="cat-card" onclick="browseArea('Italian')"><div class="cat-icon">🇮🇹</div><div class="cat-name">Italian</div></div>
+      <div class="cat-card" onclick="browseArea('Japanese')"><div class="cat-icon">🇯🇵</div><div class="cat-name">Japanese</div></div>
+      <div class="cat-card" onclick="browseArea('Mexican')"><div class="cat-icon">🇲🇽</div><div class="cat-name">Mexican</div></div>
+      <div class="cat-card" onclick="browseArea('Indian')"><div class="cat-icon">🇮🇳</div><div class="cat-name">Indian</div></div>
+      <div class="cat-card" onclick="browseArea('French')"><div class="cat-icon">🇫🇷</div><div class="cat-name">French</div></div>
+      <div class="cat-card" onclick="browseArea('Chinese')"><div class="cat-icon">🇨🇳</div><div class="cat-name">Chinese</div></div>
+      <div class="cat-card" onclick="browseArea('American')"><div class="cat-icon">🇺🇸</div><div class="cat-name">American</div></div>
+      <div class="cat-card" onclick="browseArea('Greek')"><div class="cat-icon">🇬🇷</div><div class="cat-name">Greek</div></div>
+      <div class="cat-card" onclick="browseArea('Thai')"><div class="cat-icon">🇹🇭</div><div class="cat-name">Thai</div></div>
+      <div class="cat-card" onclick="browseArea('British')"><div class="cat-icon">🇬🇧</div><div class="cat-name">British</div></div>
+      <div class="cat-card" onclick="browseArea('Spanish')"><div class="cat-icon">🇪🇸</div><div class="cat-name">Spanish</div></div>
+      <div class="cat-card" onclick="browseCategory('Dessert')"><div class="cat-icon">🍮</div><div class="cat-name">Desserts</div></div>
+      <div class="cat-card" onclick="browseCategory('Seafood')"><div class="cat-icon">🦞</div><div class="cat-name">Seafood</div></div>
+      <div class="cat-card" onclick="browseCategory('Vegetarian')"><div class="cat-icon">🥗</div><div class="cat-name">Vegetarian</div></div>
+      <div class="cat-card" onclick="browseCategory('Breakfast')"><div class="cat-icon">🥞</div><div class="cat-name">Breakfast</div></div>
+      <div class="cat-card" onclick="browseCategory('Pasta')"><div class="cat-icon">🍝</div><div class="cat-name">Pasta</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="resultsView" class="results">
+  <button class="back-btn" onclick="showView('home')">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back
+  </button>
+  <div class="results-hdr">
+    <h2 id="resultsTitle"></h2>
+    <span id="resultsCount"></span>
+  </div>
+  <div id="resultsBody"></div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="overlay" onclick="maybeClose(event)">
+  <button class="close-x" onclick="closeSheet()">✕</button>
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div id="sheetContent"></div>
+  </div>
+</div>
+
+<script>
+const BASE = 'https://www.themealdb.com/api/json/v1/1';
+
+function showView(v) {
+  document.getElementById('homeView').style.display = v==='home' ? '' : 'none';
+  document.getElementById('resultsView').style.display = v==='results' ? 'block' : 'none';
+}
+showView('home');
+
+document.getElementById('homeSearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+function doQuick(q) {
+  document.getElementById('homeSearch').value = q;
+  doSearch();
+}
+
+async function doSearch() {
+  const q = document.getElementById('homeSearch').value.trim();
+  if (!q) return;
+  showResults(`Results for "${q}"`, searchMeals(q));
+}
+
+async function browseArea(area) {
+  showResults(`${area} cuisine`, filterMeals('a', area));
+}
+async function browseCategory(cat) {
+  showResults(`${cat} recipes`, filterMeals('c', cat));
+}
+
+async function showResults(title, promise) {
+  showView('results');
+  document.getElementById('resultsTitle').textContent = title;
+  document.getElementById('resultsCount').textContent = '';
+  document.getElementById('resultsBody').innerHTML = `
+    <div class="loading">
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <p>Finding recipes…</p>
+    </div>`;
+
+  const meals = await promise;
+  if (!meals || meals.length === 0) {
+    document.getElementById('resultsBody').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🍽️</div>
+        <h3>No recipes found</h3>
+        <p>Try a different search term</p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('resultsCount').textContent = `${meals.length} recipe${meals.length!==1?'s':''}`;
+  document.getElementById('resultsBody').innerHTML = `
+    <div class="meal-grid">${meals.map(m => `
+      <div class="meal-card" onclick="openMeal('${m.idMeal}')">
+        <img class="meal-img" src="${m.strMealThumb}/preview" alt="${esc(m.strMeal)}" loading="lazy" onerror="this.style.display='none'">
+        <div class="meal-body">
+          <div class="meal-meta">
+            ${m.strArea && m.strArea!=='Unknown' ? `<span class="meal-tag tag-area">${m.strArea}</span>` : ''}
+            ${m.strCategory ? `<span class="meal-tag tag-cat">${m.strCategory}</span>` : ''}
+          </div>
+          <div class="meal-name">${m.strMeal}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+}
+
+async function searchMeals(q) {
+  try {
+    const r = await fetch(`${BASE}/search.php?s=${encodeURIComponent(q)}`);
+    const d = await r.json();
+    return d.meals || [];
+  } catch { return []; }
+}
+
+async function filterMeals(type, val) {
+  try {
+    const r = await fetch(`${BASE}/filter.php?${type}=${encodeURIComponent(val)}`);
+    const d = await r.json();
+    return d.meals || [];
+  } catch { return []; }
+}
+
+async function loadRandom() {
+  try {
+    const r = await fetch(`${BASE}/random.php`);
+    const d = await r.json();
+    if (d.meals && d.meals[0]) renderSheet(d.meals[0]);
+  } catch {}
+}
+
+async function openMeal(id) {
+  document.getElementById('sheetContent').innerHTML = `
+    <div class="loading" style="padding:48px 20px">
+      <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <p>Loading recipe…</p>
+    </div>`;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  try {
+    const r = await fetch(`${BASE}/lookup.php?i=${id}`);
+    const d = await r.json();
+    if (d.meals && d.meals[0]) renderSheet(d.meals[0]);
+  } catch {
+    document.getElementById('sheetContent').innerHTML = '<div class="empty"><p>Could not load recipe.</p></div>';
+  }
+}
+
+function renderSheet(m) {
+  // Build ingredients list
+  const ings = [];
+  for (let i = 1; i <= 20; i++) {
+    const ing = (m[`strIngredient${i}`] || '').trim();
+    const meas = (m[`strMeasure${i}`] || '').trim();
+    if (ing) ings.push({ing, meas});
+  }
+
+  // Clean up instructions into steps
+  const rawInstructions = (m.strInstructions || '').trim();
+  const steps = parseSteps(rawInstructions);
+
+  const ytId = m.strYoutube ? m.strYoutube.split('v=')[1] : null;
+
+  document.getElementById('sheetContent').innerHTML = `
+    ${m.strMealThumb
+      ? `<img class="sheet-img" src="${m.strMealThumb}" alt="${esc(m.strMeal)}">`
+      : `<div class="sheet-img-placeholder">🍽️</div>`}
+    <div class="sheet-body">
+      <div class="sheet-tags">
+        ${m.strArea && m.strArea!=='Unknown' ? `<span class="meal-tag tag-area" style="font-size:12px;padding:4px 11px">${m.strArea}</span>` : ''}
+        ${m.strCategory ? `<span class="meal-tag tag-cat" style="font-size:12px;padding:4px 11px">${m.strCategory}</span>` : ''}
+        ${m.strTags ? m.strTags.split(',').filter(t=>t.trim()).map(t=>`<span class="meal-tag" style="background:var(--surface2);color:var(--text2);font-size:12px;padding:4px 11px">${t.trim()}</span>`).join('') : ''}
+      </div>
+      <h2 class="sheet-title">${m.strMeal}</h2>
+      ${m.strSource ? `<p class="sheet-source">Source: <a href="${m.strSource}" target="_blank" rel="noopener">Original recipe ↗</a></p>` : ''}
+
+      <div class="sheet-section">
+        <h3>Ingredients <span style="font-size:14px;font-weight:400;color:var(--text3)">(${ings.length} items)</span></h3>
+        <div class="ing-grid">
+          ${ings.map(({ing,meas}) => `
+            <div class="ing-row">
+              <div class="ing-dot"></div>
+              <span>${ing}</span>
+              ${meas ? `<span class="ing-measure">${meas}</span>` : ''}
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <h3>Instructions <span style="font-size:14px;font-weight:400;color:var(--text3)">(${steps.length} steps)</span></h3>
+        <div class="steps-list">
+          ${steps.map((s,i) => `
+            <div class="step">
+              <div class="step-n">${i+1}</div>
+              <div class="step-text">${s}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      ${ytId ? `
+      <div class="sheet-section">
+        <h3>Video Guide</h3>
+        <a class="yt-btn" href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          Watch on YouTube
+        </a>
+      </div>` : ''}
+    </div>`;
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('sheet').scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function parseSteps(text) {
+  // Try to split by numbered steps first (e.g. "1. " or "Step 1")
+  let steps = text
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+
+  // Remove existing numbering like "1. " "Step 1: " "Step 1 - "
+  // Then split by double newlines or numbered markers
+  const byNum = steps.split(/\n{2,}|\d+\.\s+/);
+  const cleaned = byNum
+    .map(s => s.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim())
+    .filter(s => s.length > 15);
+
+  if (cleaned.length >= 3) return cleaned;
+
+  // Fallback: split on single newlines
+  return steps.split('\n')
+    .map(s => s.replace(/\s+/g, ' ').trim())
+    .filter(s => s.length > 15);
+}
+
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function maybeClose(e) {
+  if (e.target === document.getElementById('overlay')) closeSheet();
+}
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeSheet(); });
+</script>
+</body>
+</html>
