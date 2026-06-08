@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Research</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    padding:20px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    color:#60a5fa;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#94a3b8;
+    margin-bottom:30px;
+}
+
+.search-box{
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+}
+
+button{
+    margin-top:15px;
+    padding:12px 25px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+#loading{
+    display:none;
+    color:#60a5fa;
+    margin-top:15px;
+}
+
+.card{
+    background:#1e293b;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.card h2{
+    color:#60a5fa;
+    margin-bottom:10px;
+}
+
+.source{
+    margin-bottom:10px;
+}
+
+.source a{
+    color:#93c5fd;
+    text-decoration:none;
+}
+
+.source a:hover{
+    text-decoration:underline;
+}
+
+pre{
+    white-space:pre-wrap;
+    line-height:1.6;
+}
+
+.footer{
+    text-align:center;
+    margin-top:30px;
+    color:#64748b;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>AI Research</h1>
+
+<div class="subtitle">
+Search Wikipedia, DuckDuckGo, and arXiv without API keys
+</div>
+
+<div class="search-box">
+
+<input
+id="topic"
+placeholder="Enter a topic..."
+
+>
+
+<button onclick="runResearch()">
+Research
+</button>
+
+<div id="loading">
+🔍 Researching...
+</div>
+
+</div>
+
+<div id="results" style="display:none;">
+
+<div class="card">
+<h2>AI Summary</h2>
+<pre id="summary"></pre>
+</div>
+
+<div class="card">
+<h2>Sources</h2>
+<div id="sources"></div>
+</div>
+
+<div class="card">
+<h2>Research Data</h2>
+<pre id="raw"></pre>
+</div>
+
+</div>
+
+<div class="footer">
+AI Research • No API Keys Required
+</div>
+
+</div>
+
+<script>
+
+const proxy =
+"https://api.allorigins.win/get?url=";
+
+async function proxyFetch(url){
+
+    const response =
+    await fetch(
+        proxy +
+        encodeURIComponent(url)
+    );
+
+    const json =
+    await response.json();
+
+    return json.contents;
+}
+
+async function getWikipedia(topic){
+
+    try{
+
+        const url =
+        "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+        encodeURIComponent(topic);
+
+        const text =
+        await proxyFetch(url);
+
+        const data =
+        JSON.parse(text);
+
+        return {
+            title:"Wikipedia",
+            text:data.extract || "",
+            source:
+            data.content_urls?.desktop?.page ||
+            "https://wikipedia.org"
+        };
+
+    }catch(e){
+
+        console.error(e);
+
+        return {
+            title:"Wikipedia",
+            text:"",
+            source:""
+        };
+
+    }
+}
+
+async function getDuckDuckGo(topic){
+
+    try{
+
+        const url =
+        "https://api.duckduckgo.com/?q=" +
+        encodeURIComponent(topic) +
+        "&format=json&no_html=1&skip_disambig=1";
+
+        const text =
+        await proxyFetch(url);
+
+        const data =
+        JSON.parse(text);
+
+        return {
+            title:"DuckDuckGo",
+            text:
+                data.AbstractText ||
+                data.Answer ||
+                "",
+            source:
+                data.AbstractURL ||
+                "https://duckduckgo.com/?q=" +
+                encodeURIComponent(topic)
+        };
+
+    }catch(e){
+
+        console.error(e);
+
+        return {
+            title:"DuckDuckGo",
+            text:"",
+            source:""
+        };
+
+    }
+}
+
+async function getArxiv(topic){
+
+    try{
+
+        const url =
+        "https://export.arxiv.org/api/query?search_query=all:" +
+        encodeURIComponent(topic) +
+        "&start=0&max_results=5";
+
+        const xmlText =
+        await proxyFetch(url);
+
+        const parser =
+        new DOMParser();
+
+        const xml =
+        parser.parseFromString(
+            xmlText,
+            "text/xml"
+        );
+
+        const entries =
+        [...xml.querySelectorAll("entry")];
+
+        let combined = "";
+
+        entries.forEach(entry=>{
+
+            const title =
+            entry.querySelector("title")
+            ?.textContent
+            ?.trim() || "";
+
+            const summary =
+            entry.querySelector("summary")
+            ?.textContent
+            ?.trim() || "";
+
+            combined +=
+            title +
+            ". " +
+            summary +
+            "\n\n";
+
+        });
+
+        return {
+            title:"arXiv",
+            text:combined,
+            source:
+            "https://arxiv.org/search/?query=" +
+            encodeURIComponent(topic)
+        };
+
+    }catch(e){
+
+        console.error(e);
+
+        return {
+            title:"arXiv",
+            text:"",
+            source:""
+        };
+
+    }
+}
+
+function summarize(text){
+
+    const sentences =
+    text.match(/[^.!?]+[.!?]+/g)
+    || [];
+
+    if(sentences.length < 6){
+        return text;
+    }
+
+    const frequencies = {};
+
+    text
+    .toLowerCase()
+    .replace(/[^\w\s]/g,"")
+    .split(/\s+/)
+    .forEach(word=>{
+
+        if(word.length > 4){
+
+            frequencies[word] =
+            (frequencies[word] || 0) + 1;
+
+        }
+
+    });
+
+    const scored =
+    sentences.map(sentence=>{
+
+        let score = 0;
+
+        sentence
+        .toLowerCase()
+        .split(/\s+/)
+        .forEach(word=>{
+
+            score +=
+            frequencies[word] || 0;
+
+        });
+
+        return {
+            sentence,
+            score
+        };
+
+    });
+
+    return scored
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,8)
+    .map(x=>x.sentence.trim())
+    .join(" ");
+}
+
+async function runResearch(){
+
+    const topic =
+    document
+    .getElementById("topic")
+    .value
+    .trim();
+
+    if(!topic){
+
+        alert(
+            "Enter a topic."
+        );
+
+        return;
+    }
+
+    document
+    .getElementById("loading")
+    .style.display =
+    "block";
+
+    document
+    .getElementById("results")
+    .style.display =
+    "none";
+
+    try{
+
+        const [
+            wikipedia,
+            duckduckgo,
+            arxiv
+        ] =
+        await Promise.all([
+
+            getWikipedia(topic),
+            getDuckDuckGo(topic),
+            getArxiv(topic)
+
+        ]);
+
+        const researchText =
+
+        wikipedia.text +
+        "\n\n" +
+
+        duckduckgo.text +
+        "\n\n" +
+
+        arxiv.text;
+
+        const summary =
+        summarize(
+            researchText
+        );
+
+        document
+        .getElementById("summary")
+        .textContent =
+        summary ||
+        "No summary generated.";
+
+        document
+        .getElementById("raw")
+        .textContent =
+        researchText ||
+        "No research found.";
+
+        const sources =
+        document
+        .getElementById("sources");
+
+        sources.innerHTML =
+        "";
+
+        [
+            wikipedia,
+            duckduckgo,
+            arxiv
+        ].forEach(source=>{
+
+            if(!source.source)
+            return;
+
+            const div =
+            document.createElement(
+                "div"
+            );
+
+            div.className =
+            "source";
+
+            div.innerHTML =
+            `<a href="${source.source}" target="_blank">${source.title}</a>`;
+
+            sources.appendChild(
+                div
+            );
+
+        });
+
+        document
+        .getElementById("results")
+        .style.display =
+        "block";
+
+    }catch(error){
+
+        alert(
+            "Research failed."
+        );
+
+        console.error(error);
+
+    }
+
+    document
+    .getElementById("loading")
+    .style.display =
+    "none";
+}
+
+</script>
+
+</body>
+</html>
