@@ -1,230 +1,798 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>HTML Sudoku Board</title>
-    
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style type="text/css">
-    
-      html, body {
-        background-color: #FAFAFA
-      }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUDOKU</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      table {
-        border: 2px solid #000000;
-      }
+  :root {
+    --ink: #1a1a2e;
+    --ink-soft: #4a4a6a;
+    --ink-ghost: #9090b0;
+    --paper: #f7f5f0;
+    --paper-warm: #efebd8;
+    --paper-card: #fffdf7;
+    --line: #d8d4c4;
+    --accent: #c0392b;
+    --accent-soft: #f5d4d0;
+    --gold: #b8860b;
+    --gold-soft: #f5edd0;
+    --cell-size: 58px;
+    --grid: calc(var(--cell-size) * 9 + 10px);
+  }
 
-      td {
-        border: 1px solid #000000;
-        text-align: center;
-        vertical-align: middle;  
-      }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,0,0,0.025) 27px, rgba(0,0,0,0.025) 28px);
+  }
 
-      input {
-        color: #000000;
-        padding: 0;
-        border: 0;
-        text-align: center;
-        width: 48px;
-        height: 48px;
-        font-size: 24px;
-        background-color: #FFFFFF;
-        outline: none;
-      }
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+  }
 
-      input:disabled {
-        background-color: #EEEEEE;
-      }
+  .masthead {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    letter-spacing: 0.25em;
+    color: var(--ink);
+    line-height: 1;
+    position: relative;
+    display: inline-block;
+  }
 
-      #cell-0,  #cell-1,  #cell-2  { border-top:    2px solid #000000; }
-      #cell-2,  #cell-11, #cell-20 { border-right:  2px solid #000000; }
-      #cell-18, #cell-19, #cell-20 { border-bottom: 2px solid #000000; }
-      #cell-0,  #cell-9,  #cell-18 { border-left:   2px solid #000000; }
+  .masthead::before, .masthead::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 1.5px;
+    background: var(--ink);
+  }
+  .masthead::before { top: -8px; }
+  .masthead::after { bottom: -8px; }
 
-      #cell-3,  #cell-4,  #cell-5  { border-top:    2px solid #000000; }
-      #cell-5,  #cell-14, #cell-23 { border-right:  2px solid #000000; }
-      #cell-21, #cell-22, #cell-23 { border-bottom: 2px solid #000000; }
-      #cell-3,  #cell-12, #cell-21 { border-left:   2px solid #000000; }
+  .edition {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-soft);
+    margin-top: 16px;
+    text-transform: uppercase;
+  }
 
-      #cell-6,  #cell-7,  #cell-8  { border-top:    2px solid #000000; }
-      #cell-8,  #cell-17, #cell-26 { border-right:  2px solid #000000; }
-      #cell-24, #cell-25, #cell-26 { border-bottom: 2px solid #000000; }
-      #cell-6,  #cell-15, #cell-24 { border-left:   2px solid #000000; }
+  .controls-top {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 
-      #cell-27, #cell-28, #cell-29 { border-top:    2px solid #000000; }
-      #cell-29, #cell-38, #cell-47 { border-right:  2px solid #000000; }
-      #cell-45, #cell-46, #cell-47 { border-bottom: 2px solid #000000; }
-      #cell-27, #cell-36, #cell-45 { border-left:   2px solid #000000; }
+  .diff-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 6px 16px;
+    border: 1px solid var(--line);
+    background: var(--paper-card);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
 
-      #cell-30, #cell-31, #cell-32 { border-top:    2px solid #000000; }
-      #cell-32, #cell-41, #cell-50 { border-right:  2px solid #000000; }
-      #cell-48, #cell-49, #cell-50 { border-bottom: 2px solid #000000; }
-      #cell-30, #cell-39, #cell-48 { border-left:   2px solid #000000; }
+  .diff-btn:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .diff-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
-      #cell-33, #cell-34, #cell-35 { border-top:    2px solid #000000; }
-      #cell-35, #cell-44, #cell-53 { border-right:  2px solid #000000; }
-      #cell-51, #cell-52, #cell-53 { border-bottom: 2px solid #000000; }
-      #cell-33, #cell-42, #cell-51 { border-left:   2px solid #000000; }
+  .game-wrap {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 
-      #cell-54, #cell-55, #cell-56 { border-top:    2px solid #000000; }
-      #cell-56, #cell-65, #cell-74 { border-right:  2px solid #000000; }
-      #cell-72, #cell-73, #cell-74 { border-bottom: 2px solid #000000; }
-      #cell-54, #cell-63, #cell-72 { border-left:   2px solid #000000; }
+  .board-col { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
 
-      #cell-57, #cell-58, #cell-59 { border-top:    2px solid #000000; }
-      #cell-59, #cell-68, #cell-77 { border-right:  2px solid #000000; }
-      #cell-75, #cell-76, #cell-77 { border-bottom: 2px solid #000000; }
-      #cell-57, #cell-66, #cell-75 { border-left:   2px solid #000000; }
+  .stats-bar {
+    display: flex;
+    gap: 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.05em;
+  }
 
-      #cell-60, #cell-61, #cell-62 { border-top:    2px solid #000000; }
-      #cell-62, #cell-71, #cell-80 { border-right:  2px solid #000000; }
-      #cell-78, #cell-79, #cell-80 { border-bottom: 2px solid #000000; }
-      #cell-60, #cell-69, #cell-78 { border-left:   2px solid #000000; }
+  .stat-val {
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
 
-    </style>
-  </head>
-  <body>
+  .board {
+    display: grid;
+    grid-template-columns: repeat(9, var(--cell-size));
+    grid-template-rows: repeat(9, var(--cell-size));
+    border: 2.5px solid var(--ink);
+    gap: 0;
+    position: relative;
+    background: var(--paper-card);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
 
-    <div class="container">
-      
-      <h1>HTML Sudoku Board</h1>
+  .cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 0.5px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.1s;
+    user-select: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-      <table id="grid">
+  .cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid var(--ink); }
+  .cell:nth-child(n+19):nth-child(-n+27) { border-bottom: 2px solid var(--ink); }
+  .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--ink); }
 
-        <tr>
-          <td><input id="cell-0"  type="text" value="5" disabled></td>
-          <td><input id="cell-1"  type="text" value="3" disabled></td>
-          <td><input id="cell-2"  type="text"></td>
-          
-          <td><input id="cell-3"  type="text"></td>
-          <td><input id="cell-4"  type="text" value="7" disabled></td>
-          <td><input id="cell-5"  type="text"></td>
-          
-          <td><input id="cell-6"  type="text"></td>
-          <td><input id="cell-7"  type="text"></td>
-          <td><input id="cell-8"  type="text"></td>
-        </tr>
+  .cell-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    line-height: 1;
+    pointer-events: none;
+  }
 
-        <tr>
-          <td><input id="cell-9"  type="text" value="6" disabled></td>
-          <td><input id="cell-10" type="text"></td>
-          <td><input id="cell-11" type="text"></td>
-          
-          <td><input id="cell-12" type="text" value="1" disabled></td>
-          <td><input id="cell-13" type="text" value="9" disabled></td>
-          <td><input id="cell-14" type="text" value="5" disabled></td>
-          
-          <td><input id="cell-15" type="text"></td>
-          <td><input id="cell-16" type="text"></td>
-          <td><input id="cell-17" type="text"></td>
-        </tr>
+  .cell.given .cell-num { color: var(--ink); }
+  .cell.player .cell-num { color: #2563ab; }
+  .cell.error .cell-num { color: var(--accent); }
 
-        <tr>          
-          <td><input id="cell-18" type="text"></td>
-          <td><input id="cell-19" type="text" value="9" disabled></td>
-          <td><input id="cell-20" type="text" value="8" disabled></td>
-          
-          <td><input id="cell-21" type="text"></td>
-          <td><input id="cell-22" type="text"></td>
-          <td><input id="cell-23" type="text"></td>
-          
-          <td><input id="cell-24" type="text"></td>
-          <td><input id="cell-25" type="text" value="6" disabled></td>
-          <td><input id="cell-26" type="text"></td>
-        </tr>
+  .cell.selected { background: #dbeafe; }
+  .cell.peer { background: #f0f4ff; }
+  .cell.same-num { background: #dbeafe; }
 
-        <tr>          
-          <td><input id="cell-27" type="text" value="8" disabled></td>
-          <td><input id="cell-28" type="text"></td>
-          <td><input id="cell-29" type="text"></td>
-          
-          <td><input id="cell-30" type="text"></td>
-          <td><input id="cell-31" type="text" value="6" disabled></td>
-          <td><input id="cell-32" type="text"></td>
-          
-          <td><input id="cell-33" type="text"></td>
-          <td><input id="cell-34" type="text"></td>
-          <td><input id="cell-35" type="text" value="3" disabled></td>
-        </tr>
+  .cell.given.selected { background: #c7d9f7; }
+  .cell.given.peer { background: #e8eef8; }
 
-        <tr>          
-          <td><input id="cell-36" type="text" value="4" disabled></td>
-          <td><input id="cell-37" type="text"></td>
-          <td><input id="cell-38" type="text"></td>
-          
-          <td><input id="cell-39" type="text" value="8" disabled></td>
-          <td><input id="cell-40" type="text"></td>
-          <td><input id="cell-41" type="text" value="3" disabled></td>
-          
-          <td><input id="cell-42" type="text"></td>
-          <td><input id="cell-43" type="text"></td>
-          <td><input id="cell-44" type="text" value="1" disabled></td>
-        </tr>
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 100%;
+    height: 100%;
+    padding: 2px;
+    pointer-events: none;
+  }
 
-        <tr>          
-          <td><input id="cell-45" type="text" value="7" disabled></td>
-          <td><input id="cell-46" type="text"></td>
-          <td><input id="cell-47" type="text"></td>
-          
-          <td><input id="cell-48" type="text"></td>
-          <td><input id="cell-49" type="text" value="2" disabled></td>
-          <td><input id="cell-50" type="text"></td>
-          
-          <td><input id="cell-51" type="text"></td>
-          <td><input id="cell-52" type="text"></td>
-          <td><input id="cell-53" type="text" value="6" disabled></td>
-        </tr>
+  .note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
+    line-height: 1;
+  }
 
-        <tr>          
-          <td><input id="cell-54" type="text"></td>
-          <td><input id="cell-55" type="text" value="6" disabled></td>
-          <td><input id="cell-56" type="text"></td>
-          
-          <td><input id="cell-57" type="text"></td>
-          <td><input id="cell-58" type="text"></td>
-          <td><input id="cell-59" type="text"></td>
-          
-          <td><input id="cell-60" type="text" value="2" disabled></td>
-          <td><input id="cell-61" type="text" value="8" disabled></td>
-          <td><input id="cell-62" type="text"></td>
-        </tr>
+  .side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 180px;
+    padding-top: 3.5rem;
+  }
 
-        <tr>          
-          <td><input id="cell-63" type="text"></td>
-          <td><input id="cell-64" type="text"></td>
-          <td><input id="cell-65" type="text"></td>
-          
-          <td><input id="cell-66" type="text" value="4" disabled></td>
-          <td><input id="cell-67" type="text" value="1" disabled></td>
-          <td><input id="cell-68" type="text" value="9" disabled></td>
-          
-          <td><input id="cell-69" type="text"></td>
-          <td><input id="cell-70" type="text"></td>
-          <td><input id="cell-71" type="text" value="5" disabled></td>
-        </tr>
+  .numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
 
-        <tr>          
-          <td><input id="cell-72" type="text"></td>
-          <td><input id="cell-73" type="text"></td>
-          <td><input id="cell-74" type="text"></td>
-          
-          <td><input id="cell-75" type="text"></td>
-          <td><input id="cell-76" type="text" value="8" disabled></td>
-          <td><input id="cell-77" type="text"></td>
-          
-          <td><input id="cell-78" type="text"></td>
-          <td><input id="cell-79" type="text" value="7" disabled></td>
-          <td><input id="cell-80" type="text" value="9" disabled></td>
-        </tr>
+  .num-btn {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    aspect-ratio: 1;
+    border: 1px solid var(--line);
+    background: var(--paper-card);
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.12s;
+    position: relative;
+  }
 
-      </table>
+  .num-btn:hover { border-color: var(--ink); background: var(--paper-warm); }
+  .num-btn:active { transform: scale(0.95); }
 
+  .num-btn .rem {
+    position: absolute;
+    top: 3px; right: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--ink-ghost);
+    font-style: normal;
+  }
+
+  .num-btn.exhausted { opacity: 0.3; pointer-events: none; }
+
+  .action-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .action-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    background: var(--paper-card);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+  }
+
+  .action-btn:hover { border-color: var(--ink); background: var(--paper-warm); }
+  .action-btn:active { transform: scale(0.98); }
+  .action-btn.note-on { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+
+  .action-btn svg { flex-shrink: 0; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin-bottom: -4px;
+  }
+
+  .win-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(247,245,240,0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  .win-overlay.show { opacity: 1; pointer-events: all; }
+
+  .win-card {
+    text-align: center;
+    padding: 3rem 4rem;
+    background: var(--paper-card);
+    border: 2px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .win-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3rem;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .win-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+  }
+
+  .win-stats {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .win-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--ink-ghost);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .win-stat-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--ink);
+  }
+
+  .new-game-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 12px 32px;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .new-game-btn:hover { background: var(--paper); color: var(--ink); }
+
+  .mistakes-bar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .mistake-pip {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    background: transparent;
+    transition: background 0.2s;
+  }
+
+  .mistake-pip.filled { background: var(--accent); }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+  }
+
+  .shake { animation: shake 0.3s ease-out; }
+
+  @media (max-width: 600px) {
+    :root { --cell-size: 38px; }
+    .side-panel { width: 100%; padding-top: 0; flex-direction: row; flex-wrap: wrap; gap: 1rem; }
+    .numpad { width: 200px; }
+    .action-row { flex-direction: row; flex-wrap: wrap; width: calc(100% - 216px); }
+    .action-btn { flex: 1 0 calc(50% - 6px); font-size: 0.7rem; }
+    .cell-num { font-size: 1.1rem; }
+    .note { font-size: 0.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="masthead">SUDOKU</div>
+  <div class="edition">The Daily Puzzle · A Logic Challenge</div>
+</header>
+
+<div class="controls-top">
+  <span style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--ink-ghost);text-transform:uppercase;margin-right:4px;">Difficulty:</span>
+  <button class="diff-btn" data-diff="easy">Easy</button>
+  <button class="diff-btn active" data-diff="medium">Medium</button>
+  <button class="diff-btn" data-diff="hard">Hard</button>
+  <button class="diff-btn" data-diff="expert">Expert</button>
+</div>
+
+<div class="game-wrap">
+  <div class="board-col">
+    <div class="stats-bar">
+      <div>
+        <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;">Time</div>
+        <div class="stat-val" id="timer">0:00</div>
+      </div>
+      <div>
+        <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;">Mistakes</div>
+        <div class="mistakes-bar" id="mistakes-bar">
+          <div class="mistake-pip" id="pip0"></div>
+          <div class="mistake-pip" id="pip1"></div>
+          <div class="mistake-pip" id="pip2"></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;">Difficulty</div>
+        <div class="stat-val" id="diff-label">Medium</div>
+      </div>
+    </div>
+    <div class="board" id="board" tabindex="0"></div>
+  </div>
+
+  <div class="side-panel">
+    <div>
+      <div class="section-label">Numbers</div>
+      <div class="numpad" id="numpad">
+        <button class="num-btn" data-n="1">1</button>
+        <button class="num-btn" data-n="2">2</button>
+        <button class="num-btn" data-n="3">3</button>
+        <button class="num-btn" data-n="4">4</button>
+        <button class="num-btn" data-n="5">5</button>
+        <button class="num-btn" data-n="6">6</button>
+        <button class="num-btn" data-n="7">7</button>
+        <button class="num-btn" data-n="8">8</button>
+        <button class="num-btn" data-n="9">9</button>
+      </div>
     </div>
 
-  </body>
+    <div class="action-row">
+      <div class="section-label">Actions</div>
+      <button class="action-btn" id="btn-erase">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 20H7L3 16l10-10 7 7-3.5 3.5"/><path d="M6.5 17.5l4-4"/></svg>
+        Erase
+      </button>
+      <button class="action-btn" id="btn-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Notes
+      </button>
+      <button class="action-btn" id="btn-undo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h11a5 5 0 010 10H3"/><path d="M7 3L3 7l4 4"/></svg>
+        Undo
+      </button>
+      <button class="action-btn" id="btn-hint">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>
+        Hint <span style="font-family:'DM Mono',monospace;font-size:0.6rem;opacity:0.6;" id="hint-count">(3)</span>
+      </button>
+      <button class="action-btn" id="btn-new" style="margin-top:8px;border-color:var(--ink);font-weight:500;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        New Game
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="win-overlay" id="win-overlay">
+  <div class="win-card">
+    <div class="win-title">Solved!</div>
+    <div class="win-sub">Puzzle Complete</div>
+    <div class="win-stats">
+      <div>
+        <div class="win-stat-label">Time</div>
+        <div class="win-stat-val" id="win-time">—</div>
+      </div>
+      <div>
+        <div class="win-stat-label">Mistakes</div>
+        <div class="win-stat-val" id="win-mistakes">—</div>
+      </div>
+      <div>
+        <div class="win-stat-label">Hints</div>
+        <div class="win-stat-val" id="win-hints">—</div>
+      </div>
+    </div>
+    <button class="new-game-btn" id="win-new">New Puzzle</button>
+  </div>
+</div>
+
+<script>
+const DIFF_CLUES = { easy: 45, medium: 35, hard: 28, expert: 22 };
+let difficulty = 'medium';
+let grid = [], solution = [], given = new Set();
+let selected = -1;
+let noteMode = false;
+let notes = Array.from({length:81},()=>new Set());
+let history = [];
+let mistakes = 0;
+let hintsLeft = 3;
+let timerInterval, seconds = 0;
+let gameOver = false;
+
+function newGame() {
+  clearInterval(timerInterval);
+  seconds = 0; mistakes = 0; hintsLeft = 3; gameOver = false; selected = -1; noteMode = false;
+  notes = Array.from({length:81},()=>new Set());
+  history = [];
+  updateTimer();
+  document.getElementById('btn-note').classList.remove('note-on');
+  document.querySelectorAll('.mistake-pip').forEach(p => p.classList.remove('filled'));
+  document.getElementById('hint-count').textContent = '(3)';
+  document.getElementById('win-overlay').classList.remove('show');
+  solution = generateSolution();
+  grid = makePuzzle(solution, DIFF_CLUES[difficulty]);
+  given = new Set(grid.map((v,i)=>v?i:-1).filter(i=>i>=0));
+  render(); updateNumpad();
+  timerInterval = setInterval(()=>{ if(!gameOver){seconds++;updateTimer();} }, 1000);
+  document.getElementById('diff-label').textContent = difficulty.charAt(0).toUpperCase()+difficulty.slice(1);
+}
+
+function generateSolution() {
+  let b = Array(81).fill(0);
+  solve(b);
+  return b;
+}
+
+function solve(b) {
+  const empty = b.indexOf(0);
+  if (empty === -1) return true;
+  const nums = shuffle([1,2,3,4,5,6,7,8,9]);
+  for (const n of nums) {
+    if (isValid(b, empty, n)) {
+      b[empty] = n;
+      if (solve(b)) return true;
+      b[empty] = 0;
+    }
+  }
+  return false;
+}
+
+function solveUnique(b) {
+  const empty = b.indexOf(0);
+  if (empty === -1) return 1;
+  let count = 0;
+  for (let n = 1; n <= 9; n++) {
+    if (isValid(b, empty, n)) {
+      b[empty] = n;
+      count += solveUnique(b);
+      b[empty] = 0;
+      if (count > 1) return count;
+    }
+  }
+  return count;
+}
+
+function makePuzzle(sol, clues) {
+  let puzzle = [...sol];
+  let cells = shuffle([...Array(81).keys()]);
+  let removed = 0;
+  for (const i of cells) {
+    if (removed >= 81 - clues) break;
+    const backup = puzzle[i];
+    puzzle[i] = 0;
+    const test = [...puzzle];
+    if (solveUnique(test) !== 1) { puzzle[i] = backup; }
+    else removed++;
+  }
+  return puzzle;
+}
+
+function isValid(b, idx, n) {
+  const r = Math.floor(idx/9), c = idx%9;
+  for (let i=0;i<9;i++) {
+    if (b[r*9+i]===n) return false;
+    if (b[i*9+c]===n) return false;
+    const br=Math.floor(r/3)*3, bc=Math.floor(c/3)*3;
+    if (b[(br+Math.floor(i/3))*9+(bc+i%3)]===n) return false;
+  }
+  return true;
+}
+
+function shuffle(a) {
+  for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function peers(idx) {
+  const r=Math.floor(idx/9), c=idx%9;
+  const set=new Set();
+  for (let i=0;i<9;i++) { set.add(r*9+i); set.add(i*9+c); }
+  const br=Math.floor(r/3)*3, bc=Math.floor(c/3)*3;
+  for (let dr=0;dr<3;dr++) for (let dc=0;dc<3;dc++) set.add((br+dr)*9+(bc+dc));
+  set.delete(idx);
+  return set;
+}
+
+function render() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  const peerSet = selected >= 0 ? peers(selected) : new Set();
+  const selVal = selected >= 0 ? grid[selected] : 0;
+
+  for (let i=0;i<81;i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.i = i;
+
+    if (i === selected) cell.classList.add('selected');
+    else if (peerSet.has(i)) cell.classList.add('peer');
+    if (selVal > 0 && grid[i] === selVal && i !== selected) cell.classList.add('same-num');
+
+    if (given.has(i)) cell.classList.add('given');
+    else if (grid[i]) {
+      if (grid[i] !== solution[i]) cell.classList.add('error');
+      else cell.classList.add('player');
+    }
+
+    if (grid[i]) {
+      const span = document.createElement('span');
+      span.className = 'cell-num';
+      span.textContent = grid[i];
+      cell.appendChild(span);
+    } else if (notes[i].size > 0) {
+      const ng = document.createElement('div');
+      ng.className = 'notes-grid';
+      for (let n=1;n<=9;n++) {
+        const nd = document.createElement('div');
+        nd.className = 'note';
+        nd.textContent = notes[i].has(n) ? n : '';
+        ng.appendChild(nd);
+      }
+      cell.appendChild(ng);
+    }
+
+    cell.addEventListener('click', () => selectCell(i));
+    board.appendChild(cell);
+  }
+}
+
+function selectCell(i) {
+  selected = i;
+  render();
+}
+
+function inputNum(n) {
+  if (selected < 0 || given.has(selected) || gameOver) return;
+  if (noteMode && !grid[selected]) {
+    history.push({type:'note', idx:selected, notes:new Set(notes[selected])});
+    if (notes[selected].has(n)) notes[selected].delete(n);
+    else notes[selected].add(n);
+    render();
+    return;
+  }
+  if (noteMode && grid[selected]) return;
+  history.push({type:'cell', idx:selected, val:grid[selected]});
+  if (grid[selected] === n) { grid[selected] = 0; }
+  else {
+    if (n !== solution[selected]) {
+      mistakes++;
+      document.getElementById('pip'+(mistakes-1))?.classList.add('filled');
+      document.getElementById('board').classList.add('shake');
+      setTimeout(()=>document.getElementById('board').classList.remove('shake'),350);
+      if (mistakes >= 3) { gameOver = true; showGameOver(); return; }
+    }
+    grid[selected] = n;
+    notes[selected].clear();
+    peers(selected).forEach(p => notes[p].delete(n));
+  }
+  render(); updateNumpad(); checkWin();
+}
+
+function erase() {
+  if (selected < 0 || given.has(selected) || gameOver) return;
+  history.push({type:'cell', idx:selected, val:grid[selected], notes:new Set(notes[selected])});
+  grid[selected] = 0;
+  notes[selected].clear();
+  render(); updateNumpad();
+}
+
+function undo() {
+  if (!history.length) return;
+  const last = history.pop();
+  if (last.type === 'cell') { grid[last.idx] = last.val; if(last.notes) notes[last.idx]=last.notes; }
+  if (last.type === 'note') { notes[last.idx] = last.notes; }
+  render(); updateNumpad();
+}
+
+function hint() {
+  if (hintsLeft <= 0 || gameOver) return;
+  const empties = [];
+  for (let i=0;i<81;i++) if (!given.has(i) && grid[i]===0) empties.push(i);
+  if (!empties.length) return;
+  const pick = empties[Math.floor(Math.random()*empties.length)];
+  selected = pick;
+  hintsLeft--;
+  history.push({type:'cell', idx:pick, val:0});
+  grid[pick] = solution[pick];
+  notes[pick].clear();
+  peers(pick).forEach(p => notes[p].delete(solution[pick]));
+  document.getElementById('hint-count').textContent = `(${hintsLeft})`;
+  render(); updateNumpad(); checkWin();
+}
+
+function checkWin() {
+  if (grid.every((v,i) => v === solution[i])) {
+    gameOver = true;
+    clearInterval(timerInterval);
+    setTimeout(showWin, 300);
+  }
+}
+
+function showWin() {
+  document.getElementById('win-time').textContent = formatTime(seconds);
+  document.getElementById('win-mistakes').textContent = mistakes;
+  document.getElementById('win-hints').textContent = 3 - hintsLeft;
+  document.getElementById('win-overlay').classList.add('show');
+}
+
+function showGameOver() {
+  clearInterval(timerInterval);
+  setTimeout(() => {
+    alert('Game Over! You made 3 mistakes. Try again!');
+    newGame();
+  }, 400);
+}
+
+function updateNumpad() {
+  const counts = Array(10).fill(0);
+  grid.forEach(v => { if(v) counts[v]++; });
+  document.querySelectorAll('.num-btn').forEach(btn => {
+    const n = +btn.dataset.n;
+    const rem = 9 - counts[n];
+    btn.querySelector('.rem')?.remove();
+    const sp = document.createElement('span');
+    sp.className = 'rem';
+    sp.textContent = rem;
+    btn.appendChild(sp);
+    btn.classList.toggle('exhausted', rem <= 0);
+  });
+}
+
+function updateTimer() {
+  document.getElementById('timer').textContent = formatTime(seconds);
+}
+
+function formatTime(s) {
+  const m = Math.floor(s/60);
+  const sec = s%60;
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+document.querySelectorAll('.num-btn').forEach(btn => {
+  btn.addEventListener('click', () => inputNum(+btn.dataset.n));
+});
+
+document.getElementById('btn-erase').addEventListener('click', erase);
+document.getElementById('btn-note').addEventListener('click', () => {
+  noteMode = !noteMode;
+  document.getElementById('btn-note').classList.toggle('note-on', noteMode);
+});
+document.getElementById('btn-undo').addEventListener('click', undo);
+document.getElementById('btn-hint').addEventListener('click', hint);
+document.getElementById('btn-new').addEventListener('click', newGame);
+document.getElementById('win-new').addEventListener('click', newGame);
+
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    difficulty = btn.dataset.diff;
+    newGame();
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key >= '1' && e.key <= '9') { inputNum(+e.key); return; }
+  if (e.key === '0' || e.key === 'Backspace' || e.key === 'Delete') { erase(); return; }
+  if (e.key === 'n' || e.key === 'N') { noteMode=!noteMode; document.getElementById('btn-note').classList.toggle('note-on',noteMode); return; }
+  if (e.key === 'z' && (e.ctrlKey||e.metaKey)) { e.preventDefault(); undo(); return; }
+  if (e.key === 'h' || e.key === 'H') { hint(); return; }
+  const moves = { ArrowUp:-9, ArrowDown:9, ArrowLeft:-1, ArrowRight:1 };
+  if (moves[e.key] !== undefined) {
+    e.preventDefault();
+    if (selected < 0) selected = 0;
+    else {
+      let next = selected + moves[e.key];
+      if (e.key==='ArrowLeft'&&selected%9===0) return;
+      if (e.key==='ArrowRight'&&selected%9===8) return;
+      if (next < 0 || next > 80) return;
+      selected = next;
+    }
+    render();
+  }
+});
+
+newGame();
+</script>
+</body>
 </html>
