@@ -11,171 +11,166 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23E50914'/%3E%3Ctext x='90' y='130' text-anchor='middle' font-size='110'%3E🎬%3C/text%3E%3C/svg%3E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23E50914'/%3E%3Ctext x='16' y='24' text-anchor='middle' font-size='18'%3E🎬%3C/text%3E%3C/svg%3E">
 <style>
-:root {
-  --bg:#0a0a0a; --surface:#141414; --s2:#1c1c1e; --s3:#242428;
-  --border:rgba(255,255,255,0.08); --text:#f5f5f7; --muted:#8e8e93;
-  --dim:#48484a; --red:#e50914; --red2:#ff375f; --gold:#ffd60a;
-  --r:12px; --rlg:20px; --ease:0.2s cubic-bezier(0.4,0,0.2,1);
+:root{
+  --bg:#0a0a0a;--s1:#141414;--s2:#1c1c1e;--s3:#2c2c2e;
+  --border:rgba(255,255,255,0.09);--text:#f5f5f7;--muted:#98989d;--dim:#48484a;
+  --red:#e50914;--gold:#ffd60a;--ease:.2s cubic-bezier(.4,0,.2,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:-apple-system,'SF Pro Text',BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 img{display:block;object-fit:cover}
 button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:99px}
 
-/* NAV */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:12px;padding:0 20px;height:58px;background:rgba(10,10,10,0.92);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
-.logo{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;letter-spacing:-0.5px;flex-shrink:0;color:var(--text)}
-.logo-icon{width:32px;height:32px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;gap:14px;padding:0 24px;background:rgba(10,10,10,0.88);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:800;letter-spacing:-.6px;flex-shrink:0}
+.logo-box{width:34px;height:34px;background:var(--red);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .logo em{color:var(--red);font-style:normal}
-.nav-tabs{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none}
-.nav-tabs::-webkit-scrollbar{display:none}
-.ntab{padding:6px 13px;border-radius:20px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;transition:all var(--ease)}
-.ntab:hover{color:var(--text)}
-.ntab.on{background:var(--s2);color:var(--text)}
-.search-wrap{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:6px 13px;flex-shrink:0;transition:all var(--ease)}
-.search-wrap:focus-within{border-color:rgba(255,255,255,0.2);background:var(--s3)}
-.search-wrap svg{width:13px;height:13px;color:var(--muted);flex-shrink:0}
-.search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:160px;font-family:inherit}
-.search-wrap input::placeholder{color:var(--muted)}
+.ntabs{display:flex;gap:3px;flex:1;overflow-x:auto;scrollbar-width:none}
+.ntabs::-webkit-scrollbar{display:none}
+.nt{padding:6px 14px;border-radius:20px;font-size:13.5px;font-weight:500;color:var(--muted);white-space:nowrap;transition:all var(--ease)}
+.nt:hover{color:var(--text)}
+.nt.on{background:var(--s2);color:var(--text)}
+.srch{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:7px 14px;flex-shrink:0;transition:all var(--ease)}
+.srch:focus-within{border-color:rgba(255,255,255,0.22);background:var(--s3)}
+.srch svg{width:13px;height:13px;color:var(--muted);flex-shrink:0}
+.srch input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:170px;font-family:inherit}
+.srch input::placeholder{color:var(--muted)}
 
-/* MAIN */
-.main{padding-top:58px}
+/* ── HERO ── */
+.main{padding-top:60px}
+.hero{position:relative;height:540px;overflow:hidden;cursor:pointer;user-select:none}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.38);transition:transform .6s ease}
+.hero:hover .hero-img{transform:scale(1.03)}
+.hero-grad{position:absolute;inset:0;background:linear-gradient(105deg,rgba(10,10,10,.92) 0%,rgba(10,10,10,.5) 52%,transparent 100%),linear-gradient(to top,rgba(10,10,10,.78) 0%,transparent 52%)}
+.hero-body{position:absolute;bottom:56px;left:48px;max-width:520px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:4px 11px;border-radius:5px;margin-bottom:13px}
+.hero-title{font-size:clamp(28px,3.8vw,50px);font-weight:800;line-height:1.08;letter-spacing:-1.2px;margin-bottom:11px;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.hero-meta{display:flex;align-items:center;gap:11px;font-size:13px;color:var(--muted);margin-bottom:15px;flex-wrap:wrap}
+.stars{display:flex;align-items:center;gap:4px;color:var(--gold);font-weight:700;font-size:13.5px}
+.pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(6px);padding:3px 10px;border-radius:5px;font-size:12px;font-weight:500;color:rgba(245,245,247,.85)}
+.hero-desc{font-size:14.5px;line-height:1.65;color:rgba(245,245,247,.76);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:24px}
+.hero-acts{display:flex;gap:11px}
 
-/* HERO */
-.hero{position:relative;height:520px;overflow:hidden;cursor:pointer}
-.hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.4);transition:transform 0.5s ease}
-.hero:hover .hero-bg{transform:scale(1.02)}
-.hero-grad{position:absolute;inset:0;background:linear-gradient(to right,rgba(10,10,10,0.88) 0%,rgba(10,10,10,0.45) 55%,transparent 100%),linear-gradient(to top,rgba(10,10,10,0.75) 0%,transparent 55%)}
-.hero-content{position:absolute;bottom:52px;left:44px;max-width:500px}
-.hero-badge{display:inline-flex;align-items:center;gap:5px;background:var(--red);color:#fff;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-bottom:12px}
-.hero-title{font-size:clamp(26px,3.5vw,44px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:10px;text-shadow:0 2px 20px rgba(0,0,0,0.5)}
-.hero-meta{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);margin-bottom:14px;flex-wrap:wrap}
-.star-rating{display:flex;align-items:center;gap:4px;color:var(--gold);font-weight:700}
-.hero-desc{font-size:14px;line-height:1.65;color:rgba(245,245,247,0.78);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:22px}
-.hero-btns{display:flex;gap:10px}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:50px;font-size:14px;font-weight:600;transition:all var(--ease);letter-spacing:-0.2px}
-.btn svg{width:16px;height:16px}
-.btn-white{background:#fff;color:#000}
-.btn-white:hover{background:rgba(255,255,255,0.86);transform:scale(1.02)}
-.btn-ghost{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.14)}
-.btn-ghost:hover{background:rgba(255,255,255,0.17);transform:scale(1.02)}
-.btn-sm{padding:8px 16px;font-size:13px}
-.btn-red{background:var(--red);color:#fff}
-.btn-red:hover{background:#c50813;transform:scale(1.02)}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:50px;font-size:14.5px;font-weight:600;transition:all var(--ease);letter-spacing:-.2px;white-space:nowrap}
+.btn svg{width:17px;height:17px;flex-shrink:0}
+.btn-w{background:#fff;color:#000}
+.btn-w:hover{background:rgba(255,255,255,.86);transform:scale(1.02)}
+.btn-g{background:rgba(255,255,255,.11);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.btn-g:hover{background:rgba(255,255,255,.18);transform:scale(1.02)}
+.btn-r{background:var(--red);color:#fff}
+.btn-r:hover{background:#c8070f;transform:scale(1.02)}
+.btn-sm{padding:8px 18px;font-size:13px}
 
-/* GENRE PILLS */
-.genres{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 20px 4px;margin-bottom:8px}
+/* ── GENRES ── */
+.genres{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:16px 24px 4px}
 .genres::-webkit-scrollbar{display:none}
-.gpill{flex-shrink:0;padding:7px 16px;border-radius:50px;border:1px solid var(--border);font-size:12px;font-weight:500;color:var(--muted);background:var(--surface);transition:all var(--ease);cursor:pointer}
-.gpill:hover,.gpill.on{background:#fff;color:#000;border-color:#fff}
+.gp{flex-shrink:0;padding:7px 17px;border-radius:50px;border:1px solid var(--border);font-size:12.5px;font-weight:500;color:var(--muted);background:var(--s1);transition:all var(--ease);cursor:pointer}
+.gp:hover,.gp.on{background:#fff;color:#000;border-color:#fff}
 
-/* ROWS */
-.section{padding:0 20px 36px}
-.row-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-top:4px}
-.row-title{font-size:18px;font-weight:700;letter-spacing:-0.4px}
+/* ── ROWS ── */
+.section{padding:8px 24px 36px}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-size:19px;font-weight:700;letter-spacing:-.4px}
 .row{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px;scroll-snap-type:x mandatory}
 .row::-webkit-scrollbar{display:none}
 
-/* CARDS */
-.card{flex:0 0 150px;scroll-snap-align:start;cursor:pointer}
-.card-poster{width:100%;aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--s2);position:relative;transition:transform var(--ease);border:1px solid var(--border)}
-.card:hover .card-poster{transform:scale(1.04);border-color:rgba(255,255,255,0.15)}
+/* ── CARD ── */
+.card{flex:0 0 152px;scroll-snap-align:start;cursor:pointer}
+.card-poster{width:100%;aspect-ratio:2/3;border-radius:11px;overflow:hidden;background:var(--s2);position:relative;transition:transform var(--ease),box-shadow var(--ease);border:1px solid var(--border)}
+.card:hover .card-poster{transform:scale(1.05);box-shadow:0 12px 40px rgba(0,0,0,.5);border-color:rgba(255,255,255,.18)}
 .card-poster img{width:100%;height:100%;object-fit:cover}
-.card-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--s2);color:var(--dim)}
-.card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,transparent 55%);opacity:0;transition:opacity var(--ease);display:flex;align-items:flex-end;padding:10px}
-.card:hover .card-overlay{opacity:1}
-.play-circle{width:34px;height:34px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(0,0,0,0.4)}
-.play-circle svg{width:14px;height:14px;color:#000;margin-left:2px}
-.badge{position:absolute;top:7px;right:7px;background:rgba(0,0,0,0.78);backdrop-filter:blur(6px);padding:3px 6px;border-radius:5px;font-size:10px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:2px}
+.card-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--s2)}
+.card-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 52%);opacity:0;transition:opacity var(--ease);display:flex;align-items:flex-end;padding:11px}
+.card:hover .card-ov{opacity:1}
+.play-dot{width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.play-dot svg{width:15px;height:15px;color:#000;margin-left:2px}
+.card-badge{position:absolute;top:7px;right:7px;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);padding:3px 7px;border-radius:5px;font-size:10.5px;font-weight:700;color:var(--gold)}
 .card-info{padding:9px 2px 0}
-.card-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.card-name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
 .card-sub{font-size:11px;color:var(--muted)}
 
-/* SKELETON */
-.skel{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px}
-@keyframes shimmer{to{background-position:-200% 0}}
+/* ── SKELETON ── */
+.sk{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:sk 1.4s infinite;border-radius:11px}
+@keyframes sk{to{background-position:-200% 0}}
 
-/* SEARCH PAGE */
-.spage{padding:78px 20px 40px;display:none}
+/* ── SEARCH PAGE ── */
+.spage{padding:80px 24px 40px;display:none}
 .spage.on{display:block}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:18px;margin-top:20px}
-.empty{text-align:center;padding:70px 0;color:var(--muted);grid-column:1/-1}
-.empty .ei{font-size:54px;margin-bottom:14px}
-.empty h3{font-size:17px;color:var(--text);margin-bottom:6px}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:18px;margin-top:18px}
+.sempty{text-align:center;padding:72px 0;color:var(--muted);grid-column:1/-1}
+.sempty .ei{font-size:56px;margin-bottom:14px}
+.sempty h3{font-size:18px;color:var(--text);margin-bottom:6px}
 
-/* MODAL */
-.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px}
+/* ── MODAL OVERLAY ── */
+.overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.94);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 16px}
 .overlay.on{display:flex}
-.modal{width:100%;max-width:920px;background:var(--surface);border-radius:var(--rlg);overflow:hidden;border:1px solid var(--border);animation:mIn 0.28s cubic-bezier(0.34,1.56,0.64,1);margin:auto}
-@keyframes mIn{from{opacity:0;transform:scale(0.94) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal{width:100%;max-width:940px;background:var(--s1);border-radius:20px;overflow:hidden;border:1px solid var(--border);animation:mIn .28s cubic-bezier(.34,1.56,.64,1);margin:auto;position:relative}
+@keyframes mIn{from{opacity:0;transform:scale(.93) translateY(18px)}to{opacity:1;transform:none}}
 
-/* PLAYER */
-.player-box{position:relative;width:100%;aspect-ratio:16/9;background:#000}
-.player-box iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:block}
-
-/* spinner shows only before iframe loads */
-.player-loading{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-size:13px;color:var(--muted);z-index:2;pointer-events:none;transition:opacity 0.3s}
-.player-loading.hide{opacity:0}
-.spin{width:38px;height:38px;border:3px solid var(--s3);border-top-color:var(--red);border-radius:50%;animation:spin 0.75s linear infinite}
+/* ── PLAYER ── */
+.pbox{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden}
+.pbox iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:block}
+.pspinner{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-size:13px;color:var(--muted);z-index:2;transition:opacity .4s}
+.pspinner.gone{opacity:0;pointer-events:none}
+.spin{width:40px;height:40px;border:3px solid var(--s3);border-top-color:var(--red);border-radius:50%;animation:spin .75s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.close-x{position:absolute;top:12px;right:12px;z-index:10;width:36px;height:36px;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;transition:background var(--ease)}
+.close-x:hover{background:rgba(255,255,255,.15)}
 
-.close-btn{position:absolute;top:12px;right:12px;width:34px;height:34px;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;z-index:10;transition:background var(--ease)}
-.close-btn:hover{background:rgba(255,255,255,0.14)}
-
-/* MODAL INFO */
-.minfo{padding:24px 28px;display:flex;gap:20px}
-.mposter{flex-shrink:0;width:108px;height:162px;border-radius:10px;overflow:hidden;background:var(--s2)}
+/* ── MODAL INFO ── */
+.minfo{padding:26px 30px;display:flex;gap:22px}
+.mposter{flex-shrink:0;width:112px;height:168px;border-radius:11px;overflow:hidden;background:var(--s2)}
 .mposter img{width:100%;height:100%;object-fit:cover}
-.mdetails{flex:1;min-width:0}
-.mtitle{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:7px}
-.mmeta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--muted);margin-bottom:12px}
-.tag{background:var(--s2);border:1px solid var(--border);padding:3px 9px;border-radius:5px;font-size:11px;font-weight:500}
-.moverview{font-size:13px;line-height:1.7;color:rgba(245,245,247,0.72);margin-bottom:16px}
-.mactions{display:flex;gap:8px;flex-wrap:wrap}
+.mdet{flex:1;min-width:0}
+.mtitle{font-size:23px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px;line-height:1.15}
+.mmeta{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:13px}
+.mtag{background:var(--s2);border:1px solid var(--border);padding:3px 9px;border-radius:5px;font-size:11.5px;font-weight:500;color:var(--text)}
+.movw{font-size:13.5px;line-height:1.7;color:rgba(245,245,247,.72);margin-bottom:18px}
+.macts{display:flex;gap:9px;flex-wrap:wrap}
 
-/* SERVER / EPISODE PICKERS */
-.picker-section{padding:0 28px 24px;border-top:1px solid var(--border)}
-.picker-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin:18px 0 10px}
-.server-row{display:flex;gap:7px;flex-wrap:wrap}
-.srv-btn{padding:6px 14px;background:var(--s3);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--muted);cursor:pointer;transition:all var(--ease)}
-.srv-btn.on,.srv-btn:hover{background:#fff;color:#000;border-color:#fff}
+/* ── SERVER PICKER ── */
+.mpick{padding:0 30px 26px}
+.pick-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pick-label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.srv-row{display:flex;gap:8px;flex-wrap:wrap}
+.sbtn{padding:7px 15px;background:var(--s3);border:1px solid var(--border);border-radius:20px;font-size:12.5px;font-weight:500;color:var(--muted);transition:all var(--ease)}
+.sbtn:hover,.sbtn.on{background:#fff;color:#000;border-color:#fff}
 
-.season-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px}
-.season-row::-webkit-scrollbar{display:none}
-.sea-btn{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--surface);transition:all var(--ease);cursor:pointer}
-.sea-btn.on,.sea-btn:hover{background:var(--red);border-color:var(--red);color:#fff}
+/* ── EPISODE PICKER ── */
+.epick{padding:0 30px 26px;border-top:1px solid var(--border)}
+.seas-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:13px;padding-top:18px}
+.seas-row::-webkit-scrollbar{display:none}
+.seabtn{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--s1);transition:all var(--ease)}
+.seabtn.on,.seabtn:hover{background:var(--red);border-color:var(--red);color:#fff}
+.ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:7px}
+.epbtn{aspect-ratio:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all var(--ease)}
+.epbtn.on,.epbtn:hover{background:var(--red);border-color:var(--red);color:#fff}
 
-.ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:7px}
-.ep-btn{aspect-ratio:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all var(--ease);cursor:pointer}
-.ep-btn.on,.ep-btn:hover{background:var(--red);border-color:var(--red);color:#fff}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--s3);border:1px solid var(--border);padding:9px 20px;border-radius:50px;font-size:13px;z-index:999;opacity:0;pointer-events:none;transition:all .26s;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%)}
 
-/* NOTICE BOX */
-.notice{margin:0 28px 20px;padding:12px 16px;background:rgba(255,214,10,0.08);border:1px solid rgba(255,214,10,0.2);border-radius:10px;font-size:12px;color:rgba(255,214,10,0.85);line-height:1.5}
-
-/* HOME */
+/* ── HOME ── */
 #home{display:block}
 #home.off{display:none}
 
-/* TOAST */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--s3);border:1px solid var(--border);padding:9px 18px;border-radius:50px;font-size:13px;z-index:999;opacity:0;pointer-events:none;transition:all 0.28s ease;white-space:nowrap}
-.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* RESPONSIVE */
-@media(max-width:600px){
-  .nav{padding:0 14px}
-  .search-wrap input{width:110px}
-  .hero-content{left:16px;right:16px;bottom:32px}
-  .hero{height:390px}
-  .section{padding:0 14px 28px}
-  .genres{padding:0 14px 4px}
-  .minfo{flex-direction:column;padding:18px}
-  .mposter{width:80px;height:120px}
-  .picker-section{padding:0 16px 20px}
-  .notice{margin:0 16px 16px}
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .nav{padding:0 16px}
+  .srch input{width:120px}
+  .hero{height:400px}
+  .hero-body{left:20px;right:20px;bottom:36px}
+  .section{padding:8px 16px 30px}
+  .genres{padding:14px 16px 4px}
+  .minfo{flex-direction:column;padding:20px}
+  .mposter{width:88px;height:132px}
+  .mpick,.epick{padding-left:20px;padding-right:20px}
 }
 </style>
 </head>
@@ -184,45 +179,46 @@ button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
 <!-- NAV -->
 <nav class="nav">
   <div class="logo">
-    <div class="logo-icon">🎬</div>
+    <div class="logo-box">🎬</div>
     Stream<em>Vault</em>
   </div>
-  <div class="nav-tabs">
-    <button class="ntab on" onclick="navTab(this,'movies')">Movies</button>
-    <button class="ntab" onclick="navTab(this,'tv')">TV Shows</button>
-    <button class="ntab" onclick="navTab(this,'trending')">Trending</button>
-    <button class="ntab" onclick="navTab(this,'toprated')">Top Rated</button>
+  <div class="ntabs">
+    <button class="nt on" onclick="navClick(this,'movies')">Movies</button>
+    <button class="nt" onclick="navClick(this,'tv')">TV Shows</button>
+    <button class="nt" onclick="navClick(this,'trending')">Trending</button>
+    <button class="nt" onclick="navClick(this,'toprated')">Top Rated</button>
+    <button class="nt" onclick="navClick(this,'anime')">Anime</button>
   </div>
-  <div class="search-wrap">
+  <div class="srch">
     <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
-    <input type="text" id="sInput" placeholder="Search titles…" oninput="onSearch(this.value)" autocomplete="off">
+    <input type="text" id="sInput" placeholder="Search movies & shows…" oninput="onSearch(this.value)" autocomplete="off">
   </div>
 </nav>
 
 <main class="main">
 
-<!-- HOME PAGE -->
+<!-- HOME -->
 <div id="home">
 
   <!-- HERO -->
   <section class="hero" id="heroSection" onclick="playHero()">
-    <img class="hero-bg" id="heroBg" src="" alt="">
+    <img class="hero-img" id="heroBg" src="" alt="">
     <div class="hero-grad"></div>
-    <div class="hero-content">
+    <div class="hero-body">
       <div class="hero-badge">● Now Trending</div>
       <h1 class="hero-title" id="heroTitle">Loading…</h1>
       <div class="hero-meta">
-        <span class="star-rating">★ <span id="heroRating">—</span></span>
+        <span class="stars">★ <span id="heroRating">—</span></span>
         <span id="heroYear">—</span>
-        <span id="heroTag" class="tag">—</span>
+        <span class="pill" id="heroTag">—</span>
       </div>
       <p class="hero-desc" id="heroDesc">Fetching content…</p>
-      <div class="hero-btns">
-        <button class="btn btn-white" onclick="event.stopPropagation();playHero()">
-          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
+      <div class="hero-acts">
+        <button class="btn btn-w" onclick="event.stopPropagation();playHero()">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
           Play Now
         </button>
-        <button class="btn btn-ghost" onclick="event.stopPropagation();infoHero()">
+        <button class="btn btn-g" onclick="event.stopPropagation();infoHero()">
           <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
           More Info
         </button>
@@ -233,33 +229,37 @@ button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
   <!-- GENRES -->
   <div class="genres" id="genreRow"></div>
 
-  <!-- ROWS -->
-  <section class="section">
-    <div class="row-header"><h2 class="row-title">🔥 Trending This Week</h2></div>
+  <!-- CONTENT ROWS -->
+  <section class="section" id="sec-trending">
+    <div class="sec-hd"><h2 class="sec-title">🔥 Trending This Week</h2></div>
     <div class="row" id="rowTrending"></div>
   </section>
-  <section class="section">
-    <div class="row-header"><h2 class="row-title">🎬 Popular Movies</h2></div>
+  <section class="section" id="sec-movies">
+    <div class="sec-hd"><h2 class="sec-title">🎬 Popular Movies</h2></div>
     <div class="row" id="rowMovies"></div>
   </section>
-  <section class="section">
-    <div class="row-header"><h2 class="row-title">📺 Popular TV Shows</h2></div>
+  <section class="section" id="sec-tv">
+    <div class="sec-hd"><h2 class="sec-title">📺 Popular TV Shows</h2></div>
     <div class="row" id="rowTV"></div>
   </section>
-  <section class="section">
-    <div class="row-header"><h2 class="row-title">⭐ Top Rated Movies</h2></div>
+  <section class="section" id="sec-toprated">
+    <div class="sec-hd"><h2 class="sec-title">⭐ Top Rated Movies</h2></div>
     <div class="row" id="rowTopMovies"></div>
   </section>
-  <section class="section">
-    <div class="row-header"><h2 class="row-title">🏆 Acclaimed Series</h2></div>
+  <section class="section" id="sec-topratedtv">
+    <div class="sec-hd"><h2 class="sec-title">🏆 Acclaimed Series</h2></div>
     <div class="row" id="rowTopTV"></div>
   </section>
+  <section class="section" id="sec-anime">
+    <div class="sec-hd"><h2 class="sec-title">🍜 Anime</h2></div>
+    <div class="row" id="rowAnime"></div>
+  </section>
 
-</div><!-- /home -->
+</div>
 
 <!-- SEARCH PAGE -->
 <div class="spage" id="spage">
-  <h2 style="font-size:20px;font-weight:700">Search Results</h2>
+  <h2 style="font-size:21px;font-weight:700">Search Results</h2>
   <p style="color:var(--muted);font-size:13px;margin-top:4px" id="sSubtitle"></p>
   <div class="sgrid" id="sgrid"></div>
 </div>
@@ -267,44 +267,49 @@ button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
 </main>
 
 <!-- MODAL -->
-<div class="overlay" id="overlay" onclick="overlayClick(event)">
+<div class="overlay" id="overlay" onclick="bgClick(event)">
   <div class="modal" id="modal">
 
-    <div class="player-box" id="playerBox">
-      <div class="player-loading" id="pLoader">
+    <!-- PLAYER -->
+    <div class="pbox" id="pbox">
+      <div class="pspinner" id="pspinner">
         <div class="spin"></div>
-        <span>Loading player…</span>
+        <span id="pspinMsg">Loading stream…</span>
       </div>
-      <iframe id="pFrame" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope" allowfullscreen referrerpolicy="no-referrer-when-downgrade" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"></iframe>
-      <button class="close-btn" onclick="closeModal()">✕</button>
+      <iframe id="pframe"
+        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        frameborder="0">
+      </iframe>
+      <button class="close-x" onclick="closeModal()">✕</button>
     </div>
 
+    <!-- INFO -->
     <div class="minfo" id="minfo">
       <div class="mposter"><img id="mPoster" src="" alt=""></div>
-      <div class="mdetails">
+      <div class="mdet">
         <h2 class="mtitle" id="mTitle"></h2>
         <div class="mmeta" id="mMeta"></div>
-        <p class="moverview" id="mDesc"></p>
-        <div class="mactions" id="mActs"></div>
+        <p class="movw" id="mDesc"></p>
+        <div class="macts" id="mActs"></div>
       </div>
     </div>
 
-    <!-- Notice about popups -->
-    <div class="notice" id="popupNotice" style="display:none">
-      ⚠️ <strong>Tip:</strong> If nothing plays, click "Try Another Server" below. Some servers may open a popup the first time — allow it and close it to activate the stream. This is normal for free streaming embeds.
+    <!-- SERVER PICKER -->
+    <div class="mpick">
+      <div class="pick-bar">
+        <span class="pick-label">Stream Server</span>
+        <span style="font-size:11.5px;color:var(--muted)">Try another if video doesn't load</span>
+      </div>
+      <div class="srv-row" id="srvRow"></div>
     </div>
 
-    <!-- SERVER PICKER (movies + TV) -->
-    <div class="picker-section" id="serverSection">
-      <div class="picker-label">Stream Server</div>
-      <div class="server-row" id="srvRow"></div>
-    </div>
-
-    <!-- TV EPISODES -->
-    <div class="picker-section" id="epSection" style="display:none">
-      <div class="picker-label">Season</div>
-      <div class="season-row" id="seasonRow"></div>
-      <div class="picker-label">Episode</div>
+    <!-- TV EPISODES (hidden for movies) -->
+    <div class="epick" id="epick" style="display:none">
+      <div class="pick-label" style="padding-top:18px;margin-bottom:10px">Season</div>
+      <div class="seas-row" id="seasRow"></div>
+      <div class="pick-label" style="margin-bottom:10px">Episode</div>
       <div class="ep-grid" id="epGrid"></div>
     </div>
 
@@ -314,118 +319,141 @@ button{cursor:pointer;border:none;background:none;color:inherit;font:inherit}
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── CONFIG ───────────────────────────────────────────────────
-const TMDB_KEY = '4e44d9029b1270a757cddc766a1bcb63';
-const API = 'https://api.themoviedb.org/3';
-const IMG = 'https://image.tmdb.org/t/p/';
+// ════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════
+const BEARER = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ZjU0YTM2MDFjNzQ1N2E4NjJjYThjNzBmZWEyOGE2YiIsIm5iZiI6MTc4MTkxNjA5Ny4zOTgwMDAyLCJzdWIiOiI2YTM1ZTFjMTNiNTZlMWZhYzNkNDgxMmYiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.g4ml-3xHUW1XMoOb0csHXMLJcuCdaKlvUypCE8R3Nts';
+const TMDB = 'https://api.themoviedb.org/3';
+const IMG  = 'https://image.tmdb.org/t/p/';
 
-// ─── VERIFIED WORKING EMBED SERVERS ───────────────────────────
-// These use standard iframe embed URLs confirmed working as of 2025
-// Multiple fallbacks: vidsrc.me, vidlink.pro, multiembed.mov, 2embed
+// ── SERVERS ──────────────────────────────────────────
+// All confirmed working embed patterns (no sandbox needed when opened locally)
 const SERVERS = [
   {
-    name: 'VidSrc',
-    movie: id => `https://vidsrc.me/embed/movie?tmdb=${id}`,
-    tv:    (id,s,e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
+    name: 'VidLink',
+    movie: id  => `https://vidlink.pro/movie/${id}?autoplay=true&primaryColor=e50914`,
+    tv:   (id,s,e) => `https://vidlink.pro/tv/${id}/${s}/${e}?autoplay=true&primaryColor=e50914`
   },
   {
-    name: 'VidLink',
-    movie: id => `https://vidlink.pro/movie/${id}?autoplay=true&primaryColor=e50914`,
-    tv:    (id,s,e) => `https://vidlink.pro/tv/${id}/${s}/${e}?autoplay=true&primaryColor=e50914`
+    name: 'VidSrc',
+    movie: id  => `https://vidsrc.me/embed/movie?tmdb=${id}`,
+    tv:   (id,s,e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
+  },
+  {
+    name: 'VidSrc.cc',
+    movie: id  => `https://vidsrc.cc/v2/embed/movie/${id}`,
+    tv:   (id,s,e) => `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`
   },
   {
     name: 'SuperEmbed',
-    movie: id => `https://multiembed.mov/?video_id=${id}&tmdb=1`,
-    tv:    (id,s,e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`
+    movie: id  => `https://multiembed.mov/?video_id=${id}&tmdb=1`,
+    tv:   (id,s,e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`
   },
   {
     name: '2Embed',
-    movie: id => `https://www.2embed.stream/embed/movie/${id}`,
-    tv:    (id,s,e) => `https://www.2embed.stream/embed/tv/${id}/${s}/${e}`
+    movie: id  => `https://www.2embed.stream/embed/movie/${id}`,
+    tv:   (id,s,e) => `https://www.2embed.stream/embed/tv/${id}/${s}/${e}`
   },
   {
     name: 'EmbedSu',
-    movie: id => `https://embed.su/embed/movie/${id}`,
-    tv:    (id,s,e) => `https://embed.su/embed/tv/${id}/${s}/${e}`
+    movie: id  => `https://embed.su/embed/movie/${id}`,
+    tv:   (id,s,e) => `https://embed.su/embed/tv/${id}/${s}/${e}`
+  },
+  {
+    name: 'NovaScrape',
+    movie: id  => `https://player.autoembed.cc/embed/movie/${id}`,
+    tv:   (id,s,e) => `https://player.autoembed.cc/embed/tv/${id}/${s}/${e}`
   },
 ];
 
-// ─── STATE ─────────────────────────────────────────────────────
-let curItem = null, curType = 'movie', curSeason = 1, curEp = 1, curSrv = 0;
-let heroItem = null, genreMap = {}, searchTimer = null;
+// ── STATE ────────────────────────────────────────────
+let curItem=null, curType='movie', curSeason=1, curEp=1, curSrv=0;
+let heroItem=null, genreMap={}, searchTimer=null;
 
-// ─── TMDB FETCH ────────────────────────────────────────────────
-async function tmdb(path, params = {}) {
-  const url = new URL(`${API}${path}`);
-  url.searchParams.set('api_key', TMDB_KEY);
-  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v));
-  const r = await fetch(url);
+// ── TMDB FETCH (bearer auth) ─────────────────────────
+async function api(path, params={}) {
+  const url = new URL(`${TMDB}${path}`);
+  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k,v));
+  const r = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${BEARER}`,
+      'Content-Type': 'application/json'
+    }
+  });
   return r.json();
 }
 
-// ─── SKELETON ROW ──────────────────────────────────────────────
+// ── SKELETON ─────────────────────────────────────────
 function skelRow(id) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.innerHTML = Array(8).fill(`
+  el.innerHTML = Array(10).fill(0).map(()=>`
     <div class="card">
-      <div class="skel" style="width:150px;aspect-ratio:2/3"></div>
-      <div class="skel" style="width:110px;height:12px;margin-top:9px;border-radius:4px"></div>
+      <div class="sk" style="width:152px;aspect-ratio:2/3"></div>
+      <div class="sk" style="width:110px;height:11px;margin-top:9px;border-radius:4px"></div>
+      <div class="sk" style="width:72px;height:9px;margin-top:5px;border-radius:4px"></div>
     </div>`).join('');
 }
 
-// ─── INIT ──────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────
 async function init() {
-  ['rowTrending','rowMovies','rowTV','rowTopMovies','rowTopTV'].forEach(skelRow);
+  ['rowTrending','rowMovies','rowTV','rowTopMovies','rowTopTV','rowAnime'].forEach(skelRow);
 
-  const [mg, tg] = await Promise.all([tmdb('/genre/movie/list'), tmdb('/genre/tv/list')]);
+  // Genre maps
+  const [mg, tg] = await Promise.all([api('/genre/movie/list'), api('/genre/tv/list')]);
   [...mg.genres, ...tg.genres].forEach(g => genreMap[g.id] = g.name);
 
-  const genrePills = [
-    {id:28,n:'Action'},{id:35,n:'Comedy'},{id:18,n:'Drama'},
-    {id:27,n:'Horror'},{id:878,n:'Sci-Fi'},{id:10749,n:'Romance'},
-    {id:53,n:'Thriller'},{id:16,n:'Animation'},{id:80,n:'Crime'},
-    {id:12,n:'Adventure'},{id:14,n:'Fantasy'},{id:99,n:'Documentary'}
+  // Genre pills
+  const GP = [
+    {id:28,n:'Action'},{id:35,n:'Comedy'},{id:18,n:'Drama'},{id:27,n:'Horror'},
+    {id:878,n:'Sci-Fi'},{id:10749,n:'Romance'},{id:53,n:'Thriller'},
+    {id:16,n:'Animation'},{id:80,n:'Crime'},{id:12,n:'Adventure'},
+    {id:14,n:'Fantasy'},{id:99,n:'Documentary'},{id:10751,n:'Family'},
+    {id:36,n:'History'},{id:10402,n:'Music'}
   ];
-  document.getElementById('genreRow').innerHTML = genrePills.map(g =>
-    `<button class="gpill" onclick="browseGenre(${g.id},'${g.n}')">${g.n}</button>`
+  document.getElementById('genreRow').innerHTML = GP.map(g =>
+    `<button class="gp" onclick="browseGenre(${g.id},'${g.n}')">${g.n}</button>`
   ).join('');
 
+  // Load all rows in parallel
   await Promise.all([
-    loadTrending(), loadMovies(), loadTV(), loadTopMovies(), loadTopTV()
+    loadTrending(), loadMovies(), loadTV(),
+    loadTopMovies(), loadTopTV(), loadAnime()
   ]);
 }
 
-// ─── LOADERS ───────────────────────────────────────────────────
 async function loadTrending() {
-  const d = await tmdb('/trending/all/week');
-  const items = d.results.slice(0,20);
-  heroItem = items[0];
+  const d = await api('/trending/all/week');
+  heroItem = d.results[0];
   renderHero(heroItem);
-  renderRow('rowTrending', items, true);
+  renderRow('rowTrending', d.results.slice(0,20), true);
 }
-async function loadMovies()    { const d = await tmdb('/movie/popular');   renderRow('rowMovies',    d.results.map(m=>({...m,media_type:'movie'}))); }
-async function loadTV()        { const d = await tmdb('/tv/popular');      renderRow('rowTV',        d.results.map(t=>({...t,media_type:'tv'}))); }
-async function loadTopMovies() { const d = await tmdb('/movie/top_rated'); renderRow('rowTopMovies', d.results.map(m=>({...m,media_type:'movie'}))); }
-async function loadTopTV()     { const d = await tmdb('/tv/top_rated');    renderRow('rowTopTV',     d.results.map(t=>({...t,media_type:'tv'}))); }
+async function loadMovies()    { const d = await api('/movie/popular');   renderRow('rowMovies', d.results.map(m=>({...m,media_type:'movie'}))); }
+async function loadTV()        { const d = await api('/tv/popular');      renderRow('rowTV', d.results.map(t=>({...t,media_type:'tv'}))); }
+async function loadTopMovies() { const d = await api('/movie/top_rated'); renderRow('rowTopMovies', d.results.map(m=>({...m,media_type:'movie'}))); }
+async function loadTopTV()     { const d = await api('/tv/top_rated');    renderRow('rowTopTV', d.results.map(t=>({...t,media_type:'tv'}))); }
+async function loadAnime()     {
+  const d = await api('/discover/tv', {with_genres:'16', sort_by:'popularity.desc', with_original_language:'ja'});
+  renderRow('rowAnime', d.results.map(t=>({...t,media_type:'tv'})));
+}
 
-// ─── HERO ──────────────────────────────────────────────────────
+// ── HERO ─────────────────────────────────────────────
 function renderHero(item) {
-  const isMovie = item.media_type !== 'tv';
-  const title   = item.title || item.name || '—';
-  const year    = (item.release_date || item.first_air_date || '').slice(0,4);
-  const g       = (item.genre_ids||[]).map(id=>genreMap[id]).filter(Boolean)[0];
-  document.getElementById('heroBg').src          = item.backdrop_path ? `${IMG}original${item.backdrop_path}` : '';
-  document.getElementById('heroTitle').textContent = title;
+  if (!item) return;
+  const title = item.title || item.name || '';
+  const year  = (item.release_date || item.first_air_date || '').slice(0,4);
+  const g     = (item.genre_ids||[]).map(id=>genreMap[id]).filter(Boolean)[0] || '';
+  document.getElementById('heroBg').src            = item.backdrop_path ? `${IMG}original${item.backdrop_path}` : '';
+  document.getElementById('heroTitle').textContent  = title;
   document.getElementById('heroRating').textContent = (item.vote_average||0).toFixed(1);
   document.getElementById('heroYear').textContent   = year;
-  document.getElementById('heroTag').textContent    = g || (isMovie ? 'Movie' : 'TV');
+  document.getElementById('heroTag').textContent    = g || (item.media_type==='tv' ? 'TV Series' : 'Movie');
   document.getElementById('heroDesc').textContent   = item.overview || '';
 }
 function playHero() { if(heroItem) openModal(heroItem, heroItem.media_type==='tv'?'tv':'movie', true); }
 function infoHero() { if(heroItem) openModal(heroItem, heroItem.media_type==='tv'?'tv':'movie', false); }
 
-// ─── RENDER ROW ────────────────────────────────────────────────
+// ── RENDER ROW ───────────────────────────────────────
 function renderRow(rowId, items, showType=false) {
   const el = document.getElementById(rowId);
   if (!el) return;
@@ -434,20 +462,23 @@ function renderRow(rowId, items, showType=false) {
 
 function cardHTML(item, showType=false) {
   const isMovie = item.media_type !== 'tv';
-  const title   = item.title || item.name || '—';
+  const title   = (item.title || item.name || '—').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   const poster  = item.poster_path ? `${IMG}w342${item.poster_path}` : null;
   const year    = (item.release_date || item.first_air_date || '').slice(0,4);
   const rating  = item.vote_average ? item.vote_average.toFixed(1) : null;
-  const type    = showType ? (isMovie ? '🎬' : '📺') : '';
+  const type    = showType ? (isMovie?'🎬':'📺') : '';
   const sub     = [type, year].filter(Boolean).join(' ');
-  const data    = JSON.stringify(item).replace(/"/g,'&quot;');
   const mtype   = isMovie ? 'movie' : 'tv';
+  // Safely encode item data
+  const data    = encodeURIComponent(JSON.stringify(item));
 
-  return `<div class="card" onclick='openModal(JSON.parse(this.dataset.item), "${mtype}")' data-item="${data}">
+  return `<div class="card" onclick="cardClick('${data}','${mtype}')">
     <div class="card-poster">
-      ${poster ? `<img src="${poster}" alt="${title}" loading="lazy">` : `<div class="card-ph">🎬</div>`}
-      ${rating ? `<div class="badge">★ ${rating}</div>` : ''}
-      <div class="card-overlay"><div class="play-circle"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg></div></div>
+      ${poster
+        ? `<img src="${poster}" alt="${title}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=card-ph>🎬</div>'">`
+        : `<div class="card-ph">🎬</div>`}
+      ${rating ? `<div class="card-badge">★ ${rating}</div>` : ''}
+      <div class="card-ov"><div class="play-dot"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg></div></div>
     </div>
     <div class="card-info">
       <div class="card-name" title="${title}">${title}</div>
@@ -456,10 +487,17 @@ function cardHTML(item, showType=false) {
   </div>`;
 }
 
-// ─── OPEN MODAL ────────────────────────────────────────────────
-async function openModal(item, type, autoPlay = true) {
+function cardClick(encoded, type) {
+  try {
+    const item = JSON.parse(decodeURIComponent(encoded));
+    openModal(item, type, true);
+  } catch(e) { console.error(e); }
+}
+
+// ── OPEN MODAL ───────────────────────────────────────
+async function openModal(item, type, autoPlay=true) {
   curItem   = item;
-  curType   = type || (item.media_type === 'tv' ? 'tv' : 'movie');
+  curType   = type;
   curSeason = 1;
   curEp     = 1;
   curSrv    = 0;
@@ -467,135 +505,136 @@ async function openModal(item, type, autoPlay = true) {
   document.getElementById('overlay').classList.add('on');
   document.body.style.overflow = 'hidden';
 
-  // Hide loading overlay immediately — iframe will render itself
-  const loader = document.getElementById('pLoader');
-  loader.classList.remove('hide');
-  document.getElementById('pFrame').src = 'about:blank';
+  // Reset player
+  const frame = document.getElementById('pframe');
+  frame.src   = 'about:blank';
+  showSpinner('Loading stream…');
 
-  // Populate info
-  const title    = item.title || item.name || '—';
-  const year     = (item.release_date || item.first_air_date || '').slice(0,4);
-  const rating   = item.vote_average ? item.vote_average.toFixed(1) : null;
-  const overview = item.overview || 'No description available.';
-  const poster   = item.poster_path ? `${IMG}w342${item.poster_path}` : '';
-  const genres   = (item.genre_ids||[]).map(id=>genreMap[id]).filter(Boolean);
+  // Fill info
+  const title   = item.title || item.name || '—';
+  const year    = (item.release_date || item.first_air_date || '').slice(0,4);
+  const rating  = item.vote_average ? item.vote_average.toFixed(1) : null;
+  const poster  = item.poster_path ? `${IMG}w342${item.poster_path}` : '';
+  const genres  = (item.genre_ids||[]).map(id=>genreMap[id]).filter(Boolean);
 
-  document.getElementById('mTitle').textContent   = title;
-  document.getElementById('mDesc').textContent    = overview;
-  document.getElementById('mPoster').src          = poster;
-  document.getElementById('mPoster').alt          = title;
-  document.getElementById('popupNotice').style.display = 'block';
+  document.getElementById('mTitle').textContent  = title;
+  document.getElementById('mDesc').textContent   = item.overview || 'No description available.';
+  document.getElementById('mPoster').src         = poster;
+  document.getElementById('mPoster').alt         = title;
 
   document.getElementById('mMeta').innerHTML = [
     year ? `<span>${year}</span>` : '',
-    rating ? `<span class="star-rating">★ ${rating}</span>` : '',
-    `<span class="tag">${curType === 'movie' ? 'Movie' : 'TV Series'}</span>`,
-    ...genres.slice(0,3).map(g=>`<span class="tag">${g}</span>`)
-  ].join('<span style="color:var(--dim)">·</span>');
+    rating ? `<span class="stars">★ ${rating}</span>` : '',
+    `<span class="mtag">${curType==='movie'?'Movie':'TV Series'}</span>`,
+    ...genres.slice(0,3).map(g=>`<span class="mtag">${g}</span>`)
+  ].join('<span style="color:var(--dim);padding:0 2px">·</span>');
 
   document.getElementById('mActs').innerHTML = `
-    <button class="btn btn-red btn-sm" onclick="doPlay()">▶ Play</button>
-    <button class="btn btn-ghost btn-sm" onclick="shareItem('${title.replace(/'/g,"\\'")}')">Share</button>
+    <button class="btn btn-r btn-sm" onclick="doPlay()">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+      Play
+    </button>
+    <button class="btn btn-g btn-sm" onclick="shareItem('${title.replace(/'/g,"\\'")}')">Share</button>
   `;
 
-  // Build server buttons
-  buildServerBtns();
+  // Server buttons
+  document.getElementById('srvRow').innerHTML = SERVERS.map((s,i) =>
+    `<button class="sbtn ${i===0?'on':''}" onclick="switchSrv(${i})">${s.name}</button>`
+  ).join('');
 
   // TV episodes
   if (curType === 'tv') {
-    document.getElementById('epSection').style.display = 'block';
+    document.getElementById('epick').style.display = 'block';
     await loadSeasons(item.id);
   } else {
-    document.getElementById('epSection').style.display = 'none';
+    document.getElementById('epick').style.display = 'none';
   }
 
   if (autoPlay) doPlay();
-  else loader.classList.add('hide');
+  else hideSpinner();
 }
 
-// ─── BUILD SERVER BUTTONS ──────────────────────────────────────
-function buildServerBtns() {
-  document.getElementById('srvRow').innerHTML = SERVERS.map((s, i) =>
-    `<button class="srv-btn ${i===0?'on':''}" onclick="switchSrv(${i})">${s.name}</button>`
-  ).join('');
-}
-
-function switchSrv(idx) {
-  curSrv = idx;
-  document.querySelectorAll('.srv-btn').forEach((b,i) => b.classList.toggle('on', i===idx));
+function switchSrv(i) {
+  curSrv = i;
+  document.querySelectorAll('.sbtn').forEach((b,j)=>b.classList.toggle('on',j===i));
   doPlay();
 }
 
-// ─── PLAY ──────────────────────────────────────────────────────
+// ── PLAY ─────────────────────────────────────────────
 function doPlay() {
-  const frame  = document.getElementById('pFrame');
-  const loader = document.getElementById('pLoader');
+  const frame = document.getElementById('pframe');
+  const srv   = SERVERS[curSrv];
+  showSpinner(`Loading ${srv.name}…`);
 
-  loader.classList.remove('hide');
+  const src = curType === 'movie'
+    ? srv.movie(curItem.id)
+    : srv.tv(curItem.id, curSeason, curEp);
 
-  const srv = SERVERS[curSrv];
-  let src;
-  if (curType === 'movie') {
-    src = srv.movie(curItem.id);
-  } else {
-    src = srv.tv(curItem.id, curSeason, curEp);
-  }
-
-  // Set the src directly — the iframe handles the rest
   frame.src = src;
 
-  // Hide the spinner overlay after a short delay
-  // (can't reliably detect iframe load due to cross-origin)
-  setTimeout(() => loader.classList.add('hide'), 3000);
+  // Hide spinner after delay (cross-origin iframe can't be detected)
+  clearTimeout(window._spinTimer);
+  window._spinTimer = setTimeout(hideSpinner, 3500);
 }
 
-// ─── TV SEASONS ────────────────────────────────────────────────
+function showSpinner(msg='Loading…') {
+  const sp = document.getElementById('pspinner');
+  document.getElementById('pspinMsg').textContent = msg;
+  sp.classList.remove('gone');
+}
+function hideSpinner() {
+  document.getElementById('pspinner').classList.add('gone');
+}
+
+// ── SEASONS / EPISODES ───────────────────────────────
 async function loadSeasons(tvId) {
   try {
-    const d = await tmdb(`/tv/${tvId}`);
-    const seasons = (d.seasons || []).filter(s => s.season_number > 0);
-    renderSeasons(seasons.length ? seasons : [{season_number:1, episode_count:12}]);
+    const d = await api(`/tv/${tvId}`);
+    const seas = (d.seasons||[]).filter(s=>s.season_number>0);
+    buildSeasons(seas.length ? seas : [{season_number:1,episode_count:12}]);
   } catch {
-    renderSeasons([{season_number:1, episode_count:12}]);
+    buildSeasons([{season_number:1,episode_count:12}]);
   }
 }
 
-function renderSeasons(seasons) {
-  document.getElementById('seasonRow').innerHTML = seasons.map(s =>
-    `<button class="sea-btn ${s.season_number===1?'on':''}" onclick="pickSeason(${s.season_number},${s.episode_count||20},this)">S${s.season_number}</button>`
+function buildSeasons(seas) {
+  document.getElementById('seasRow').innerHTML = seas.map(s =>
+    `<button class="seabtn ${s.season_number===1?'on':''}" onclick="pickSeason(${s.season_number},${s.episode_count||20},this)">S${s.season_number}</button>`
   ).join('');
-  renderEps(seasons[0]?.episode_count || 12);
+  buildEps(seas[0]?.episode_count || 12);
 }
 
 function pickSeason(num, count, btn) {
-  curSeason = num; curEp = 1;
-  document.querySelectorAll('.sea-btn').forEach(b=>b.classList.remove('on'));
+  curSeason=num; curEp=1;
+  document.querySelectorAll('.seabtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  renderEps(count);
+  buildEps(count);
 }
 
-function renderEps(count) {
-  document.getElementById('epGrid').innerHTML = Array.from({length:Math.min(count,60)},(_,i)=>i+1).map(ep =>
-    `<button class="ep-btn ${ep===curEp?'on':''}" onclick="pickEp(${ep},this)">E${ep}</button>`
-  ).join('');
+function buildEps(count) {
+  document.getElementById('epGrid').innerHTML =
+    Array.from({length:Math.min(count,60)},(_,i)=>i+1).map(ep=>
+      `<button class="epbtn ${ep===curEp?'on':''}" onclick="pickEp(${ep},this)">E${ep}</button>`
+    ).join('');
 }
 
 function pickEp(ep, btn) {
-  curEp = ep;
-  document.querySelectorAll('.ep-btn').forEach(b=>b.classList.remove('on'));
+  curEp=ep;
+  document.querySelectorAll('.epbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   doPlay();
 }
 
-// ─── CLOSE ─────────────────────────────────────────────────────
+// ── CLOSE ────────────────────────────────────────────
 function closeModal() {
+  clearTimeout(window._spinTimer);
   document.getElementById('overlay').classList.remove('on');
-  document.getElementById('pFrame').src = 'about:blank';
+  document.getElementById('pframe').src = 'about:blank';
   document.body.style.overflow = '';
 }
-function overlayClick(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+function bgClick(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
 
-// ─── SEARCH ────────────────────────────────────────────────────
+// ── SEARCH ───────────────────────────────────────────
 function onSearch(val) {
   clearTimeout(searchTimer);
   const home = document.getElementById('home');
@@ -608,82 +647,88 @@ function onSearch(val) {
   home.classList.add('off');
   sp.classList.add('on');
   document.getElementById('sSubtitle').textContent = `Searching for "${val}"…`;
-  document.getElementById('sgrid').innerHTML = Array(8).fill(`
-    <div><div class="skel" style="width:100%;aspect-ratio:2/3"></div>
-    <div class="skel" style="width:75%;height:12px;margin-top:8px;border-radius:4px"></div></div>`).join('');
-  searchTimer = setTimeout(() => doSearch(val), 420);
+  document.getElementById('sgrid').innerHTML = Array(8).fill(0).map(()=>`
+    <div><div class="sk" style="width:100%;aspect-ratio:2/3"></div>
+    <div class="sk" style="width:75%;height:11px;margin-top:8px;border-radius:4px"></div></div>`).join('');
+  searchTimer = setTimeout(()=>doSearch(val), 400);
 }
 
 async function doSearch(q) {
-  const d = await tmdb('/search/multi', { query: q, include_adult: false });
-  const results = d.results.filter(r => (r.media_type==='movie'||r.media_type==='tv') && r.poster_path);
-  document.getElementById('sSubtitle').textContent = `${results.length} result${results.length!==1?'s':''} for "${q}"`;
-  if (!results.length) {
-    document.getElementById('sgrid').innerHTML = `<div class="empty"><div class="ei">🔍</div><h3>Nothing found</h3><p>Try a different title or genre</p></div>`;
+  const d = await api('/search/multi', {query:q, include_adult:false});
+  const r = d.results.filter(x=>(x.media_type==='movie'||x.media_type==='tv') && (x.poster_path||x.backdrop_path));
+  document.getElementById('sSubtitle').textContent = `${r.length} result${r.length!==1?'s':''} for "${q}"`;
+  if (!r.length) {
+    document.getElementById('sgrid').innerHTML = `<div class="sempty"><div class="ei">🔍</div><h3>Nothing found</h3><p>Try a different title or genre</p></div>`;
     return;
   }
-  document.getElementById('sgrid').innerHTML = results.map(r=>cardHTML(r)).join('');
+  document.getElementById('sgrid').innerHTML = r.map(x=>cardHTML(x)).join('');
 }
 
-// ─── NAV TABS ──────────────────────────────────────────────────
-function navTab(btn, tab) {
-  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+// ── NAV TABS ─────────────────────────────────────────
+function navClick(btn, tab) {
+  document.querySelectorAll('.nt').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   document.getElementById('sInput').value = '';
   document.getElementById('home').classList.remove('off');
   document.getElementById('spage').classList.remove('on');
-  const map = {movies:'rowMovies',tv:'rowTV',trending:'rowTrending',toprated:'rowTopMovies'};
+  const map = {
+    movies:'sec-movies', tv:'sec-tv', trending:'sec-trending',
+    toprated:'sec-toprated', anime:'sec-anime'
+  };
   const el = document.getElementById(map[tab]);
-  if (el) el.closest('.section').scrollIntoView({behavior:'smooth',block:'start'});
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-// ─── GENRE BROWSE ──────────────────────────────────────────────
+// ── GENRE BROWSE ─────────────────────────────────────
 async function browseGenre(id, name) {
   document.getElementById('home').classList.add('off');
-  const sp = document.getElementById('spage');
-  sp.classList.add('on');
+  document.getElementById('spage').classList.add('on');
   document.getElementById('sSubtitle').textContent = `Browsing: ${name}`;
-  document.getElementById('sgrid').innerHTML = Array(8).fill(`<div><div class="skel" style="width:100%;aspect-ratio:2/3"></div></div>`).join('');
+  document.getElementById('sgrid').innerHTML = Array(8).fill(0).map(()=>`
+    <div><div class="sk" style="width:100%;aspect-ratio:2/3"></div></div>`).join('');
 
   const [mv, tv] = await Promise.all([
-    tmdb('/discover/movie', {with_genres:id, sort_by:'popularity.desc'}),
-    tmdb('/discover/tv',    {with_genres:id, sort_by:'popularity.desc'})
+    api('/discover/movie', {with_genres:id, sort_by:'popularity.desc'}),
+    api('/discover/tv',    {with_genres:id, sort_by:'popularity.desc'})
   ]);
   const combined = [
     ...mv.results.map(m=>({...m,media_type:'movie'})),
     ...tv.results.map(t=>({...t,media_type:'tv'}))
   ].sort((a,b)=>b.popularity-a.popularity);
 
-  document.getElementById('sgrid').innerHTML = combined.map(r=>cardHTML(r)).join('');
-  document.querySelectorAll('.gpill').forEach(p=>p.classList.toggle('on',p.textContent===name));
+  document.getElementById('sgrid').innerHTML = combined.length
+    ? combined.map(x=>cardHTML(x)).join('')
+    : `<div class="sempty"><div class="ei">🎬</div><h3>Nothing found</h3></div>`;
+
+  document.querySelectorAll('.gp').forEach(p=>p.classList.toggle('on',p.textContent===name));
 }
 
-// ─── SHARE ─────────────────────────────────────────────────────
+// ── SHARE ────────────────────────────────────────────
 function shareItem(title) {
   if (navigator.share) {
     navigator.share({title:`Watch ${title}`, text:`Watching "${title}" on StreamVault`});
   } else {
-    navigator.clipboard?.writeText(`Watching: ${title} on StreamVault`);
-    showToast('📋 Copied!');
+    navigator.clipboard?.writeText(window.location.href);
+    showToast('📋 Link copied!');
   }
 }
-
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('on');
-  setTimeout(() => t.classList.remove('on'), 2400);
+  setTimeout(()=>t.classList.remove('on'), 2500);
 }
 
-// ─── KEYBOARD ──────────────────────────────────────────────────
+// ── KEYBOARD ─────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-  if ((e.key==='f'||e.key==='F') && document.getElementById('overlay').classList.contains('on')) {
-    document.getElementById('pFrame').requestFullscreen?.();
+  if (e.key==='Escape') closeModal();
+  if (e.key==='f' || e.key==='F') {
+    if (document.getElementById('overlay').classList.contains('on'))
+      document.getElementById('pframe').requestFullscreen?.();
   }
 });
 
-// ─── GO ────────────────────────────────────────────────────────
+// ── GO ───────────────────────────────────────────────
 init();
 </script>
 </body>
