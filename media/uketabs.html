@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤙 UkuTab — Play What You Love</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --sand:    #F7F3ED;
+    --bark:    #2B1F14;
+    --wood:    #C4843A;
+    --wood-lt: #E9B97A;
+    --sage:    #6B8F71;
+    --rose:    #D4756A;
+    --cream:   #FDF9F4;
+    --muted:   #8C7B6E;
+    --border:  #E2D8CE;
+    --chord-bg:#FFF8F0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--sand);
+    color: var(--bark);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--bark);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(43,31,20,.35);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--wood-lt);
+    letter-spacing: -.5px;
+  }
+  .logo span { color: var(--rose); }
+  .header-right { display: flex; gap: .75rem; align-items: center; }
+  .btn-sm {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.18);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .8rem;
+    padding: .35rem .8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-sm:hover { background: rgba(255,255,255,.16); }
+  .btn-sm.active { background: var(--wood); border-color: var(--wood); color: #fff; }
+
+  /* ── LAYOUT ── */
+  .app { display: flex; height: calc(100vh - 60px); overflow: hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 310px;
+    min-width: 260px;
+    background: var(--cream);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .search-wrap {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .search-wrap input {
+    width: 100%;
+    background: var(--sand);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .55rem .9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    color: var(--bark);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .search-wrap input:focus { border-color: var(--wood); }
+  .genre-pills {
+    display: flex;
+    gap: .4rem;
+    flex-wrap: wrap;
+    padding: .75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .pill {
+    font-size: .72rem;
+    font-weight: 500;
+    padding: .25rem .65rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .pill:hover, .pill.active {
+    background: var(--wood);
+    border-color: var(--wood);
+    color: #fff;
+  }
+  .song-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: .5rem 0;
+  }
+  .song-list::-webkit-scrollbar { width: 4px; }
+  .song-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .song-item {
+    padding: .7rem 1rem;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all .12s;
+    display: flex;
+    flex-direction: column;
+    gap: .1rem;
+  }
+  .song-item:hover { background: var(--sand); }
+  .song-item.active {
+    border-left-color: var(--wood);
+    background: rgba(196,132,58,.08);
+  }
+  .song-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .92rem;
+    line-height: 1.2;
+  }
+  .song-meta {
+    font-size: .75rem;
+    color: var(--muted);
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+  }
+  .diff-badge {
+    font-size: .65rem;
+    padding: .1rem .4rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .diff-easy   { background: #D4EDD7; color: #2F6B35; }
+  .diff-medium { background: #FFF0D0; color: #8B5E00; }
+  .diff-hard   { background: #FAD9D5; color: #8B2A20; }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    padding: .65rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .toolbar-group { display: flex; align-items: center; gap: .5rem; }
+  .toolbar label { font-size: .78rem; color: var(--muted); font-weight: 500; }
+  .btn {
+    background: var(--bark);
+    color: #fff;
+    border: none;
+    padding: .4rem .9rem;
+    border-radius: 7px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--bark);
+  }
+  .btn.secondary:hover { background: var(--sand); }
+  .btn.wood { background: var(--wood); }
+  .btn.sage { background: var(--sage); }
+  .transpose-val {
+    font-family: 'DM Mono', monospace;
+    font-size: .9rem;
+    font-weight: 500;
+    min-width: 2.5rem;
+    text-align: center;
+    color: var(--wood);
+  }
+  .speed-val {
+    font-family: 'DM Mono', monospace;
+    font-size: .85rem;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+  .toolbar-sep { width: 1px; background: var(--border); height: 28px; }
+
+  /* ── CONTENT ── */
+  .content-area {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    gap: 0;
+  }
+  .content-area::-webkit-scrollbar { width: 6px; }
+  .content-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+  /* ── SONG VIEW ── */
+  .song-view {
+    flex: 1;
+    padding: 2rem 2.5rem;
+    max-width: 760px;
+  }
+  .song-header { margin-bottom: 2rem; }
+  .song-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: .3rem;
+  }
+  .song-header .artist { font-size: 1rem; color: var(--muted); }
+  .song-header .tags {
+    display: flex;
+    gap: .5rem;
+    margin-top: .6rem;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-size: .72rem;
+    padding: .2rem .55rem;
+    border-radius: 4px;
+    background: var(--sand);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  /* ── CHORD DIAGRAMS ── */
+  .chord-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--chord-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .chord-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .3rem;
+    cursor: pointer;
+    transition: transform .1s;
+  }
+  .chord-diagram:hover { transform: scale(1.05); }
+  .chord-name {
+    font-family: 'Syne', sans-serif;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--bark);
+  }
+  .chord-svg { display: block; }
+
+  /* ── TABS / LYRICS ── */
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--wood);
+    margin: 1.5rem 0 .5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .tab-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .tab-block pre {
+    font-family: 'DM Mono', monospace;
+    font-size: .88rem;
+    line-height: 2;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--bark);
+  }
+  .chord-inline {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: var(--wood);
+    font-size: .95rem;
+    cursor: pointer;
+    text-decoration: none;
+    background: rgba(196,132,58,.1);
+    padding: 0 .2rem;
+    border-radius: 3px;
+    transition: background .1s;
+  }
+  .chord-inline:hover { background: rgba(196,132,58,.22); }
+
+  .lyrics-line { margin-bottom: .1rem; font-size: .95rem; }
+  .chords-line {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: var(--wood);
+    font-size: .88rem;
+    letter-spacing: .03em;
+    margin-bottom: 0;
+  }
+
+  /* ── YOUTUBE PANEL ── */
+  .yt-panel {
+    width: 340px;
+    min-width: 280px;
+    background: var(--cream);
+    border-left: 1px solid var(--border);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+  }
+  .yt-panel h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .yt-embed {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 8px;
+    border: none;
+    background: #000;
+  }
+  .yt-results { display: flex; flex-direction: column; gap: .5rem; }
+  .yt-card {
+    display: flex;
+    gap: .6rem;
+    padding: .5rem;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .12s;
+    align-items: flex-start;
+  }
+  .yt-card:hover { background: var(--sand); border-color: var(--border); }
+  .yt-card.selected { border-color: var(--wood); background: rgba(196,132,58,.06); }
+  .yt-thumb {
+    width: 80px;
+    height: 45px;
+    border-radius: 4px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--border);
+  }
+  .yt-card-title {
+    font-size: .78rem;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--bark);
+  }
+  .yt-card-ch { font-size: .7rem; color: var(--muted); margin-top: .2rem; }
+  .yt-placeholder {
+    aspect-ratio: 16/9;
+    background: var(--bark);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,.5);
+    font-size: .85rem;
+    gap: .5rem;
+  }
+  .yt-placeholder svg { opacity: .4; }
+
+  /* ── WELCOME / NO SONG ── */
+  .welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem;
+    gap: 1rem;
+  }
+  .welcome-icon { font-size: 4rem; }
+  .welcome h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+  }
+  .welcome p { color: var(--muted); max-width: 360px; line-height: 1.6; }
+
+  /* ── CHORD POPUP ── */
+  .chord-popup {
+    position: fixed;
+    background: var(--bark);
+    color: #fff;
+    border-radius: 12px;
+    padding: .75rem 1rem;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: .4rem;
+    z-index: 999;
+    box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    pointer-events: none;
+  }
+  .chord-popup.show { display: flex; }
+  .chord-popup .chord-name { color: var(--wood-lt); font-size: 1rem; }
+
+  /* ── AUTOSCROLL INDICATOR ── */
+  .autoscroll-bar {
+    height: 3px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .autoscroll-bar .fill {
+    height: 100%;
+    background: var(--wood);
+    width: 0%;
+    transition: width .1s linear;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .sidebar { width: 240px; }
+    .yt-panel { width: 280px; }
+  }
+  @media (max-width: 680px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; max-height: 220px; flex-direction: row; overflow-x: auto; }
+    .yt-panel { width: 100%; border-left: none; border-top: 1px solid var(--border); }
+    .content-area { flex-direction: column; }
+  }
+
+  /* ── CAPO NOTICE ── */
+  .capo-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: rgba(107,143,113,.12);
+    border: 1px solid var(--sage);
+    border-radius: 6px;
+    padding: .3rem .7rem;
+    font-size: .8rem;
+    color: var(--sage);
+    font-weight: 500;
+    margin-top: .5rem;
+  }
+
+  .rating-stars { color: var(--wood); font-size: .85rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Uku<span>Tab</span></div>
+  <div class="header-right">
+    <button class="btn-sm" id="toggleYT">🎥 YouTube</button>
+    <button class="btn-sm" id="toggleChords">🎸 Show Chords</button>
+  </div>
+</header>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search songs or artists…" />
+    </div>
+    <div class="genre-pills" id="genrePills">
+      <button class="pill active" data-genre="all">All</button>
+      <button class="pill" data-genre="pop">Pop</button>
+      <button class="pill" data-genre="classic">Classic</button>
+      <button class="pill" data-genre="folk">Folk</button>
+      <button class="pill" data-genre="rock">Rock</button>
+      <button class="pill" data-genre="hawaiian">Hawaiian</button>
+      <button class="pill" data-genre="indie">Indie</button>
+    </div>
+    <div class="song-list" id="songList"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="autoscroll-bar"><div class="fill" id="scrollFill"></div></div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-group">
+        <label>Transpose</label>
+        <button class="btn secondary" id="transposeDown">−</button>
+        <span class="transpose-val" id="transposeVal">0</span>
+        <button class="btn secondary" id="transposeUp">+</button>
+        <button class="btn secondary" style="font-size:.75rem" id="transposeReset">Reset</button>
+      </div>
+      <div class="toolbar-sep"></div>
+      <div class="toolbar-group">
+        <label>Auto-scroll</label>
+        <button class="btn wood" id="scrollToggle">▶ Start</button>
+        <button class="btn secondary" id="scrollSlower">🐢</button>
+        <span class="speed-val" id="scrollSpeed">1×</span>
+        <button class="btn secondary" id="scrollFaster">🐇</button>
+      </div>
+      <div class="toolbar-sep"></div>
+      <div class="toolbar-group">
+        <button class="btn sage" id="printBtn">🖨 Print</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+      <div id="songView" class="song-view">
+        <div class="welcome" id="welcomeMsg">
+          <div class="welcome-icon">🤙</div>
+          <h2>Pick a song, start strumming</h2>
+          <p>Browse the list on the left or search for your favourite tune. Chords, tabs, auto-scroll, and YouTube side-by-side — all in one place.</p>
+        </div>
+      </div>
+      <div class="yt-panel" id="ytPanel">
+        <h3>🎥 Listen along</h3>
+        <div class="yt-placeholder" id="ytPlaceholder">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <span>Pick a song to load videos</span>
+        </div>
+        <iframe class="yt-embed" id="ytEmbed" src="" frameborder="0" allowfullscreen style="display:none"></iframe>
+        <div class="yt-results" id="ytResults"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="chord-popup" id="chordPopup">
+  <span class="chord-name" id="popupChordName"></span>
+  <svg class="chord-svg" id="popupChordSvg" width="80" height="90" viewBox="0 0 80 90"></svg>
+  <span style="font-size:.7rem;opacity:.5">G C E A</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CHORD DATA  (G C E A tuning)
+// Format: [fret_g, fret_C, fret_E, fret_A]  or  {barre, frets}
+// ═══════════════════════════════════════════════════════
+const CHORDS = {
+  "C":  [0,0,0,3],
+  "Cm": [0,3,3,3],
+  "C7": [0,0,0,1],
+  "Cmaj7": [0,0,0,2],
+  "D":  [2,2,2,0],
+  "Dm": [2,2,1,0],
+  "D7": [2,2,2,3],
+  "Dmaj7": [2,2,2,4],
+  "E":  [4,4,4,2],
+  "Em": [0,4,3,2],
+  "E7": [1,2,0,2],
+  "F":  [2,0,1,0],
+  "Fm": [1,0,1,3],
+  "F7": [2,3,1,0],
+  "Fmaj7": [2,4,1,0],
+  "G":  [0,2,3,2],
+  "Gm": [0,2,3,1],
+  "G7": [0,2,1,2],
+  "Gmaj7": [0,2,2,2],
+  "A":  [2,1,0,0],
+  "Am": [2,0,0,0],
+  "A7": [0,1,0,0],
+  "Amaj7": [1,1,0,0],
+  "B":  [4,3,2,2],
+  "Bm": [4,2,2,2],
+  "B7": [2,3,2,2],
+  "Bb": [3,2,1,1],
+  "Bbm":[3,1,1,1],
+  "Eb": [0,3,3,1],
+  "Ab": [5,3,4,3],
+  "F#m":[2,1,2,0],
+  "C#m":[6,4,4,4],
+  "G#m":[4,3,4,2],
+};
+
+const NOTES  = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const NOTE_ALIASES = {"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#"};
+
+function normalizeNote(n){ return NOTE_ALIASES[n] || n; }
+
+function transposeChord(chord, semis) {
+  if (semis === 0) return chord;
+  // Parse chord: root + quality
+  const m = chord.match(/^([A-G][b#]?)(.*)/);
+  if (!m) return chord;
+  let root = normalizeNote(m[1]);
+  const quality = m[2];
+  let idx = NOTES.indexOf(root);
+  if (idx < 0) return chord;
+  idx = ((idx + semis) % 12 + 12) % 12;
+  return NOTES[idx] + quality;
+}
+
+// ═══════════════════════════════════════════════════════
+// SONG DATABASE
+// ═══════════════════════════════════════════════════════
+const SONGS = [
+  {
+    id: 1, title: "Somewhere Over the Rainbow", artist: "Israel Kamakawiwoʻole",
+    genre: "hawaiian", difficulty: "easy", capo: 0, rating: 5,
+    tags: ["classic","feel-good","fingerpick"],
+    ytSearch: "Somewhere Over the Rainbow IZ ukulele",
+    ytVideos: [
+      { id: "V1bFr2SWP1I", title: "IZ – Somewhere Over the Rainbow (Official)", ch: "Israel IZ Kamakawiwoʻole" },
+      { id: "h3uFLpJKTuQ", title: "Beginner Ukulele Tutorial", ch: "The Ukulele Teacher" },
+    ],
+    chords: ["C","Em","Am","F","G","G7"],
+    sections: [
+      { name: "Intro", type: "chords", lines: [
+        { chords: "C          Em       Am       F",
+          lyrics:  "Somewhere over the rainbow way up high" },
+        { chords: "C          Em       Am       F",
+          lyrics:  "And the dreams that you dreamed of once in a lullaby" },
+      ]},
+      { name: "Verse", type: "chords", lines: [
+        { chords: "C          Em       Am       F",
+          lyrics:  "Somewhere over the rainbow skies are blue" },
+        { chords: "C          Em       Am       F  G7",
+          lyrics:  "And the dreams that you dare to dream really do come true" },
+        { chords: "C          G        Am       F",
+          lyrics:  "Someday I'll wish upon a star" },
+        { chords: "C          G        Am       F",
+          lyrics:  "Wake up where the clouds are far behind me" },
+      ]},
+      { name: "Chorus", type: "chords", lines: [
+        { chords: "F          C        G        Am   F",
+          lyrics:  "Somewhere over the rainbow bluebirds fly" },
+        { chords: "F          C        Am       F  G7  C",
+          lyrics:  "And the dream that you dare to, oh why oh why can't I?" },
+      ]},
+      { name: "Tab — Intro Riff", type: "tab", content:
+`G|--0---0---0---0--0-----|
+C|--0---0---0---0--0-----|
+E|--0-0-0-0-0-0-0-0-0----|
+A|--3-3-3-3-2-2-0-0-0----|
+     C           Em` }
+    ]
+  },
+  {
+    id: 2, title: "Riptide", artist: "Vance Joy",
+    genre: "indie", difficulty: "easy", capo: 0, rating: 5,
+    tags: ["strumming","singalong","indie"],
+    ytSearch: "Riptide Vance Joy ukulele",
+    ytVideos: [
+      { id: "uJ_1HMAGb4k", title: "Vance Joy – Riptide (Official Video)", ch: "Vance Joy" },
+      { id: "OkRiGYHBHRI", title: "Riptide Easy Ukulele Tutorial", ch: "The Ukulele Teacher" },
+    ],
+    chords: ["Am","G","C","F"],
+    sections: [
+      { name: "Intro", type: "tab", content:
+`G|--0-0--2--0--0--2--0--|
+C|--0-0--0--0--0--0--0--|
+E|--2-2--0--0--2--0--0--|
+A|--0-0--2--3--0--2--3--|
+     Am    G   C` },
+      { name: "Verse", type: "chords", lines: [
+        { chords: "Am         G          C",
+          lyrics:  "I was scared of dentists and the dark" },
+        { chords: "Am         G          C",
+          lyrics:  "I was scared of pretty girls and starting conversations" },
+        { chords: "Am         G          C",
+          lyrics:  "Oh all my friends are turning green" },
+        { chords: "Am         G          C",
+          lyrics:  "You're the magician's assistant in their dreams" },
+      ]},
+      { name: "Pre-Chorus", type: "chords", lines: [
+        { chords: "Am         G          C",
+          lyrics:  "And they come unstuck" },
+      ]},
+      { name: "Chorus", type: "chords", lines: [
+        { chords: "C          G          Am         F",
+          lyrics:  "Lady, running down to the riptide" },
+        { chords: "C          G          Am         F",
+          lyrics:  "Taken away to the dark side" },
+        { chords: "C          G          Am         F",
+          lyrics:  "I wanna be your left-hand man" },
+        { chords: "C          G          Am         F",
+          lyrics:  "I love you when you're singing that song" },
+        { chords: "C          G          Am         F",
+          lyrics:  "And I got a lump in my throat cause you're gonna sing the words wrong" },
+      ]},
+    ]
+  },
+  {
+    id: 3, title: "I'm Yours", artist: "Jason Mraz",
+    genre: "pop", difficulty: "easy", capo: 4, rating: 5,
+    tags: ["capo","strumming","feel-good"],
+    ytSearch: "I'm Yours Jason Mraz ukulele",
+    ytVideos: [
+      { id: "EkHTsc9PU2A", title: "Jason Mraz – I'm Yours (Official)", ch: "Jason Mraz" },
+      { id: "mLWfZEjSIPg", title: "I'm Yours Ukulele Lesson", ch: "Ukulele Go" },
+    ],
+    chords: ["C","G","Am","F"],
+    capoNote: "Capo 4 to play along with Jason Mraz",
+    sections: [
+      { name: "Verse", type: "chords", lines: [
+        { chords: "C                G",
+          lyrics:  "Well, you done done me and you bet I felt it" },
+        { chords: "Am               F",
+          lyrics:  "I tried to be chill but you're so hot that I melted" },
+        { chords: "C                G",
+          lyrics:  "I fell right through the cracks" },
+        { chords: "Am               F",
+          lyrics:  "Now I'm trying to get back" },
+      ]},
+      { name: "Chorus", type: "chords", lines: [
+        { chords: "C            G",
+          lyrics:  "Well open up your mind and see like me" },
+        { chords: "Am           F",
+          lyrics:  "Open up your plans and damn you're free" },
+        { chords: "C            G",
+          lyrics:  "Look into your heart and you'll find love love love love" },
+        { chords: "Am              F",
+          lyrics:  "Listen to the music of the moment people dance and sing" },
+        { chords: "C              G",
+          lyrics:  "We're just one big family" },
+        { chords: "Am                   F",
+          lyrics:  "And it's our God-forsaken right to be loved loved loved loved" },
+        { chords: "C  G  Am  F",
+          lyrics:  "I, I'm yours" },
+      ]},
+    ]
+  },
+  {
+    id: 4, title: "Hotel California", artist: "Eagles",
+    genre: "rock", difficulty: "hard", capo: 0, rating: 5,
+    tags: ["fingerpick","classic","iconic"],
+    ytSearch: "Hotel California ukulele fingerstyle",
+    ytVideos: [
+      { id: "BciS5krYL80", title: "Hotel California Ukulele Fingerstyle", ch: "Ukulele Underground" },
+      { id: "uMsWkJFGPDE", title: "Eagles – Hotel California Cover Uke", ch: "Aldrine Guerrero" },
+    ],
+    chords: ["Bm","F#","A","E","G","D","Em","F#7"],
+    sections: [
+      { name: "Intro Tab", type: "tab", content:
+`G|--2-2-2-0-2-2-0---2-0-2-2-2------|
+C|--2-------2---2---2---2-2-2---2---|
+E|--3-3-3---2---2---0---0-0-0---2---|
+A|----------2---2---0---0-0-0---2---|
+     Bm         F#` },
+      { name: "Verse", type: "chords", lines: [
+        { chords: "Bm                    F#7",
+          lyrics:  "On a dark desert highway, cool wind in my hair" },
+        { chords: "A                     E",
+          lyrics:  "Warm smell of colitas rising up through the air" },
+        { chords: "G                     D",
+          lyrics:  "Up ahead in the distance I saw a shimmering light" },
+        { chords: "Em                    F#7",
+          lyrics:  "My head grew heavy and my sight grew dim" },
+        { chords: "Bm                    F#7",
+          lyrics:  "I had to stop for the night" },
+      ]},
+      { name: "Chorus", type: "chords", lines: [
+        { chords: "G                     D",
+          lyrics:  "Welcome to the Hotel California" },
+        { chords: "Bm                    F#7",
+          lyrics:  "Such a lovely place, such a lovely face" },
+        { chords: "G                     D",
+          lyrics:  "Plenty of room at the Hotel California" },
+        { chords: "Em                    F#7",
+          lyrics:  "Any time of year, you can find it here" },
+      ]},
+    ]
+  },
+  {
+    id: 5, title: "Blackbird", artist: "The Beatles",
+    genre: "classic", difficulty: "medium", capo: 0, rating: 5,
+    tags: ["fingerpick","Beatles","solo"],
+    ytSearch: "Blackbird Beatles ukulele fingerpicking",
+    ytVideos: [
+      { id: "gEp8g5RVBZU", title: "Blackbird – Ukulele Tutorial (Fingerstyle)", ch: "Cynthia Lin" },
+      { id: "GHUeQ5PZsPA", title: "The Beatles – Blackbird Ukulele Cover", ch: "Aldrine Guerrero" },
+    ],
+    chords: ["G","Am","G7","C","D7","Em"],
+    sections: [
+      { name: "Main Riff", type: "tab", content:
+`G|----0-0-0---0-0-0---0-0----0-0-0---|
+C|--0-------0-------0----0-0---------|
+E|--2-2-----2-2-----0----0-0-----2---|
+A|----------0-------0----0-0-----2---|
+     G               Am       G7  C` },
+      { name: "Verse", type: "chords", lines: [
+        { chords: "G           Am           G  G7",
+          lyrics:  "Blackbird singing in the dead of night" },
+        { chords: "C           C#dim        D  D#dim",
+          lyrics:  "Take these broken wings and learn to fly" },
+        { chords: "Em          Eb           D  C#dim",
+          lyrics:  "All your life" },
+        { chords: "C           B7           Bb  A  D7  G",
+          lyrics:  "You were only waiting for this moment to arise" },
+      ]},
+    ]
+  },
+  {
+    id: 6, title: "Can't Help Falling in Love", artist: "Elvis Presley",
+    genre: "classic", difficulty: "easy", capo: 0, rating: 5,
+    tags: ["love song","classic","Elvis","waltz"],
+    ytSearch: "Can't Help Falling in Love ukulele",
+    ytVideos: [
+      { id: "vGJTaP6anOU", title: "Can't Help Falling in Love – Ukulele Tutorial", ch: "The Ukulele Teacher" },
+      { id: "A3yCcXgbKrE", title: "Elvis – Can't Help Falling in Love (Cover)", ch: "Cynthia Lin" },
+    ],
+    chords: ["C","Em","Am","F","G","G7"],
+    sections: [
+      { name: "Verse (3/4 waltz)", type: "chords", lines: [
+        { chords: "C   Em  Am",
+          lyrics:  "Wise men say" },
+        { chords: "F   C   G",
+          lyrics:  "Only fools rush in" },
+        { chords: "F   G   Am  F",
+          lyrics:  "But I can't help falling in love with you" },
+      ]},
+      { name: "Bridge", type: "chords", lines: [
+        { chords: "Em      Am      Em      Am",
+          lyrics:  "Like a river flows surely to the sea" },
+        { chords: "Em      Am      F   G",
+          lyrics:  "Darling so it goes, some things are meant to be" },
+      ]},
+      { name: "Verse 2", type: "chords", lines: [
+        { chords: "C   Em  Am",
+          lyrics:  "Take my hand" },
+        { chords: "F   C   G",
+          lyrics:  "Take my whole life too" },
+        { chords: "F   G   Am  F",
+          lyrics:  "For I can't help falling in love with you" },
+        { chords: "F   G   C",
+          lyrics:  "For I can't help falling in love with you" },
+      ]},
+      { name: "Strumming Pattern", type: "tab", content:
+`3/4 Time (Waltz)
+D   DU  UDU
+1   2+  3+
+
+Down = strum toward floor
+U    = up strum` }
+    ]
+  },
+  {
+    id: 7, title: "Hey Soul Sister", artist: "Train",
+    genre: "pop", difficulty: "easy", capo: 0, rating: 4,
+    tags: ["strumming","pop","fun"],
+    ytSearch: "Hey Soul Sister ukulele tutorial",
+    ytVideos: [
+      { id: "xdS3j3SQZQE", title: "Hey Soul Sister – Ukulele Lesson Beginner", ch: "The Ukulele Teacher" },
+      { id: "kVNhPgbFpLQ", title: "Train – Hey Soul Sister Ukulele Cover", ch: "Ukulele Go" },
+    ],
+    chords: ["C","G","Am","F"],
+    sections: [
+      { name: "Verse", type: "chords", lines: [
+        { chords: "C              G",
+          lyrics:  "Hey hey hey" },
+        { chords: "C                      G",
+          lyrics:  "Your lipstick stains on the front lobe of my left side brains" },
+        { chords: "Am                     F",
+          lyrics:  "I knew I wouldn't forget ya, and so I went and let you blow my mind" },
+        { chords: "C                      G",
+          lyrics:  "Your sweet moonbeam, the smell of you in every single dream I dream" },
+        { chords: "Am                     F",
+          lyrics:  "I knew when we collided you're the one I have decided" },
+        { chords: "Am           F",
+          lyrics:  "Who's one of my kind" },
+      ]},
+      { name: "Chorus", type: "chords", lines: [
+        { chords: "C       G       Am      F",
+          lyrics:  "Hey soul sister, ain't that Mr. Mister on the radio, stereo" },
+        { chords: "C       G       Am      F",
+          lyrics:  "The way you move ain't fair you know" },
+        { chords: "C       G       Am      F",
+          lyrics:  "Hey soul sister I don't wanna miss a single thing you do tonight" },
+        { chords: "C    G    Am   F",
+          lyrics:  "Hey hey hey" },
+      ]},
+    ]
+  },
+  {
+    id: 8, title: "Hallelujah", artist: "Leonard Cohen",
+    genre: "folk", difficulty: "medium", capo: 5, rating: 5,
+    tags: ["emotional","folk","fingerpick"],
+    ytSearch: "Hallelujah Leonard Cohen ukulele",
+    ytVideos: [
+      { id: "YrLk4vdY28Q", title: "Hallelujah – Ukulele Tutorial", ch: "Aldrine Guerrero" },
+      { id: "tt2TJmzfmG0", title: "Hallelujah – Ukulele Fingerstyle Cover", ch: "Cynthia Lin" },
+    ],
+    chords: ["C","Am","F","G","E7"],
+    capoNote: "Capo 5 to play in original key",
+    sections: [
+      { name: "Verse", type: "chords", lines: [
+        { chords: "C              Am",
+          lyrics:  "I heard there was a secret chord" },
+        { chords: "C              Am",
+          lyrics:  "That David played and it pleased the Lord" },
+        { chords: "F              G         C  G",
+          lyrics:  "But you don't really care for music, do ya?" },
+        { chords: "C              F           G",
+          lyrics:  "Well it goes like this, the fourth, the fifth" },
+        { chords: "Am             F",
+          lyrics:  "The minor fall and the major lift" },
+        { chords: "G              E7          Am",
+          lyrics:  "The baffled king composing Hallelujah" },
+      ]},
+      { name: "Chorus", type: "chords", lines: [
+        { chords: "F           Am",
+          lyrics:  "Hallelujah, Hallelujah" },
+        { chords: "F           C    G    C",
+          lyrics:  "Hallelujah, Hallelujah" },
+      ]},
+    ]
+  },
+  {
+    id: 9, title: "Three Little Birds", artist: "Bob Marley",
+    genre: "folk", difficulty: "easy", capo: 0, rating: 5,
+    tags: ["reggae","happy","beginner"],
+    ytSearch: "Three Little Birds Bob Marley ukulele",
+    ytVideos: [
+      { id: "vDsE8LFTQWQ", title: "Three Little Birds – Ukulele Tutorial", ch: "The Ukulele Teacher" },
+      { id: "HNBCVM4KbUM", title: "Bob Marley – Three Little Birds Ukulele Cover", ch: "Ukulele Go" },
+    ],
+    chords: ["A","D","E"],
+    sections: [
+      { name: "Chorus", type: "chords", lines: [
+        { chords: "A",
+          lyrics:  "Don't worry, about a thing" },
+        { chords: "D                   A",
+          lyrics:  "'Cause every little thing gonna be all right" },
+        { chords: "A",
+          lyrics:  "Singin', don't worry, about a thing" },
+        { chords: "D                   A",
+          lyrics:  "'Cause every little thing gonna be all right" },
+      ]},
+      { name: "Verse", type: "chords", lines: [
+        { chords: "A",
+          lyrics:  "Rise up this mornin'" },
+        { chords: "A",
+          lyrics:  "Smiled with the risin' sun" },
+        { chords: "D                   A",
+          lyrics:  "Three little birds pitched by my doorstep" },
+        { chords: "E                   D             A",
+          lyrics:  "Singin' sweet songs of melodies pure and true" },
+        { chords: "E                   D             A",
+          lyrics:  "Saying this is my message to you" },
+      ]},
+      { name: "Reggae Strum Pattern", type: "tab", content:
+`  1   +   2   +   3   +   4   +
+  D       U   D       U   D
+  
+Miss beat 1, accent on the "+"
+Classic reggae skank - chop on upbeats!` }
+    ]
+  },
+  {
+    id: 10, title: "Wonderful World", artist: "Sam Cooke",
+    genre: "classic", difficulty: "easy", capo: 0, rating: 4,
+    tags: ["classic","feel-good","easy"],
+    ytSearch: "Wonderful World Sam Cooke ukulele",
+    ytVideos: [
+      { id: "Lm5NKNa1t3M", title: "Wonderful World – Sam Cooke Ukulele", ch: "Ukulele Teacher" },
+    ],
+    chords: ["C","Am","F","G","G7"],
+    sections: [
+      { name: "Verse", type: "chords", lines: [
+        { chords: "C           Am",
+          lyrics:  "Don't know much about history" },
+        { chords: "C           Am",
+          lyrics:  "Don't know much biology" },
+        { chords: "F              G",
+          lyrics:  "Don't know much about a science book" },
+        { chords: "F              G7",
+          lyrics:  "Don't know much about the French I took" },
+        { chords: "C        Am        F     G7",
+          lyrics:  "But I do know that I love you" },
+        { chords: "C           Am        F      G7",
+          lyrics:  "And I know that if you love me too" },
+        { chords: "C     F  G7     C",
+          lyrics:  "What a wonderful world this would be" },
+      ]},
+    ]
+  },
+  {
+    id: 11, title: "Fly Me to the Moon", artist: "Frank Sinatra",
+    genre: "classic", difficulty: "medium", capo: 0, rating: 4,
+    tags: ["jazz","swing","classic"],
+    ytSearch: "Fly Me to the Moon ukulele jazz",
+    ytVideos: [
+      { id: "c5Iv9_6kLzE", title: "Fly Me to the Moon Ukulele Jazz Chords", ch: "Ukulele Underground" },
+    ],
+    chords: ["Am","Dm","G7","Cmaj7","Fmaj7","Bm","E7"],
+    sections: [
+      { name: "Verse (Bossa Nova Jazz)", type: "chords", lines: [
+        { chords: "Am              Dm",
+          lyrics:  "Fly me to the moon, let me play among the stars" },
+        { chords: "G7              Cmaj7",
+          lyrics:  "Let me see what spring is like on Jupiter and Mars" },
+        { chords: "Fmaj7           Bm        E7",
+          lyrics:  "In other words, hold my hand" },
+        { chords: "Am         Dm      G7    C",
+          lyrics:  "In other words, baby kiss me" },
+      ]},
+    ]
+  },
+  {
+    id: 12, title: "Banana Pancakes", artist: "Jack Johnson",
+    genre: "indie", difficulty: "medium", capo: 0, rating: 4,
+    tags: ["mellow","jack johnson","feel-good"],
+    ytSearch: "Banana Pancakes Jack Johnson ukulele",
+    ytVideos: [
+      { id: "OkRiGYHBHRI", title: "Banana Pancakes Ukulele Tutorial", ch: "The Ukulele Teacher" },
+    ],
+    chords: ["G","C","D","Am","E7"],
+    sections: [
+      { name: "Verse", type: "chords", lines: [
+        { chords: "G              C",
+          lyrics:  "Can't you see that it's just raining" },
+        { chords: "G              C",
+          lyrics:  "Ain't no need to go outside" },
+        { chords: "G              C",
+          lyrics:  "But baby, you hardly even notice" },
+        { chords: "G              C",
+          lyrics:  "When I try to show you this" },
+        { chords: "D              Am",
+          lyrics:  "Song is meant to keep ya" },
+        { chords: "D              Am      E7",
+          lyrics:  "From doing what you're supposed to" },
+      ]},
+      { name: "Chorus", type: "chords", lines: [
+        { chords: "G         C",
+          lyrics:  "We could stay in bed" },
+        { chords: "G         C",
+          lyrics:  "Make banana pancakes" },
+        { chords: "G         C         D         C",
+          lyrics:  "Pretend like it's the weekend now" },
+      ]},
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let currentSong = null;
+let transpose   = 0;
+let autoScroll  = false;
+let scrollSpeed = 1;
+let scrollInterval = null;
+let showYT      = true;
+let showChords  = true;
+let ytLoaded    = null;
+let activeGenre = "all";
+let searchQ     = "";
+let ytVideos    = [];
+
+// ═══════════════════════════════════════════════════════
+// CHORD DIAGRAM RENDERER
+// ═══════════════════════════════════════════════════════
+function renderChordSvg(chordName, w=80, h=90) {
+  const raw = normalizeNote(chordName.replace(/[^A-Ga-g#b]/g, c => c));
+  let frets = CHORDS[chordName] || CHORDS[raw];
+  if (!frets) {
+    // Attempt transposed lookup
+    return `<text x="${w/2}" y="${h/2}" text-anchor="middle" font-size="11" fill="#aaa">${chordName}</text>`;
+  }
+
+  const strings = 4;
+  const rows    = 5;
+  const padL = 14, padT = 22, padR = 8;
+  const bw = w - padL - padR;
+  const bh = h - padT - 14;
+  const sx = bw / (strings-1);
+  const sy = bh / (rows-1);
+
+  let svg = '';
+  // Nut
+  const minFret = Math.min(...frets.filter(f=>f>0));
+  const maxFret = Math.max(...frets);
+  const startFret = maxFret > 4 ? minFret : 1;
+  if (startFret === 1) svg += `<rect x="${padL-1}" y="${padT-4}" width="${bw+2}" height="5" rx="1" fill="#2B1F14"/>`;
+
+  // Grid
+  for (let r=0; r<=rows-1; r++) {
+    svg += `<line x1="${padL}" y1="${padT+r*sy}" x2="${padL+bw}" y2="${padT+r*sy}" stroke="#ccc" stroke-width="1"/>`;
+  }
+  for (let s=0; s<strings; s++) {
+    svg += `<line x1="${padL+s*sx}" y1="${padT}" x2="${padL+s*sx}" y2="${padT+bh}" stroke="#999" stroke-width="1.2"/>`;
+  }
+
+  // Dots
+  frets.forEach((f, i) => {
+    const cx = padL + i * sx;
+    if (f === 0) {
+      svg += `<circle cx="${cx}" cy="${padT-9}" r="4" fill="none" stroke="#999" stroke-width="1.5"/>`;
+    } else {
+      const row = f - startFret;
+      const cy = padT + row * sy + sy/2;
+      svg += `<circle cx="${cx}" cy="${cy}" r="5" fill="#C4843A"/>`;
+    }
+  });
+
+  // Fret number
+  if (startFret > 1) {
+    svg += `<text x="${padL-6}" y="${padT+sy/2+4}" text-anchor="end" font-size="9" fill="#888">${startFret}fr</text>`;
+  }
+
+  // String labels
+  const strings_lbl = ['G','C','E','A'];
+  strings_lbl.forEach((l,i) => {
+    svg += `<text x="${padL+i*sx}" y="${h-1}" text-anchor="middle" font-size="8" fill="#aaa">${l}</text>`;
+  });
+
+  return svg;
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER SIDEBAR
+// ═══════════════════════════════════════════════════════
+function filteredSongs() {
+  return SONGS.filter(s => {
+    const matchGenre = activeGenre === "all" || s.genre === activeGenre;
+    const q = searchQ.toLowerCase();
+    const matchSearch = !q || s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q) || s.tags.some(t=>t.includes(q));
+    return matchGenre && matchSearch;
+  });
+}
+
+function renderSidebar() {
+  const list = document.getElementById('songList');
+  const songs = filteredSongs();
+  list.innerHTML = '';
+  songs.forEach(song => {
+    const el = document.createElement('div');
+    el.className = 'song-item' + (currentSong && currentSong.id === song.id ? ' active' : '');
+    el.innerHTML = `
+      <div class="song-title">${song.title}</div>
+      <div class="song-meta">
+        <span>${song.artist}</span>
+        <span class="diff-badge diff-${song.difficulty}">${song.difficulty}</span>
+        <span class="rating-stars">${'★'.repeat(song.rating)}${'☆'.repeat(5-song.rating)}</span>
+      </div>`;
+    el.onclick = () => loadSong(song);
+    list.appendChild(el);
+  });
+  if (!songs.length) list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--muted);font-size:.85rem">No songs match your search</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// TRANSPOSE
+// ═══════════════════════════════════════════════════════
+function applyTranspose(chordStr) {
+  if (transpose === 0) return chordStr;
+  return chordStr.replace(/[A-G][b#]?(?:maj7|m7|7|maj|m|dim|aug|sus[24]?|add9)?/g, ch => transposeChord(ch, transpose));
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER CHORD ROW
+// ═══════════════════════════════════════════════════════
+function renderChordRow(chordNames) {
+  if (!showChords) return '';
+  const unique = [...new Set(chordNames.map(c => transposeChord(c, transpose)))];
+  let html = '<div class="chord-row">';
+  unique.forEach(ch => {
+    const svg = renderChordSvg(ch);
+    html += `<div class="chord-diagram" data-chord="${ch}">
+      <div class="chord-name">${ch}</div>
+      <svg class="chord-svg" width="80" height="90" viewBox="0 0 80 90">${svg}</svg>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER SECTION
+// ═══════════════════════════════════════════════════════
+function renderSection(sec) {
+  let html = `<div class="section-label">${sec.name}</div>`;
+  if (sec.type === 'tab') {
+    html += `<div class="tab-block"><pre>${sec.content}</pre></div>`;
+  } else {
+    html += '<div class="tab-block">';
+    sec.lines.forEach(line => {
+      const transChords = applyTranspose(line.chords);
+      const chordHtml = transChords.replace(/[A-G][b#]?(?:maj7|m7|7|maj|m|dim|aug|sus[24]?|add9)?/g,
+        ch => `<span class="chord-inline" data-chord="${ch}">${ch}</span>`);
+      html += `<div class="chords-line">${chordHtml}</div>`;
+      html += `<div class="lyrics-line">${line.lyrics}</div>`;
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════
+// LOAD SONG
+// ═══════════════════════════════════════════════════════
+function loadSong(song) {
+  currentSong = song;
+  stopScroll();
+  renderSidebar();
+
+  const view = document.getElementById('songView');
+
+  let capoHtml = '';
+  if (song.capoNote) {
+    capoHtml = `<div class="capo-notice">🎸 ${song.capoNote}</div>`;
+  }
+
+  const tagHtml = song.tags.map(t=>`<span class="tag">#${t}</span>`).join('');
+  let html = `<div class="song-header">
+    <h1>${song.title}</h1>
+    <div class="artist">${song.artist}</div>
+    <div class="tags">${tagHtml}</div>
+    ${capoHtml}
+  </div>`;
+
+  // Chord diagrams
+  html += renderChordRow(song.chords.map(c=>transposeChord(c,transpose)));
+
+  // Sections
+  song.sections.forEach(sec => { html += renderSection(sec); });
+
+  view.innerHTML = html;
+  view.scrollTop = 0;
+
+  // Bind chord hovers
+  view.querySelectorAll('[data-chord]').forEach(el => {
+    el.addEventListener('mouseenter', showChordPopup);
+    el.addEventListener('mouseleave', hideChordPopup);
+  });
+  view.querySelectorAll('.chord-diagram').forEach(el => {
+    el.addEventListener('mouseenter', showChordPopup);
+    el.addEventListener('mouseleave', hideChordPopup);
+  });
+
+  // Load YT videos
+  loadYT(song);
+}
+
+// ═══════════════════════════════════════════════════════
+// YOUTUBE
+// ═══════════════════════════════════════════════════════
+function loadYT(song) {
+  ytVideos = song.ytVideos || [];
+  const ytResults = document.getElementById('ytResults');
+  const ytEmbed   = document.getElementById('ytEmbed');
+  const ytPlaceholder = document.getElementById('ytPlaceholder');
+  ytLoaded = null;
+  ytEmbed.style.display = 'none';
+  ytPlaceholder.style.display = 'flex';
+  ytResults.innerHTML = '';
+
+  ytVideos.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'yt-card' + (i===0 ? ' selected' : '');
+    card.innerHTML = `
+      <img class="yt-thumb" src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="" onerror="this.style.background='#ccc'">
+      <div>
+        <div class="yt-card-title">${v.title}</div>
+        <div class="yt-card-ch">${v.ch}</div>
+      </div>`;
+    card.onclick = () => {
+      ytResults.querySelectorAll('.yt-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      playYT(v.id);
+    };
+    ytResults.appendChild(card);
+  });
+}
+
+function playYT(id) {
+  const ytEmbed = document.getElementById('ytEmbed');
+  const ytPlaceholder = document.getElementById('ytPlaceholder');
+  ytEmbed.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+  ytEmbed.style.display = 'block';
+  ytPlaceholder.style.display = 'none';
+  ytLoaded = id;
+}
+
+// Play first video automatically on song load if panel visible
+function tryAutoPlayFirst() {
+  if (showYT && ytVideos.length && !ytLoaded) {
+    playYT(ytVideos[0].id);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// CHORD POPUP
+// ═══════════════════════════════════════════════════════
+function showChordPopup(e) {
+  const ch = this.dataset.chord;
+  if (!ch) return;
+  const popup = document.getElementById('chordPopup');
+  const svg = document.getElementById('popupChordSvg');
+  const name = document.getElementById('popupChordName');
+  name.textContent = ch;
+  svg.innerHTML = renderChordSvg(ch, 80, 90);
+  popup.classList.add('show');
+  const rect = this.getBoundingClientRect();
+  popup.style.left = (rect.left + window.scrollX) + 'px';
+  popup.style.top  = (rect.bottom + window.scrollY + 8) + 'px';
+}
+function hideChordPopup() {
+  document.getElementById('chordPopup').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTOSCROLL
+// ═══════════════════════════════════════════════════════
+function startScroll() {
+  autoScroll = true;
+  document.getElementById('scrollToggle').textContent = '⏸ Pause';
+  document.getElementById('scrollToggle').style.background = 'var(--rose)';
+  const view = document.getElementById('songView');
+  const fill = document.getElementById('scrollFill');
+  scrollInterval = setInterval(() => {
+    view.scrollTop += scrollSpeed * 0.7;
+    const pct = (view.scrollTop / (view.scrollHeight - view.clientHeight)) * 100;
+    fill.style.width = Math.min(pct, 100) + '%';
+    if (view.scrollTop >= view.scrollHeight - view.clientHeight) {
+      stopScroll();
+    }
+  }, 30);
+}
+function stopScroll() {
+  autoScroll = false;
+  clearInterval(scrollInterval);
+  const btn = document.getElementById('scrollToggle');
+  if (btn) { btn.textContent = '▶ Start'; btn.style.background = 'var(--wood)'; }
+  document.getElementById('scrollFill').style.width = '0%';
+}
+
+// ═══════════════════════════════════════════════════════
+// PRINT
+// ═══════════════════════════════════════════════════════
+function printSong() {
+  if (!currentSong) return;
+  window.print();
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT & EVENT LISTENERS
+// ═══════════════════════════════════════════════════════
+renderSidebar();
+
+document.getElementById('transposeUp').onclick = () => {
+  transpose = Math.min(6, transpose + 1);
+  document.getElementById('transposeVal').textContent = (transpose > 0 ? '+' : '') + transpose;
+  if (currentSong) loadSong(currentSong);
+};
+document.getElementById('transposeDown').onclick = () => {
+  transpose = Math.max(-6, transpose - 1);
+  document.getElementById('transposeVal').textContent = (transpose > 0 ? '+' : '') + transpose;
+  if (currentSong) loadSong(currentSong);
+};
+document.getElementById('transposeReset').onclick = () => {
+  transpose = 0;
+  document.getElementById('transposeVal').textContent = '0';
+  if (currentSong) loadSong(currentSong);
+};
+
+document.getElementById('scrollToggle').onclick = () => {
+  if (!currentSong) return;
+  autoScroll ? stopScroll() : startScroll();
+};
+document.getElementById('scrollFaster').onclick = () => {
+  scrollSpeed = Math.min(5, +(scrollSpeed + 0.5).toFixed(1));
+  document.getElementById('scrollSpeed').textContent = scrollSpeed + '×';
+  if (autoScroll) { stopScroll(); startScroll(); }
+};
+document.getElementById('scrollSlower').onclick = () => {
+  scrollSpeed = Math.max(0.5, +(scrollSpeed - 0.5).toFixed(1));
+  document.getElementById('scrollSpeed').textContent = scrollSpeed + '×';
+  if (autoScroll) { stopScroll(); startScroll(); }
+};
+
+document.getElementById('printBtn').onclick = printSong;
+
+document.getElementById('toggleYT').onclick = function() {
+  showYT = !showYT;
+  document.getElementById('ytPanel').style.display = showYT ? '' : 'none';
+  this.classList.toggle('active', showYT);
+};
+
+document.getElementById('toggleChords').onclick = function() {
+  showChords = !showChords;
+  this.classList.toggle('active', !showChords);
+  if (currentSong) loadSong(currentSong);
+};
+
+document.getElementById('searchInput').oninput = function() {
+  searchQ = this.value;
+  renderSidebar();
+};
+
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.onclick = function() {
+    document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+    this.classList.add('active');
+    activeGenre = this.dataset.genre;
+    renderSidebar();
+  };
+});
+
+// Load first song on start
+loadSong(SONGS[0]);
+playYT(SONGS[0].ytVideos[0].id);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); document.getElementById('scrollToggle').click(); }
+  if (e.code === 'ArrowUp') { e.preventDefault(); document.getElementById('scrollSlower').click(); }
+  if (e.code === 'ArrowDown') { e.preventDefault(); document.getElementById('scrollFaster').click(); }
+  if (e.code === 'ArrowLeft') document.getElementById('transposeDown').click();
+  if (e.code === 'ArrowRight') document.getElementById('transposeUp').click();
+});
+</script>
+</body>
+</html>
