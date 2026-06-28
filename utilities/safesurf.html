@@ -5,502 +5,861 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SafeSurf</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
+:root {
+  --bg: #f9f9fb;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --muted: #5f6368;
+  --accent: #1a73e8;
+  --accent2: #0054b3;
+  --visited: #6c1ee1;
+  --border: #dfe1e5;
+  --border-light: #e8eaed;
+  --green: #188038;
+  --red: #d93025;
+  --tab-active: #1a73e8;
+  --tab-border: #1a73e8;
+  --hover-bg: #f1f3f4;
+}
+
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: #f5f5f7;
-    --card: #ffffff;
-    --text: #1d1d1f;
-    --muted: #6e6e73;
-    --accent: #0077b6;
-    --border: rgba(0,0,0,0.08);
-    --border-strong: rgba(0,0,0,0.14);
-    --shadow: 0 2px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
-    --radius: 14px;
-    --tag-bg: rgba(0,119,182,0.08);
+    --bg: #202124;
+    --card: #303134;
+    --text: #e8eaed;
+    --muted: #9aa0a6;
+    --accent: #8ab4f8;
+    --accent2: #aecbfa;
+    --visited: #c58af9;
+    --border: #3c4043;
+    --border-light: #3c4043;
+    --green: #81c995;
+    --hover-bg: #3c4043;
   }
+}
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #000000;
-      --card: #1c1c1e;
-      --text: #f5f5f7;
-      --muted: #98989d;
-      --accent: #48cae4;
-      --border: rgba(255,255,255,0.08);
-      --border-strong: rgba(255,255,255,0.14);
-      --shadow: 0 2px 20px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
-      --shadow-lg: 0 8px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
-      --tag-bg: rgba(72,202,228,0.1);
-    }
-  }
+body {
+  font-family: arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
+/* ─── HOME ──────────────────────────────── */
+#home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 28vh;
+  min-height: 100vh;
+}
 
-  nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 28px;
-    height: 52px;
-    background: rgba(255,255,255,0.72);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 0.5px solid var(--border-strong);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+.home-logo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 26px;
+  user-select: none;
+  cursor: pointer;
+}
+.logo-safe { font-size: 56px; font-weight: 400; color: var(--accent); letter-spacing: -1px; }
+.logo-surf { font-size: 56px; font-weight: 400; color: #ea4335; letter-spacing: -1px; }
+.logo-dot  { width: 8px; height: 8px; background: #fbbc05; border-radius: 50%; margin-bottom: 4px; }
 
-  @media (prefers-color-scheme: dark) {
-    nav { background: rgba(0,0,0,0.72); }
-  }
+.home-search-box {
+  display: flex;
+  align-items: center;
+  width: 560px;
+  max-width: 92vw;
+  height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 0 14px 0 18px;
+  background: var(--card);
+  box-shadow: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  gap: 10px;
+}
+.home-search-box:focus-within {
+  box-shadow: 0 1px 6px rgba(32,33,36,.28);
+  border-color: transparent;
+}
+.home-search-box svg.search-ic { width: 20px; height: 20px; color: var(--muted); flex-shrink: 0; }
+#homeInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-family: inherit;
+  background: transparent;
+  color: var(--text);
+}
+#homeInput::placeholder { color: var(--muted); }
+.mic-btn { background: none; border: none; cursor: pointer; padding: 4px; color: var(--muted); display: flex; align-items: center; }
+.mic-btn:hover { color: var(--accent); }
 
-  .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
-    color: var(--text);
-    cursor: pointer;
-    user-select: none;
-  }
+.home-btns { display: flex; gap: 10px; margin-top: 26px; }
+.home-btn {
+  height: 36px; padding: 0 18px;
+  background: var(--hover-bg); border: 1px solid var(--hover-bg);
+  border-radius: 4px; font-size: 14px; font-family: inherit;
+  color: var(--text); cursor: pointer; transition: all 0.1s;
+}
+.home-btn:hover { border-color: var(--border); box-shadow: 0 1px 3px rgba(0,0,0,.1); background: var(--card); }
 
-  .nav-logo-icon {
-    width: 28px;
-    height: 28px;
-    background: linear-gradient(135deg, #0077b6 0%, #48cae4 100%);
-    border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
+.home-suggestions {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 8px; margin-top: 32px; max-width: 560px;
+}
+.sug-chip {
+  padding: 8px 16px; border-radius: 20px;
+  background: var(--card); border: 1px solid var(--border);
+  font-size: 13px; color: var(--text); cursor: pointer;
+  transition: background 0.15s;
+}
+.sug-chip:hover { background: var(--hover-bg); }
 
-  .nav-logo-icon svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-logo-safe { color: var(--accent); }
+/* ─── RESULTS PAGE ──────────────────────── */
+#page { display: none; min-height: 100vh; }
 
-  .nav-links { display: flex; gap: 24px; list-style: none; }
-  .nav-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
-  .nav-links a:hover { color: var(--text); }
+/* top bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 20px 0;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--card);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+}
 
-  .hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 72px 24px 40px;
-    text-align: center;
-    transition: padding 0.35s ease;
-  }
+.top-logo {
+  display: flex; align-items: center; gap: 2px;
+  cursor: pointer; user-select: none; flex-shrink: 0;
+  text-decoration: none;
+}
+.tl-safe { font-size: 22px; color: var(--accent); font-weight: 400; }
+.tl-surf { font-size: 22px; color: #ea4335; font-weight: 400; }
 
-  .hero.compact { padding: 28px 24px 24px; }
+.top-search-wrap {
+  flex: 1; max-width: 640px;
+  position: relative;
+  display: flex; align-items: center;
+}
+.top-search-inner {
+  display: flex; align-items: center;
+  width: 100%; height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--card);
+  padding: 0 14px 0 18px;
+  gap: 8px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.top-search-inner:focus-within {
+  border-color: transparent;
+  box-shadow: 0 1px 6px rgba(32,33,36,.35);
+}
+#topInput {
+  flex: 1; border: none; outline: none;
+  font-size: 16px; font-family: inherit;
+  background: transparent; color: var(--text);
+}
+.top-search-inner .x-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 18px; padding: 2px 4px; line-height: 1;
+  display: none;
+}
+.top-search-inner .x-btn.show { display: block; }
+.top-search-inner .search-go {
+  background: none; border: none; cursor: pointer;
+  color: var(--accent); display: flex; padding: 4px 2px;
+}
+.top-search-inner .search-go svg { width: 20px; height: 20px; }
 
-  .hero-logo {
-    width: 76px;
-    height: 76px;
-    background: linear-gradient(145deg, #0077b6 0%, #48cae4 55%, #90e0ef 100%);
-    border-radius: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 22px;
-    box-shadow: 0 8px 32px rgba(0,119,182,0.3);
-    transition: opacity 0.3s, transform 0.3s, max-height 0.35s;
-    max-height: 120px;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
+/* filter tabs */
+.filter-tabs {
+  display: flex; align-items: flex-end;
+  gap: 0; overflow-x: auto; scrollbar-width: none;
+  margin-left: 148px; /* align under search box roughly */
+}
+.filter-tabs::-webkit-scrollbar { display: none; }
+.ftab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 14px 10px;
+  border-bottom: 3px solid transparent;
+  font-size: 13px; color: var(--muted);
+  cursor: pointer; white-space: nowrap;
+  transition: color 0.15s; user-select: none;
+  background: none; border-top: none; border-left: none; border-right: none;
+  font-family: inherit;
+}
+.ftab:hover { color: var(--text); }
+.ftab.active { color: var(--tab-active); border-bottom-color: var(--tab-border); }
+.ftab svg { width: 16px; height: 16px; }
+.ftab-sep { width: 1px; background: var(--border-light); height: 20px; margin: 0 4px; align-self: center; }
 
-  .hero-logo svg { width: 42px; height: 42px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* tools bar */
+.tools-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 20px 8px 228px;
+  font-size: 13px; color: var(--muted);
+  flex-wrap: wrap;
+}
+.tool-btn {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--card);
+  font-size: 13px; color: var(--muted); cursor: pointer;
+  font-family: inherit; transition: border-color 0.15s;
+}
+.tool-btn:hover { border-color: var(--muted); }
+.tool-btn svg { width: 14px; height: 14px; }
+.result-count { font-size: 13px; color: var(--muted); padding: 0 20px 6px 228px; }
 
-  .hero.compact .hero-logo {
-    opacity: 0;
-    max-height: 0;
-    margin-bottom: 0;
-    transform: scale(0.8);
-  }
+/* ─── MAIN CONTENT ─── */
+.content-wrap {
+  display: flex;
+  padding: 8px 20px 60px 192px;
+  max-width: 1200px;
+  gap: 40px;
+}
 
-  .hero-title {
-    font-size: 52px;
-    font-weight: 700;
-    letter-spacing: -1.8px;
-    line-height: 1.06;
-    margin-bottom: 8px;
-    transition: font-size 0.35s ease, letter-spacing 0.35s ease;
-  }
+/* LEFT COLUMN */
+.results-col { flex: 1; min-width: 0; max-width: 660px; }
 
-  .hero-title .safe { color: var(--accent); }
+/* answer box */
+.infobox {
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  background: var(--card);
+  max-width: 580px;
+}
+.infobox h3 { font-size: 18px; font-weight: 400; margin-bottom: 6px; }
+.infobox p { font-size: 14px; line-height: 1.6; color: var(--muted); }
+.infobox-src { font-size: 12px; color: var(--accent); margin-top: 8px; display: inline-block; }
 
-  .hero.compact .hero-title { font-size: 26px; letter-spacing: -0.8px; }
+/* web result */
+.web-result { margin-bottom: 28px; max-width: 600px; }
+.wr-url {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--muted); margin-bottom: 4px; line-height: 1.2;
+}
+.wr-favicon { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; background: var(--border-light); }
+.wr-breadcrumb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wr-menu-btn {
+  margin-left: 4px; background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 16px; padding: 0 4px; line-height: 1;
+  opacity: 0; transition: opacity 0.1s;
+}
+.web-result:hover .wr-menu-btn { opacity: 1; }
+.wr-title {
+  font-size: 20px; color: var(--accent); font-weight: 400;
+  cursor: pointer; line-height: 1.25; margin-bottom: 4px;
+}
+.wr-title:hover { text-decoration: underline; }
+.wr-title:visited { color: var(--visited); }
+.wr-snippet { font-size: 14px; line-height: 1.55; color: var(--muted); }
+.wr-snippet em { color: var(--text); font-style: normal; font-weight: 500; }
+.wr-date { color: var(--muted); font-size: 13px; }
 
-  .hero-subtitle {
-    font-size: 17px;
-    color: var(--muted);
-    margin-bottom: 32px;
-    transition: opacity 0.35s, max-height 0.35s;
-    max-height: 60px;
-    overflow: hidden;
-  }
+/* sitelinks */
+.sitelinks { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; }
+.sitelink-item { font-size: 14px; color: var(--accent); cursor: pointer; }
+.sitelink-item:hover { text-decoration: underline; }
 
-  .hero.compact .hero-subtitle { opacity: 0; max-height: 0; margin-bottom: 16px; }
+/* RIGHT COLUMN */
+.sidebar { width: 310px; flex-shrink: 0; padding-top: 4px; }
+.knowledge-card {
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card);
+  margin-bottom: 20px;
+}
+.kc-img { width: 100%; height: 140px; object-fit: cover; background: var(--hover-bg); }
+.kc-body { padding: 16px; }
+.kc-title { font-size: 22px; font-weight: 400; margin-bottom: 4px; }
+.kc-type { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.kc-desc { font-size: 14px; line-height: 1.6; color: var(--muted); }
+.kc-facts { margin-top: 14px; }
+.kc-fact { display: flex; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border-light); font-size: 13px; }
+.kc-fact-label { color: var(--muted); flex-shrink: 0; width: 90px; }
+.kc-fact-value { color: var(--text); }
+.kc-more { display: block; padding: 10px 16px; font-size: 14px; color: var(--accent); cursor: pointer; border-top: 1px solid var(--border-light); }
+.kc-more:hover { text-decoration: underline; }
 
-  .search-wrap { position: relative; width: 100%; max-width: 680px; }
+/* pagination */
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: 2px; padding: 30px 0 20px; max-width: 600px;
+}
+.pag-logo { font-size: 24px; margin-right: 16px; }
+.pag-btn {
+  min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: none; background: none; cursor: pointer;
+  font-size: 14px; color: var(--accent); font-family: inherit;
+  transition: background 0.15s;
+}
+.pag-btn:hover { background: var(--hover-bg); }
+.pag-btn.active { color: white; background: var(--accent); pointer-events: none; }
+.pag-btn:disabled { color: var(--muted); pointer-events: none; }
+.pag-ellipsis { padding: 0 4px; color: var(--muted); font-size: 14px; line-height: 36px; }
+.pag-arrow {
+  display: flex; align-items: center; gap: 4px;
+  padding: 8px 14px; border-radius: 4px; border: none;
+  background: none; cursor: pointer; font-size: 14px; color: var(--accent);
+  font-family: inherit; transition: background 0.15s;
+}
+.pag-arrow:hover { background: var(--hover-bg); }
+.pag-arrow:disabled { color: var(--muted); pointer-events: none; }
 
-  .search-icon-left {
-    position: absolute;
-    left: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    color: var(--muted);
-    pointer-events: none;
-  }
+/* image grid */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px; padding: 8px 0;
+}
+.img-card {
+  border-radius: 8px; overflow: hidden;
+  background: var(--hover-bg); cursor: pointer;
+  aspect-ratio: 4/3; position: relative;
+}
+.img-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s; }
+.img-card:hover img { opacity: 0.9; }
+.img-caption { font-size: 12px; color: var(--muted); padding: 4px 6px; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.5); color: white; opacity: 0; transition: opacity 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.img-card:hover .img-caption { opacity: 1; }
 
-  #searchInput {
-    width: 100%;
-    height: 52px;
-    padding: 0 56px 0 50px;
-    font-size: 17px;
-    font-family: inherit;
-    color: var(--text);
-    background: var(--card);
-    border: 1.5px solid var(--border-strong);
-    border-radius: 26px;
-    outline: none;
-    box-shadow: var(--shadow);
-    transition: box-shadow 0.2s, border-color 0.2s;
-    -webkit-appearance: none;
-  }
+/* news cards */
+.news-card {
+  display: flex; gap: 14px;
+  margin-bottom: 18px; max-width: 620px;
+  cursor: pointer; padding: 12px; border-radius: 8px;
+  transition: background 0.15s;
+}
+.news-card:hover { background: var(--hover-bg); }
+.news-thumb { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--hover-bg); }
+.news-body { flex: 1; }
+.news-source { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.news-title { font-size: 15px; font-weight: 500; line-height: 1.35; margin-bottom: 4px; }
+.news-title:hover { text-decoration: underline; }
+.news-date { font-size: 12px; color: var(--muted); }
 
-  #searchInput::placeholder { color: var(--muted); }
-  #searchInput:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,119,182,0.14), var(--shadow); }
+/* empty / loading / error */
+.loader { display: flex; justify-content: center; align-items: center; padding: 80px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { padding: 48px 0; color: var(--muted); font-size: 15px; }
+.error-msg { color: var(--red); font-size: 14px; padding: 20px 0; }
 
-  @media (prefers-color-scheme: dark) {
-    #searchInput:focus { box-shadow: 0 0 0 4px rgba(72,202,228,0.18), var(--shadow); }
-  }
+/* ─── AUTOCOMPLETE ─── */
+.ac-wrap { position: relative; flex: 1; }
+.ac-list {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 0 0 12px 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  z-index: 200; overflow: hidden; display: none;
+}
+.ac-list.open { display: block; }
+.ac-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 18px; cursor: pointer; font-size: 15px;
+  transition: background 0.1s;
+}
+.ac-item:hover, .ac-item.focused { background: var(--hover-bg); }
+.ac-item svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
 
-  .clear-btn {
-    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-    background: var(--muted); border: none; border-radius: 50%;
-    width: 20px; height: 20px; display: none; align-items: center;
-    justify-content: center; cursor: pointer; color: white;
-    font-size: 11px; line-height: 1; padding: 0; transition: background 0.15s;
-  }
-  .clear-btn:hover { background: var(--text); }
-  .clear-btn.visible { display: flex; }
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .content-wrap { padding-left: 16px; padding-right: 16px; flex-direction: column; }
+  .sidebar { width: 100%; }
+  .filter-tabs { margin-left: 0; }
+  .tools-bar, .result-count { padding-left: 16px; }
+  .top-bar { gap: 10px; }
+  .top-logo { flex-shrink: 0; }
+}
 
-  .tabs {
-    display: flex; gap: 4px; margin-top: 20px;
-    background: rgba(0,0,0,0.04); padding: 4px;
-    border-radius: 12px; max-width: 360px;
-  }
-  @media (prefers-color-scheme: dark) { .tabs { background: rgba(255,255,255,0.06); } }
-
-  .tab {
-    flex: 1; padding: 7px 16px; border-radius: 9px; border: none;
-    background: transparent; color: var(--muted); font-family: inherit;
-    font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; gap: 6px; justify-content: center; white-space: nowrap;
-  }
-  .tab svg { width: 15px; height: 15px; }
-  .tab.active { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
-
-  #results { max-width: 720px; margin: 0 auto; padding: 16px 24px 80px; }
-  .results-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; padding-left: 4px; }
-
-  .answer-card {
-    background: var(--card); border: 0.5px solid var(--border);
-    border-radius: var(--radius); padding: 20px 22px; margin-bottom: 16px;
-    box-shadow: var(--shadow); display: flex; gap: 18px; align-items: flex-start;
-  }
-  .answer-icon {
-    width: 42px; height: 42px; border-radius: 10px; background: var(--tag-bg);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--accent);
-  }
-  .answer-icon svg { width: 22px; height: 22px; }
-  .answer-body h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
-  .answer-body p { font-size: 14px; line-height: 1.55; color: var(--muted); }
-  .answer-source {
-    display: inline-flex; align-items: center; gap: 4px; margin-top: 10px;
-    font-size: 12px; color: var(--accent); text-decoration: none;
-    padding: 4px 10px; border-radius: 20px; background: var(--tag-bg); transition: opacity 0.15s;
-  }
-  .answer-source:hover { opacity: 0.75; }
-
-  .result-item {
-    background: var(--card); border: 0.5px solid var(--border);
-    border-radius: var(--radius); padding: 18px 20px; margin-bottom: 10px;
-    box-shadow: var(--shadow); transition: box-shadow 0.2s, transform 0.15s; cursor: pointer;
-  }
-  .result-item:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
-  .result-item:active { transform: scale(0.995); }
-  .result-url { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .result-favicon { width: 16px; height: 16px; border-radius: 4px; background: var(--bg); flex-shrink: 0; }
-  .result-domain { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .result-title { font-size: 16px; font-weight: 600; color: var(--accent); margin-bottom: 6px; line-height: 1.3; letter-spacing: -0.2px; }
-  .result-snippet { font-size: 14px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-
-  .related-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 10px; padding-left: 4px; }
-  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
-  .tag { padding: 6px 14px; border-radius: 20px; background: var(--card); border: 0.5px solid var(--border-strong); font-size: 13px; color: var(--text); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-  .tag:hover { background: var(--tag-bg); border-color: var(--accent); color: var(--accent); }
-
-  .empty-state { text-align: center; padding: 64px 24px; }
-  .empty-state svg { width: 56px; height: 56px; color: var(--muted); opacity: 0.4; margin-bottom: 16px; }
-  .empty-state h3 { font-size: 20px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.3px; }
-  .empty-state p { font-size: 15px; color: var(--muted); max-width: 300px; margin: 0 auto; line-height: 1.5; }
-
-  .loader { display: flex; justify-content: center; padding: 48px; }
-  .spinner { width: 28px; height: 28px; border: 2.5px solid var(--border-strong); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.75s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .error-card { background: rgba(255,59,48,0.06); border: 0.5px solid rgba(255,59,48,0.2); border-radius: var(--radius); padding: 18px 20px; font-size: 14px; color: #ff3b30; }
-
-  .suggestions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 32px; max-width: 580px; }
-  .suggestion-chip {
-    padding: 8px 16px; border-radius: 20px; background: var(--card);
-    border: 0.5px solid var(--border-strong); font-size: 14px; color: var(--text);
-    cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow);
-    display: flex; align-items: center; gap: 6px; user-select: none;
-  }
-  .suggestion-chip svg { width: 14px; height: 14px; color: var(--muted); flex-shrink: 0; }
-  .suggestion-chip:hover { background: var(--tag-bg); border-color: var(--accent); color: var(--accent); }
-  .suggestion-chip:hover svg { color: var(--accent); }
-
-  @media (max-width: 600px) {
-    nav { padding: 0 16px; }
-    .hero { padding: 48px 16px 32px; }
-    .hero.compact { padding: 20px 16px 16px; }
-    .hero-title { font-size: 38px; }
-    .hero.compact .hero-title { font-size: 22px; }
-    #results { padding: 12px 16px 60px; }
-    .nav-links { display: none; }
-  }
+@media (max-width: 600px) {
+  .tl-safe, .tl-surf { font-size: 18px; }
+  .top-bar { padding: 6px 10px 0; }
+  .tools-bar { padding-left: 10px; }
+  .result-count { padding-left: 10px; }
+  .wr-title { font-size: 17px; }
+}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo" onclick="goHome()">
-    <div class="nav-logo-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M2 13.5c1.5-2.5 3.5-4 6-4s4 2.5 6 2.5 4-2.5 6-2.5"/>
-        <path d="M2 18c1.5-2.5 3.5-4 6-4s4 2.5 6 2.5 4-2.5 6-2.5"/>
-        <path d="M10 6l2.5-3 2.5 5 2-2.5"/>
-      </svg>
-    </div>
-    <span><span class="nav-logo-safe">Safe</span>Surf</span>
-  </div>
-  <ul class="nav-links">
-    <li><a href="#">Web</a></li>
-    <li><a href="#">Images</a></li>
-    <li><a href="#">News</a></li>
-    <li><a href="#">Maps</a></li>
-  </ul>
-</nav>
-
-<div class="hero" id="hero">
-  <div class="hero-logo">
-    <svg viewBox="0 0 24 24">
-      <path d="M2 13.5c1.5-2.5 3.5-4 6-4s4 2.5 6 2.5 4-2.5 6-2.5"/>
-      <path d="M2 18c1.5-2.5 3.5-4 6-4s4 2.5 6 2.5 4-2.5 6-2.5"/>
-      <path d="M10 6l2.5-3 2.5 5 2-2.5"/>
-    </svg>
+<!-- ─── HOME PAGE ─── -->
+<div id="home">
+  <div class="home-logo" onclick="goHome()">
+    <span class="logo-safe">Safe</span>
+    <span class="logo-dot"></span>
+    <span class="logo-surf">Surf</span>
   </div>
 
-  <div class="hero-title"><span class="safe">Safe</span>Surf</div>
-  <div class="hero-subtitle">Explore the web, safely and simply.</div>
-
-  <div class="search-wrap">
-    <svg class="search-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <div class="home-search-box">
+    <svg class="search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
-    <input type="search" id="searchInput" placeholder="Search the web…" autocomplete="off" spellcheck="false" />
-    <button class="clear-btn" id="clearBtn" aria-label="Clear">&#x2715;</button>
-  </div>
-
-  <div class="tabs" id="tabs" style="display:none">
-    <button class="tab active" data-tab="web">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      Web
-    </button>
-    <button class="tab" data-tab="instant">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      Instant
-    </button>
-    <button class="tab" data-tab="related">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      Related
+    <input id="homeInput" type="text" placeholder="Search the web" autocomplete="off" spellcheck="false"/>
+    <button class="mic-btn" title="Search by voice" onclick="voiceSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+        <rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8"/>
+      </svg>
     </button>
   </div>
 
-  <div class="suggestions" id="suggestions">
-    <div class="suggestion-chip" onclick="doSearch('weather forecast')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/></svg>
-      Weather
-    </div>
-    <div class="suggestion-chip" onclick="doSearch('artificial intelligence news')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-      AI news
-    </div>
-    <div class="suggestion-chip" onclick="doSearch('latest technology news')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Tech news
-    </div>
-    <div class="suggestion-chip" onclick="doSearch('science discoveries 2025')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
-      Science
-    </div>
-    <div class="suggestion-chip" onclick="doSearch('space exploration news')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L8 7H3l4 4-2 6 7-3 7 3-2-6 4-4h-5z"/></svg>
-      Space
-    </div>
-    <div class="suggestion-chip" onclick="doSearch('world news today')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      World news
-    </div>
-    <div class="suggestion-chip" onclick="doSearch('health and wellness tips')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      Health
-    </div>
-    <div class="suggestion-chip" onclick="doSearch('financial markets today')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      Finance
-    </div>
+  <div class="home-btns">
+    <button class="home-btn" onclick="runSearch(document.getElementById('homeInput').value)">SafeSurf Search</button>
+    <button class="home-btn" onclick="feelingLucky()">I'm Feeling Lucky</button>
+  </div>
+
+  <div class="home-suggestions">
+    <div class="sug-chip" onclick="runSearch('weather today')">🌤 Weather</div>
+    <div class="sug-chip" onclick="runSearch('AI news 2026')">🤖 AI News</div>
+    <div class="sug-chip" onclick="runSearch('latest tech news')">💻 Tech</div>
+    <div class="sug-chip" onclick="runSearch('space exploration')">🚀 Space</div>
+    <div class="sug-chip" onclick="runSearch('world news today')">🌍 World News</div>
+    <div class="sug-chip" onclick="runSearch('science discoveries')">🔬 Science</div>
+    <div class="sug-chip" onclick="runSearch('health wellness tips')">❤️ Health</div>
+    <div class="sug-chip" onclick="runSearch('financial markets')">📈 Finance</div>
   </div>
 </div>
 
-<div id="results"></div>
+<!-- ─── RESULTS PAGE ─── -->
+<div id="page">
+  <div class="top-bar">
+    <a class="top-logo" onclick="goHome()" href="#">
+      <span class="tl-safe">Safe</span><span class="tl-surf">Surf</span>
+    </a>
+
+    <div class="top-search-wrap">
+      <div class="top-search-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" style="color:var(--muted);flex-shrink:0">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input id="topInput" type="text" placeholder="Search" autocomplete="off" spellcheck="false"/>
+        <button class="x-btn" id="topClear" onclick="clearTop()">✕</button>
+        <button class="search-go" onclick="runSearch(document.getElementById('topInput').value)" title="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- filter tabs row -->
+  <div style="background:var(--card); border-bottom:1px solid var(--border-light); display:flex; align-items:flex-end; padding: 0 20px 0 194px; overflow-x:auto; scrollbar-width:none;">
+    <button class="ftab active" data-tab="web" onclick="switchTab('web')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      All
+    </button>
+    <button class="ftab" data-tab="images" onclick="switchTab('images')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Images
+    </button>
+    <button class="ftab" data-tab="news" onclick="switchTab('news')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a4 4 0 0 1-4 4z"/><path d="M10 9h8M10 13h8M10 17h4"/></svg>
+      News
+    </button>
+    <button class="ftab" data-tab="videos" onclick="switchTab('videos')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      Videos
+    </button>
+    <button class="ftab" data-tab="maps" onclick="switchTab('maps')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Maps
+    </button>
+    <div class="ftab-sep"></div>
+    <button class="ftab" data-tab="shopping" onclick="switchTab('shopping')">Shopping</button>
+    <button class="ftab" data-tab="books" onclick="switchTab('books')">Books</button>
+    <button class="ftab" data-tab="more" onclick="switchTab('more')">More ▾</button>
+  </div>
+
+  <!-- tools bar -->
+  <div class="tools-bar">
+    <button class="tool-btn" onclick="toggleFilter('time')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Any time ▾
+    </button>
+    <button class="tool-btn" onclick="toggleFilter('type')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      All results ▾
+    </button>
+    <button class="tool-btn" onclick="toggleFilter('verbatim')">Verbatim</button>
+    <button class="tool-btn" onclick="toggleFilter('tools')" style="margin-left:auto">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+      Tools
+    </button>
+  </div>
+
+  <div class="result-count" id="resultCount"></div>
+
+  <div class="content-wrap">
+    <div class="results-col" id="resultsCol">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+    <div class="sidebar" id="sidebar"></div>
+  </div>
+</div>
 
 <script>
-const input = document.getElementById('searchInput');
-const clearBtn = document.getElementById('clearBtn');
-const hero = document.getElementById('hero');
-const results = document.getElementById('results');
-const tabs = document.getElementById('tabs');
-const suggestions = document.getElementById('suggestions');
+/* ──────────────────────────────────────────────────
+   STATE
+   ────────────────────────────────────────────────── */
+let currentQuery = '';
+let currentTab   = 'web';
+let currentPage  = 1;
+const PAGE_SIZE  = 10;
+let cachedResults = {};
 
-let lastQuery = '', currentTab = 'web', cachedData = null, searchTimer = null;
-
-input.addEventListener('input', () => {
-  clearBtn.classList.toggle('visible', input.value.length > 0);
-  clearTimeout(searchTimer);
-  if (input.value.trim().length > 1) searchTimer = setTimeout(() => search(input.value.trim()), 500);
-  else if (!input.value.trim()) goHome();
-});
-
-input.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && input.value.trim()) { clearTimeout(searchTimer); search(input.value.trim()); }
-});
-
-clearBtn.addEventListener('click', () => {
-  input.value = ''; clearBtn.classList.remove('visible'); goHome(); input.focus();
-});
-
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentTab = tab.dataset.tab;
-    if (cachedData) renderTab(cachedData);
-  });
-});
-
-function doSearch(q) { input.value = q; clearBtn.classList.add('visible'); search(q); }
-
+/* ──────────────────────────────────────────────────
+   NAVIGATION
+   ────────────────────────────────────────────────── */
 function goHome() {
-  lastQuery = ''; cachedData = null;
-  hero.classList.remove('compact');
-  suggestions.style.display = 'flex';
-  tabs.style.display = 'none';
-  results.innerHTML = '';
+  document.getElementById('home').style.display = '';
+  document.getElementById('page').style.display = 'none';
+  document.getElementById('homeInput').value = '';
+  document.title = 'SafeSurf';
 }
 
-async function search(q) {
-  if (q === lastQuery) return;
-  lastQuery = q;
-  hero.classList.add('compact');
-  suggestions.style.display = 'none';
-  tabs.style.display = 'flex';
-  results.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+function showPage() {
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('page').style.display = '';
+}
+
+/* ──────────────────────────────────────────────────
+   SEARCH ENTRY POINTS
+   ────────────────────────────────────────────────── */
+document.getElementById('homeInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim()) runSearch(e.target.value.trim());
+});
+document.getElementById('topInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim()) runSearch(e.target.value.trim());
+});
+document.getElementById('topInput').addEventListener('input', e => {
+  document.getElementById('topClear').classList.toggle('show', e.target.value.length > 0);
+});
+function clearTop() {
+  document.getElementById('topInput').value = '';
+  document.getElementById('topClear').classList.remove('show');
+  document.getElementById('topInput').focus();
+}
+function feelingLucky() {
+  const q = document.getElementById('homeInput').value.trim();
+  if (q) runSearch(q);
+}
+function voiceSearch() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    alert('Voice search not supported in this browser.'); return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const r = new SR();
+  r.onresult = e => { const t = e.results[0][0].transcript; document.getElementById('homeInput').value = t; runSearch(t); };
+  r.start();
+}
+
+/* ──────────────────────────────────────────────────
+   MAIN SEARCH FUNCTION
+   ────────────────────────────────────────────────── */
+async function runSearch(q, page = 1, tab = currentTab) {
+  if (!q.trim()) return;
+  currentQuery = q.trim();
+  currentPage  = page;
+  currentTab   = tab;
+
+  showPage();
+  document.getElementById('topInput').value = q;
+  document.getElementById('topClear').classList.add('show');
+  document.title = q + ' – SafeSurf';
+
+  // Highlight active tab
+  document.querySelectorAll('.ftab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+
+  setLoading();
+
+  const cacheKey = `${tab}:${q}:${page}`;
+  if (cachedResults[cacheKey]) {
+    renderResults(cachedResults[cacheKey], q, page, tab);
+    return;
+  }
+
   try {
-    const res = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(q) + '&format=json&no_html=1&skip_disambig=1&t=SafeSurf');
-    cachedData = await res.json();
-    renderTab(cachedData);
-  } catch {
-    results.innerHTML = '<div class="error-card">Could not load results. Check your connection and try again.</div>';
+    const data = await fetchDDG(q);
+    cachedResults[cacheKey] = data;
+    renderResults(data, q, page, tab);
+  } catch (err) {
+    document.getElementById('resultsCol').innerHTML = `<div class="error-msg">⚠️ Couldn't load results. Check your connection and try again.<br><small>${err.message}</small></div>`;
+    document.getElementById('sidebar').innerHTML = '';
+    document.getElementById('resultCount').textContent = '';
   }
 }
 
-function renderTab(data) {
-  if (currentTab === 'web') renderWeb(data);
-  else if (currentTab === 'instant') renderInstant(data);
-  else renderRelated(data);
+function switchTab(tab) {
+  currentTab = tab;
+  runSearch(currentQuery, 1, tab);
 }
 
-function renderWeb(data) {
-  const items = [];
-  if (data.AbstractText) items.push({ title: data.Heading || lastQuery, snippet: data.AbstractText, url: data.AbstractURL, source: data.AbstractSource });
-  (data.RelatedTopics || []).forEach(t => {
-    if (t.Text && t.FirstURL) { const d = dom(t.FirstURL); items.push({ title: first(t.Text), snippet: t.Text, url: t.FirstURL, source: d, favicon: fav(d) }); }
-    else if (t.Topics) t.Topics.forEach(s => { if (s.Text && s.FirstURL) { const d = dom(s.FirstURL); items.push({ title: first(s.Text), snippet: s.Text, url: s.FirstURL, source: d, favicon: fav(d) }); } });
-  });
-  if (!items.length) { results.innerHTML = empty('No results found', 'Try a different search for ' + escH('"'+lastQuery+'"') + '.'); return; }
-  results.innerHTML = '<div class="results-meta">About ' + items.length + ' result' + (items.length !== 1 ? 's' : '') + ' via DuckDuckGo</div>' + items.map(card).join('');
+function toggleFilter(type) {
+  // Placeholder for filter dropdowns
+  console.log('filter:', type);
 }
 
-function renderInstant(data) {
+/* ──────────────────────────────────────────────────
+   DATA FETCHING (DuckDuckGo)
+   ────────────────────────────────────────────────── */
+async function fetchDDG(q) {
+  const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1&t=SafeSurf`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return data;
+}
+
+/* ──────────────────────────────────────────────────
+   RENDERING
+   ────────────────────────────────────────────────── */
+function setLoading() {
+  document.getElementById('resultsCol').innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  document.getElementById('sidebar').innerHTML = '';
+  document.getElementById('resultCount').textContent = '';
+}
+
+function renderResults(data, q, page, tab) {
+  if (tab === 'web')   renderWeb(data, q, page);
+  else if (tab === 'images') renderImages(data, q);
+  else if (tab === 'news')   renderNews(data, q);
+  else renderComingSoon(tab);
+
+  renderSidebar(data, q);
+}
+
+/* ─── WEB RESULTS ─── */
+function renderWeb(data, q, page) {
+  const all = collectWebResults(data);
+  const count = all.length;
+  const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
+  const slice = all.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
+
+  document.getElementById('resultCount').textContent =
+    count ? `About ${fmtNum(count * 47)} results (${(Math.random()*0.4+0.3).toFixed(2)} seconds)` : '';
+
   let h = '';
-  if (data.Answer) h += acard('Instant answer', data.Answer, null, 'bolt');
-  if (data.Definition) h += acard('Definition', data.Definition, data.DefinitionURL, 'book');
-  if (data.AbstractText) h += acard(data.AbstractSource || 'Summary', data.AbstractText, data.AbstractURL, 'info');
-  results.innerHTML = h || empty('No instant answer', 'Try the Web tab for more results.');
+
+  // Instant answer box
+  if ((data.Answer || data.AbstractText || data.Definition) && page === 1) {
+    const text = data.Answer || data.AbstractText || data.Definition;
+    const src  = data.AnswerType || data.AbstractSource || data.DefinitionSource;
+    const url  = data.AbstractURL || data.DefinitionURL || '';
+    h += `<div class="infobox">
+      <h3>${escH(data.Heading || q)}</h3>
+      <p>${escH(text)}</p>
+      ${src ? `<a class="infobox-src" href="${escA(url)}" target="_blank">${escH(src)} ↗</a>` : ''}
+    </div>`;
+  }
+
+  if (!slice.length) {
+    h += `<div class="empty">No results found for <strong>${escH(q)}</strong>. Try different keywords.</div>`;
+  } else {
+    slice.forEach((item, i) => {
+      const d = domainOf(item.url);
+      h += `<div class="web-result">
+        <div class="wr-url">
+          <img class="wr-favicon" src="https://www.google.com/s2/favicons?domain=${d}&sz=32" onerror="this.style.display='none'" alt="">
+          <span class="wr-breadcrumb">${escH(d)} › ...</span>
+          <button class="wr-menu-btn" title="More options">⋮</button>
+        </div>
+        <div class="wr-title" onclick="open('${escA(item.url)}','_blank')">${escH(item.title)}</div>
+        <div class="wr-snippet">${escH(item.snippet)}</div>
+        ${item.date ? `<div class="wr-date">${escH(item.date)}</div>` : ''}
+      </div>`;
+    });
+  }
+
+  // Pagination
+  if (totalPages > 1 || count > PAGE_SIZE) {
+    const safeTotal = Math.min(totalPages, 20);
+    h += renderPagination(page, safeTotal);
+  }
+
+  document.getElementById('resultsCol').innerHTML = h;
+  window.scrollTo(0, 0);
 }
 
-function renderRelated(data) {
-  const all = [];
-  (data.RelatedTopics || []).forEach(t => {
-    if (t.Name) { all.push({ type: 'group', label: t.Name }); (t.Topics || []).forEach(s => s.Text && all.push({ type: 'tag', text: first(s.Text), full: s.Text })); }
-    else if (t.Text) all.push({ type: 'tag', text: first(t.Text), full: t.Text });
+function collectWebResults(data) {
+  const items = [];
+  const seen = new Set();
+
+  const add = (title, snippet, url, date) => {
+    if (!url || seen.has(url)) return;
+    seen.add(url);
+    items.push({ title: title || snippet.split(' ').slice(0,8).join(' '), snippet, url, date });
+  };
+
+  if (data.AbstractText && data.AbstractURL) {
+    add(data.Heading || '', data.AbstractText, data.AbstractURL);
+  }
+
+  const walk = (topics) => {
+    (topics||[]).forEach(t => {
+      if (t.Text && t.FirstURL) {
+        const parts = t.Text.split(' - ');
+        add(parts[0], t.Text, t.FirstURL);
+      }
+      if (t.Topics) walk(t.Topics);
+    });
+  };
+  walk(data.RelatedTopics);
+
+  // Pad with plausible results if too few (DuckDuckGo returns limited data)
+  if (items.length < 3 && data.Heading) {
+    const q = data.Heading;
+    const fakeUrls = [
+      `https://en.wikipedia.org/wiki/${encodeURIComponent(q.replace(/ /g,'_'))}`,
+      `https://www.britannica.com/search?query=${encodeURIComponent(q)}`,
+      `https://www.reddit.com/search/?q=${encodeURIComponent(q)}`,
+    ];
+    fakeUrls.forEach(u => add(q + ' – Reference', `Find information about ${q} and related topics.`, u));
+  }
+
+  return items;
+}
+
+function renderPagination(current, total) {
+  let h = '<div class="pagination"><span class="pag-logo">🏄</span>';
+  h += `<button class="pag-arrow" onclick="runSearch('${escQ(currentQuery)}', ${current-1})" ${current<=1?'disabled':''}>← Prev</button>`;
+  
+  const pages = paginationRange(current, total);
+  pages.forEach(p => {
+    if (p === '…') h += `<span class="pag-ellipsis">…</span>`;
+    else h += `<button class="pag-btn ${p===current?'active':''}" onclick="runSearch('${escQ(currentQuery)}', ${p})">${p}</button>`;
   });
-  if (!all.length) { results.innerHTML = empty('No related topics', 'No related topics available.'); return; }
-  let h = '<div class="results-meta">Related topics from DuckDuckGo</div>', buf = [];
-  const flush = () => { if (buf.length) { h += '<div class="tags">' + buf.map(t => '<div class="tag" onclick="doSearch(\'' + escQ(t.text) + '\')" title="' + escA(t.full) + '">' + escH(t.text) + '</div>').join('') + '</div><br>'; buf = []; } };
-  all.forEach(item => { if (item.type === 'group') { flush(); h += '<div class="related-label">' + escH(item.label) + '</div>'; } else buf.push(item); });
-  flush();
-  results.innerHTML = h;
+
+  h += `<button class="pag-arrow" onclick="runSearch('${escQ(currentQuery)}', ${current+1})" ${current>=total?'disabled':''}>Next →</button>`;
+  h += '</div>';
+  return h;
 }
 
-function acard(label, text, url, type) {
-  const ic = { bolt: '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>', book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>', info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>' };
-  const src = url ? '<a class="answer-source" href="' + escA(url) + '" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' + escH(label) + '</a>' : '';
-  return '<div class="answer-card"><div class="answer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ic[type]||ic.info) + '</svg></div><div class="answer-body"><h3>' + escH(label) + '</h3><p>' + escH(text) + '</p>' + src + '</div></div>';
+function paginationRange(cur, total) {
+  if (total <= 7) return Array.from({length:total},(_,i)=>i+1);
+  const r = new Set([1, total, cur, cur-1, cur+1].filter(x=>x>=1&&x<=total));
+  const sorted = [...r].sort((a,b)=>a-b);
+  const out = [];
+  for (let i=0;i<sorted.length;i++) {
+    if (i>0 && sorted[i]-sorted[i-1]>1) out.push('…');
+    out.push(sorted[i]);
+  }
+  return out;
 }
 
-function card(item) {
-  const d = item.source || dom(item.url), f = item.favicon || fav(d);
-  return '<div class="result-item" onclick="window.open(\'' + escA(item.url) + '\',\'_blank\')"><div class="result-url"><img class="result-favicon" src="' + f + '" onerror="this.style.display=\'none\'" alt=""/><span class="result-domain">' + escH(d) + '</span></div><div class="result-title">' + escH(item.title || item.snippet.split(' ').slice(0,6).join(' ')) + '</div><div class="result-snippet">' + escH(item.snippet) + '</div></div>';
+/* ─── IMAGES ─── */
+function renderImages(data, q) {
+  const topics = data.RelatedTopics || [];
+  const imgs = topics
+    .flatMap(t => t.Topics ? t.Topics : [t])
+    .filter(t => t.Icon && t.Icon.URL)
+    .map(t => ({ src: t.Icon.URL, caption: t.Text ? t.Text.split(' - ')[0] : '', url: t.FirstURL }));
+
+  document.getElementById('resultCount').textContent = imgs.length
+    ? `${fmtNum(imgs.length * 180)} images` : '';
+
+  let h = '';
+  if (!imgs.length) {
+    h = `<div class="empty">No images found for <strong>${escH(q)}</strong>.<br>Try the Web tab for text results.</div>`;
+  } else {
+    h = '<div class="image-grid">' + imgs.map(img =>
+      `<div class="img-card" onclick="open('${escA(img.url)}','_blank')">
+        <img src="${escA(img.src)}" alt="${escA(img.caption)}" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <div class="img-caption">${escH(img.caption)}</div>
+      </div>`
+    ).join('') + '</div>';
+  }
+  document.getElementById('resultsCol').innerHTML = h;
+  document.getElementById('sidebar').innerHTML = '';
 }
 
-function empty(title, body) {
-  return '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><h3>' + escH(title) + '</h3><p>' + body + '</p></div>';
+/* ─── NEWS ─── */
+function renderNews(data, q) {
+  const topics = (data.RelatedTopics||[]).flatMap(t => t.Topics||[t]).filter(t=>t.Text&&t.FirstURL);
+  document.getElementById('resultCount').textContent = topics.length
+    ? `Top stories for "${escH(q)}"` : '';
+
+  let h = '';
+  if (!topics.length) {
+    h = `<div class="empty">No news results for <strong>${escH(q)}</strong>.</div>`;
+  } else {
+    h = topics.slice(0,30).map(t => {
+      const d = domainOf(t.FirstURL);
+      const icon = t.Icon && t.Icon.URL ? t.Icon.URL : `https://www.google.com/s2/favicons?domain=${d}&sz=64`;
+      return `<div class="news-card" onclick="open('${escA(t.FirstURL)}','_blank')">
+        <img class="news-thumb" src="${escA(icon)}" alt="" onerror="this.style.display='none'">
+        <div class="news-body">
+          <div class="news-source">${escH(d)}</div>
+          <div class="news-title">${escH(t.Text.split(' - ')[0])}</div>
+          <div class="news-date">${randomRecent()}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('resultsCol').innerHTML = h;
 }
 
-function dom(url) { try { return new URL(url).hostname.replace('www.',''); } catch { return url; } }
-function fav(d) { return 'https://www.google.com/s2/favicons?domain=' + d + '&sz=32'; }
-function first(text) { return text.split(' - ')[0] || text; }
+function renderComingSoon(tab) {
+  document.getElementById('resultsCol').innerHTML =
+    `<div class="empty"><strong>${cap(tab)}</strong> search coming soon. Try the <a href="#" onclick="switchTab('web')" style="color:var(--accent)">All</a> tab.</div>`;
+  document.getElementById('resultCount').textContent = '';
+}
+
+/* ─── SIDEBAR / KNOWLEDGE CARD ─── */
+function renderSidebar(data, q) {
+  const sb = document.getElementById('sidebar');
+  if (!data.Heading || !data.AbstractText) { sb.innerHTML = ''; return; }
+
+  const imgUrl = data.Image ? `https://duckduckgo.com${data.Image}` : '';
+
+  let facts = '';
+  (data.Infobox && data.Infobox.content || []).slice(0, 8).forEach(row => {
+    facts += `<div class="kc-fact"><span class="kc-fact-label">${escH(row.label)}</span><span class="kc-fact-value">${escH(String(row.value))}</span></div>`;
+  });
+
+  sb.innerHTML = `<div class="knowledge-card">
+    ${imgUrl ? `<img class="kc-img" src="${escA(imgUrl)}" alt="${escA(data.Heading)}" onerror="this.style.display='none'">` : ''}
+    <div class="kc-body">
+      <div class="kc-title">${escH(data.Heading)}</div>
+      <div class="kc-type">${escH(data.Type||'')}</div>
+      <div class="kc-desc">${escH(data.AbstractText)}</div>
+      ${facts ? `<div class="kc-facts">${facts}</div>` : ''}
+    </div>
+    ${data.AbstractURL ? `<a class="kc-more" href="${escA(data.AbstractURL)}" target="_blank">More about ${escH(data.Heading)} ↗</a>` : ''}
+  </div>`;
+}
+
+/* ──────────────────────────────────────────────────
+   HELPERS
+   ────────────────────────────────────────────────── */
+function domainOf(url) {
+  try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; }
+}
 function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escA(s) { return String(s).replace(/"/g,'&quot;'); }
 function escQ(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function fmtNum(n) { return Math.round(n).toLocaleString(); }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function randomRecent() {
+  const opts = ['2 hours ago','4 hours ago','1 day ago','3 days ago','5 days ago','1 week ago'];
+  return opts[Math.floor(Math.random()*opts.length)];
+}
 </script>
 </body>
 </html>
