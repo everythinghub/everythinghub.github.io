@@ -13,434 +13,252 @@
   --text: #1a1a1a;
   --muted: #5f6368;
   --accent: #1a73e8;
-  --accent2: #0054b3;
   --visited: #6c1ee1;
   --border: #dfe1e5;
   --border-light: #e8eaed;
-  --green: #188038;
   --red: #d93025;
   --tab-active: #1a73e8;
-  --tab-border: #1a73e8;
   --hover-bg: #f1f3f4;
 }
-
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #202124;
-    --card: #303134;
-    --text: #e8eaed;
-    --muted: #9aa0a6;
-    --accent: #8ab4f8;
-    --accent2: #aecbfa;
-    --visited: #c58af9;
-    --border: #3c4043;
-    --border-light: #3c4043;
-    --green: #81c995;
-    --hover-bg: #3c4043;
+    --bg: #202124; --card: #303134; --text: #e8eaed;
+    --muted: #9aa0a6; --accent: #8ab4f8; --visited: #c58af9;
+    --border: #3c4043; --border-light: #3c4043; --hover-bg: #3c4043;
   }
 }
 
-body {
-  font-family: arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
+body { font-family: arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-/* ─── HOME ──────────────────────────────── */
-#home {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 28vh;
-  min-height: 100vh;
-}
-
-.home-logo {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 26px;
-  user-select: none;
-  cursor: pointer;
-}
-.logo-safe { font-size: 56px; font-weight: 400; color: var(--accent); letter-spacing: -1px; }
-.logo-surf { font-size: 56px; font-weight: 400; color: #ea4335; letter-spacing: -1px; }
-.logo-dot  { width: 8px; height: 8px; background: #fbbc05; border-radius: 50%; margin-bottom: 4px; }
+/* HOME */
+#home { display:flex; flex-direction:column; align-items:center; padding-top:28vh; min-height:100vh; }
+.home-logo { display:flex; align-items:center; gap:2px; margin-bottom:26px; user-select:none; cursor:pointer; }
+.logo-safe { font-size:56px; font-weight:400; color:#4285f4; }
+.logo-a    { font-size:56px; font-weight:400; color:#ea4335; }
+.logo-f    { font-size:56px; font-weight:400; color:#fbbc05; }
+.logo-e    { font-size:56px; font-weight:400; color:#4285f4; }
+.logo-s2   { font-size:56px; font-weight:400; color:#34a853; }
+.logo-u    { font-size:56px; font-weight:400; color:#ea4335; }
+.logo-rf   { font-size:56px; font-weight:400; color:#4285f4; }
+.logo-f2   { font-size:56px; font-weight:400; color:#fbbc05; }
 
 .home-search-box {
-  display: flex;
-  align-items: center;
-  width: 560px;
-  max-width: 92vw;
-  height: 46px;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 0 14px 0 18px;
-  background: var(--card);
-  box-shadow: none;
-  transition: box-shadow 0.2s, border-color 0.2s;
-  gap: 10px;
+  display:flex; align-items:center; width:560px; max-width:92vw;
+  height:46px; border:1px solid var(--border); border-radius:24px;
+  padding:0 14px 0 18px; background:var(--card);
+  box-shadow:none; transition:box-shadow .2s,border-color .2s; gap:10px;
 }
-.home-search-box:focus-within {
-  box-shadow: 0 1px 6px rgba(32,33,36,.28);
-  border-color: transparent;
-}
-.home-search-box svg.search-ic { width: 20px; height: 20px; color: var(--muted); flex-shrink: 0; }
+.home-search-box:focus-within { box-shadow:0 1px 6px rgba(32,33,36,.28); border-color:transparent; }
+.home-search-box svg { width:20px; height:20px; color:var(--muted); flex-shrink:0; }
 #homeInput {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  font-family: inherit;
-  background: transparent;
-  color: var(--text);
+  flex:1; border:none; outline:none; font-size:16px;
+  font-family:inherit; background:transparent; color:var(--text);
 }
-#homeInput::placeholder { color: var(--muted); }
-.mic-btn { background: none; border: none; cursor: pointer; padding: 4px; color: var(--muted); display: flex; align-items: center; }
-.mic-btn:hover { color: var(--accent); }
-
-.home-btns { display: flex; gap: 10px; margin-top: 26px; }
+#homeInput::placeholder { color:var(--muted); }
+.home-btns { display:flex; gap:10px; margin-top:26px; }
 .home-btn {
-  height: 36px; padding: 0 18px;
-  background: var(--hover-bg); border: 1px solid var(--hover-bg);
-  border-radius: 4px; font-size: 14px; font-family: inherit;
-  color: var(--text); cursor: pointer; transition: all 0.1s;
+  height:36px; padding:0 18px; background:var(--hover-bg);
+  border:1px solid var(--hover-bg); border-radius:4px; font-size:14px;
+  font-family:inherit; color:var(--text); cursor:pointer; transition:all .1s;
 }
-.home-btn:hover { border-color: var(--border); box-shadow: 0 1px 3px rgba(0,0,0,.1); background: var(--card); }
-
-.home-suggestions {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: 8px; margin-top: 32px; max-width: 560px;
-}
+.home-btn:hover { border-color:var(--border); box-shadow:0 1px 3px rgba(0,0,0,.1); background:var(--card); }
+.home-suggestions { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:32px; max-width:560px; }
 .sug-chip {
-  padding: 8px 16px; border-radius: 20px;
-  background: var(--card); border: 1px solid var(--border);
-  font-size: 13px; color: var(--text); cursor: pointer;
-  transition: background 0.15s;
+  padding:8px 16px; border-radius:20px; background:var(--card);
+  border:1px solid var(--border); font-size:13px; color:var(--text);
+  cursor:pointer; transition:background .15s;
 }
-.sug-chip:hover { background: var(--hover-bg); }
+.sug-chip:hover { background:var(--hover-bg); }
 
-/* ─── RESULTS PAGE ──────────────────────── */
-#page { display: none; min-height: 100vh; }
+/* RESULTS PAGE */
+#page { display:none; min-height:100vh; }
 
-/* top bar */
 .top-bar {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 8px 20px 0;
-  border-bottom: 1px solid var(--border-light);
-  background: var(--card);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  flex-wrap: wrap;
+  display:flex; align-items:center; gap:18px; padding:8px 20px 0;
+  border-bottom:1px solid var(--border-light); background:var(--card);
+  position:sticky; top:0; z-index:100; flex-wrap:wrap;
 }
+.top-logo { display:flex; align-items:center; gap:1px; cursor:pointer; text-decoration:none; flex-shrink:0; }
+.tl-s { font-size:22px; color:#4285f4; font-weight:400; }
+.tl-a { font-size:22px; color:#ea4335; font-weight:400; }
+.tl-f { font-size:22px; color:#fbbc05; font-weight:400; }
+.tl-e { font-size:22px; color:#4285f4; font-weight:400; }
+.tl-S { font-size:22px; color:#34a853; font-weight:400; }
+.tl-u { font-size:22px; color:#ea4335; font-weight:400; }
+.tl-r { font-size:22px; color:#4285f4; font-weight:400; }
+.tl-ff{ font-size:22px; color:#fbbc05; font-weight:400; }
 
-.top-logo {
-  display: flex; align-items: center; gap: 2px;
-  cursor: pointer; user-select: none; flex-shrink: 0;
-  text-decoration: none;
-}
-.tl-safe { font-size: 22px; color: var(--accent); font-weight: 400; }
-.tl-surf { font-size: 22px; color: #ea4335; font-weight: 400; }
-
-.top-search-wrap {
-  flex: 1; max-width: 640px;
-  position: relative;
-  display: flex; align-items: center;
-}
+.top-search-wrap { flex:1; max-width:640px; display:flex; align-items:center; }
 .top-search-inner {
-  display: flex; align-items: center;
-  width: 100%; height: 44px;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  background: var(--card);
-  padding: 0 14px 0 18px;
-  gap: 8px;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  display:flex; align-items:center; width:100%; height:44px;
+  border:1px solid var(--border); border-radius:24px; background:var(--card);
+  padding:0 14px 0 18px; gap:8px; transition:box-shadow .15s,border-color .15s;
 }
-.top-search-inner:focus-within {
-  border-color: transparent;
-  box-shadow: 0 1px 6px rgba(32,33,36,.35);
-}
-#topInput {
-  flex: 1; border: none; outline: none;
-  font-size: 16px; font-family: inherit;
-  background: transparent; color: var(--text);
-}
-.top-search-inner .x-btn {
-  background: none; border: none; cursor: pointer;
-  color: var(--muted); font-size: 18px; padding: 2px 4px; line-height: 1;
-  display: none;
-}
-.top-search-inner .x-btn.show { display: block; }
-.top-search-inner .search-go {
-  background: none; border: none; cursor: pointer;
-  color: var(--accent); display: flex; padding: 4px 2px;
-}
-.top-search-inner .search-go svg { width: 20px; height: 20px; }
+.top-search-inner:focus-within { border-color:transparent; box-shadow:0 1px 6px rgba(32,33,36,.35); }
+#topInput { flex:1; border:none; outline:none; font-size:16px; font-family:inherit; background:transparent; color:var(--text); }
+.x-btn { background:none; border:none; cursor:pointer; color:var(--muted); font-size:18px; padding:2px 4px; display:none; }
+.x-btn.show { display:block; }
+.search-go { background:none; border:none; cursor:pointer; color:var(--accent); display:flex; padding:4px 2px; }
+.search-go svg { width:20px; height:20px; }
 
-/* filter tabs */
-.filter-tabs {
-  display: flex; align-items: flex-end;
-  gap: 0; overflow-x: auto; scrollbar-width: none;
-  margin-left: 148px; /* align under search box roughly */
+.tabs-row {
+  background:var(--card); border-bottom:1px solid var(--border-light);
+  display:flex; align-items:flex-end; padding:0 20px 0 194px;
+  overflow-x:auto; scrollbar-width:none;
 }
-.filter-tabs::-webkit-scrollbar { display: none; }
+.tabs-row::-webkit-scrollbar { display:none; }
 .ftab {
-  display: flex; align-items: center; gap: 6px;
-  padding: 10px 14px 10px;
-  border-bottom: 3px solid transparent;
-  font-size: 13px; color: var(--muted);
-  cursor: pointer; white-space: nowrap;
-  transition: color 0.15s; user-select: none;
-  background: none; border-top: none; border-left: none; border-right: none;
-  font-family: inherit;
+  display:flex; align-items:center; gap:6px; padding:10px 14px;
+  border-bottom:3px solid transparent; font-size:13px; color:var(--muted);
+  cursor:pointer; white-space:nowrap; transition:color .15s;
+  background:none; border-top:none; border-left:none; border-right:none;
+  font-family:inherit;
 }
-.ftab:hover { color: var(--text); }
-.ftab.active { color: var(--tab-active); border-bottom-color: var(--tab-border); }
-.ftab svg { width: 16px; height: 16px; }
-.ftab-sep { width: 1px; background: var(--border-light); height: 20px; margin: 0 4px; align-self: center; }
+.ftab:hover { color:var(--text); }
+.ftab.active { color:var(--tab-active); border-bottom-color:var(--tab-active); }
+.ftab svg { width:16px; height:16px; }
+.ftab-sep { width:1px; background:var(--border-light); height:20px; margin:0 4px; align-self:center; }
 
-/* tools bar */
 .tools-bar {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 20px 8px 228px;
-  font-size: 13px; color: var(--muted);
-  flex-wrap: wrap;
+  display:flex; align-items:center; gap:8px;
+  padding:8px 20px 8px 228px; flex-wrap:wrap;
 }
 .tool-btn {
-  display: flex; align-items: center; gap: 4px;
-  padding: 5px 12px; border-radius: 20px;
-  border: 1px solid var(--border); background: var(--card);
-  font-size: 13px; color: var(--muted); cursor: pointer;
-  font-family: inherit; transition: border-color 0.15s;
+  display:flex; align-items:center; gap:4px; padding:5px 12px;
+  border-radius:20px; border:1px solid var(--border); background:var(--card);
+  font-size:13px; color:var(--muted); cursor:pointer; font-family:inherit;
 }
-.tool-btn:hover { border-color: var(--muted); }
-.tool-btn svg { width: 14px; height: 14px; }
-.result-count { font-size: 13px; color: var(--muted); padding: 0 20px 6px 228px; }
+.tool-btn:hover { border-color:var(--muted); }
+.tool-btn svg { width:14px; height:14px; }
+.result-count { font-size:13px; color:var(--muted); padding:0 20px 6px 228px; }
 
-/* ─── MAIN CONTENT ─── */
-.content-wrap {
-  display: flex;
-  padding: 8px 20px 60px 192px;
-  max-width: 1200px;
-  gap: 40px;
-}
+.content-wrap { display:flex; padding:8px 20px 60px 192px; max-width:1200px; gap:40px; }
+.results-col { flex:1; min-width:0; max-width:660px; }
 
-/* LEFT COLUMN */
-.results-col { flex: 1; min-width: 0; max-width: 660px; }
-
-/* answer box */
+/* infobox */
 .infobox {
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  padding: 18px 20px;
-  margin-bottom: 20px;
-  background: var(--card);
-  max-width: 580px;
+  border:1px solid var(--border-light); border-radius:12px;
+  padding:18px 20px; margin-bottom:20px; background:var(--card); max-width:580px;
 }
-.infobox h3 { font-size: 18px; font-weight: 400; margin-bottom: 6px; }
-.infobox p { font-size: 14px; line-height: 1.6; color: var(--muted); }
-.infobox-src { font-size: 12px; color: var(--accent); margin-top: 8px; display: inline-block; }
+.infobox h3 { font-size:18px; font-weight:400; margin-bottom:6px; }
+.infobox p { font-size:14px; line-height:1.6; color:var(--muted); }
+.infobox-src { font-size:12px; color:var(--accent); margin-top:8px; display:inline-block; }
 
 /* web result */
-.web-result { margin-bottom: 28px; max-width: 600px; }
-.wr-url {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: var(--muted); margin-bottom: 4px; line-height: 1.2;
-}
-.wr-favicon { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; background: var(--border-light); }
-.wr-breadcrumb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wr-menu-btn {
-  margin-left: 4px; background: none; border: none; cursor: pointer;
-  color: var(--muted); font-size: 16px; padding: 0 4px; line-height: 1;
-  opacity: 0; transition: opacity 0.1s;
-}
-.web-result:hover .wr-menu-btn { opacity: 1; }
-.wr-title {
-  font-size: 20px; color: var(--accent); font-weight: 400;
-  cursor: pointer; line-height: 1.25; margin-bottom: 4px;
-}
-.wr-title:hover { text-decoration: underline; }
-.wr-title:visited { color: var(--visited); }
-.wr-snippet { font-size: 14px; line-height: 1.55; color: var(--muted); }
-.wr-snippet em { color: var(--text); font-style: normal; font-weight: 500; }
-.wr-date { color: var(--muted); font-size: 13px; }
+.web-result { margin-bottom:28px; max-width:600px; }
+.wr-url { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-bottom:4px; }
+.wr-favicon { width:18px; height:18px; border-radius:50%; flex-shrink:0; background:var(--border-light); }
+.wr-breadcrumb { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.wr-title { font-size:20px; color:var(--accent); font-weight:400; cursor:pointer; line-height:1.25; margin-bottom:4px; }
+.wr-title:hover { text-decoration:underline; }
+.wr-snippet { font-size:14px; line-height:1.55; color:var(--muted); }
+.wr-snippet b { color:var(--text); font-weight:500; }
 
-/* sitelinks */
-.sitelinks { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; }
-.sitelink-item { font-size: 14px; color: var(--accent); cursor: pointer; }
-.sitelink-item:hover { text-decoration: underline; }
-
-/* RIGHT COLUMN */
-.sidebar { width: 310px; flex-shrink: 0; padding-top: 4px; }
-.knowledge-card {
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--card);
-  margin-bottom: 20px;
-}
-.kc-img { width: 100%; height: 140px; object-fit: cover; background: var(--hover-bg); }
-.kc-body { padding: 16px; }
-.kc-title { font-size: 22px; font-weight: 400; margin-bottom: 4px; }
-.kc-type { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
-.kc-desc { font-size: 14px; line-height: 1.6; color: var(--muted); }
-.kc-facts { margin-top: 14px; }
-.kc-fact { display: flex; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border-light); font-size: 13px; }
-.kc-fact-label { color: var(--muted); flex-shrink: 0; width: 90px; }
-.kc-fact-value { color: var(--text); }
-.kc-more { display: block; padding: 10px 16px; font-size: 14px; color: var(--accent); cursor: pointer; border-top: 1px solid var(--border-light); }
-.kc-more:hover { text-decoration: underline; }
+/* sidebar */
+.sidebar { width:310px; flex-shrink:0; padding-top:4px; }
+.knowledge-card { border:1px solid var(--border-light); border-radius:12px; overflow:hidden; background:var(--card); margin-bottom:20px; }
+.kc-img { width:100%; height:140px; object-fit:cover; background:var(--hover-bg); }
+.kc-body { padding:16px; }
+.kc-title { font-size:22px; font-weight:400; margin-bottom:4px; }
+.kc-type { font-size:13px; color:var(--muted); margin-bottom:12px; }
+.kc-desc { font-size:14px; line-height:1.6; color:var(--muted); }
+.kc-more { display:block; padding:10px 16px; font-size:14px; color:var(--accent); cursor:pointer; border-top:1px solid var(--border-light); text-decoration:none; }
+.kc-more:hover { text-decoration:underline; }
 
 /* pagination */
-.pagination {
-  display: flex; align-items: center; justify-content: center;
-  gap: 2px; padding: 30px 0 20px; max-width: 600px;
-}
-.pag-logo { font-size: 24px; margin-right: 16px; }
+.pagination { display:flex; align-items:center; justify-content:center; gap:2px; padding:30px 0 20px; max-width:600px; }
+.pag-logo { font-size:24px; margin-right:16px; }
 .pag-btn {
-  min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; border: none; background: none; cursor: pointer;
-  font-size: 14px; color: var(--accent); font-family: inherit;
-  transition: background 0.15s;
+  min-width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+  border-radius:50%; border:none; background:none; cursor:pointer;
+  font-size:14px; color:var(--accent); font-family:inherit; transition:background .15s;
 }
-.pag-btn:hover { background: var(--hover-bg); }
-.pag-btn.active { color: white; background: var(--accent); pointer-events: none; }
-.pag-btn:disabled { color: var(--muted); pointer-events: none; }
-.pag-ellipsis { padding: 0 4px; color: var(--muted); font-size: 14px; line-height: 36px; }
+.pag-btn:hover { background:var(--hover-bg); }
+.pag-btn.active { color:#fff; background:var(--accent); pointer-events:none; }
+.pag-ellipsis { padding:0 4px; color:var(--muted); font-size:14px; line-height:36px; }
 .pag-arrow {
-  display: flex; align-items: center; gap: 4px;
-  padding: 8px 14px; border-radius: 4px; border: none;
-  background: none; cursor: pointer; font-size: 14px; color: var(--accent);
-  font-family: inherit; transition: background 0.15s;
+  display:flex; align-items:center; gap:4px; padding:8px 14px;
+  border-radius:4px; border:none; background:none; cursor:pointer;
+  font-size:14px; color:var(--accent); font-family:inherit; transition:background .15s;
 }
-.pag-arrow:hover { background: var(--hover-bg); }
-.pag-arrow:disabled { color: var(--muted); pointer-events: none; }
+.pag-arrow:hover { background:var(--hover-bg); }
+.pag-arrow:disabled { color:var(--muted); pointer-events:none; }
 
 /* image grid */
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 8px; padding: 8px 0;
-}
-.img-card {
-  border-radius: 8px; overflow: hidden;
-  background: var(--hover-bg); cursor: pointer;
-  aspect-ratio: 4/3; position: relative;
-}
-.img-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s; }
-.img-card:hover img { opacity: 0.9; }
-.img-caption { font-size: 12px; color: var(--muted); padding: 4px 6px; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.5); color: white; opacity: 0; transition: opacity 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.img-card:hover .img-caption { opacity: 1; }
+.image-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:8px; padding:8px 0; }
+.img-card { border-radius:8px; overflow:hidden; background:var(--hover-bg); cursor:pointer; aspect-ratio:4/3; position:relative; }
+.img-card img { width:100%; height:100%; object-fit:cover; display:block; }
+.img-caption { font-size:12px; padding:4px 6px; position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,.55); color:#fff; opacity:0; transition:opacity .15s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.img-card:hover .img-caption { opacity:1; }
 
-/* news cards */
-.news-card {
-  display: flex; gap: 14px;
-  margin-bottom: 18px; max-width: 620px;
-  cursor: pointer; padding: 12px; border-radius: 8px;
-  transition: background 0.15s;
-}
-.news-card:hover { background: var(--hover-bg); }
-.news-thumb { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--hover-bg); }
-.news-body { flex: 1; }
-.news-source { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-.news-title { font-size: 15px; font-weight: 500; line-height: 1.35; margin-bottom: 4px; }
-.news-title:hover { text-decoration: underline; }
-.news-date { font-size: 12px; color: var(--muted); }
+/* news */
+.news-card { display:flex; gap:14px; margin-bottom:18px; max-width:620px; cursor:pointer; padding:12px; border-radius:8px; transition:background .15s; }
+.news-card:hover { background:var(--hover-bg); }
+.news-icon { width:48px; height:48px; border-radius:8px; flex-shrink:0; background:var(--accent); display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; }
+.news-body { flex:1; }
+.news-source { font-size:12px; color:var(--muted); margin-bottom:4px; }
+.news-title { font-size:15px; font-weight:500; line-height:1.35; margin-bottom:4px; }
+.news-date { font-size:12px; color:var(--muted); }
 
-/* empty / loading / error */
-.loader { display: flex; justify-content: center; align-items: center; padding: 80px; }
-.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.empty { padding: 48px 0; color: var(--muted); font-size: 15px; }
-.error-msg { color: var(--red); font-size: 14px; padding: 20px 0; }
+/* loader / error / empty */
+.loader { display:flex; justify-content:center; align-items:center; padding:80px; }
+.spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.empty { padding:48px 0; color:var(--muted); font-size:15px; }
+.error-msg { color:var(--red); font-size:14px; padding:20px 0; }
 
-/* ─── AUTOCOMPLETE ─── */
-.ac-wrap { position: relative; flex: 1; }
-.ac-list {
-  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 0 0 12px 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
-  z-index: 200; overflow: hidden; display: none;
-}
-.ac-list.open { display: block; }
-.ac-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 18px; cursor: pointer; font-size: 15px;
-  transition: background 0.1s;
-}
-.ac-item:hover, .ac-item.focused { background: var(--hover-bg); }
-.ac-item svg { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
+/* streaming text */
+.streaming { opacity:.7; }
 
-/* ─── RESPONSIVE ─── */
-@media (max-width: 900px) {
-  .content-wrap { padding-left: 16px; padding-right: 16px; flex-direction: column; }
-  .sidebar { width: 100%; }
-  .filter-tabs { margin-left: 0; }
-  .tools-bar, .result-count { padding-left: 16px; }
-  .top-bar { gap: 10px; }
-  .top-logo { flex-shrink: 0; }
+@media (max-width:900px) {
+  .content-wrap { padding-left:16px; padding-right:16px; flex-direction:column; }
+  .sidebar { width:100%; }
+  .tabs-row { padding-left:0; }
+  .tools-bar, .result-count { padding-left:16px; }
 }
-
-@media (max-width: 600px) {
-  .tl-safe, .tl-surf { font-size: 18px; }
-  .top-bar { padding: 6px 10px 0; }
-  .tools-bar { padding-left: 10px; }
-  .result-count { padding-left: 10px; }
-  .wr-title { font-size: 17px; }
+@media (max-width:600px) {
+  .tl-s,.tl-a,.tl-f,.tl-e,.tl-S,.tl-u,.tl-r,.tl-ff { font-size:18px; }
+  .top-bar { padding:6px 10px 0; }
+  .tools-bar,.result-count { padding-left:10px; }
+  .wr-title { font-size:17px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ─── HOME PAGE ─── -->
+<!-- HOME -->
 <div id="home">
   <div class="home-logo" onclick="goHome()">
-    <span class="logo-safe">Safe</span>
-    <span class="logo-dot"></span>
-    <span class="logo-surf">Surf</span>
+    <span class="logo-safe">S</span><span class="logo-a">a</span><span class="logo-f">f</span><span class="logo-e">e</span><span class="logo-s2">S</span><span class="logo-u">u</span><span class="logo-rf">r</span><span class="logo-f2">f</span>
   </div>
-
   <div class="home-search-box">
-    <svg class="search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
     <input id="homeInput" type="text" placeholder="Search the web" autocomplete="off" spellcheck="false"/>
-    <button class="mic-btn" title="Search by voice" onclick="voiceSearch()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-        <rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8"/>
-      </svg>
-    </button>
   </div>
-
   <div class="home-btns">
     <button class="home-btn" onclick="runSearch(document.getElementById('homeInput').value)">SafeSurf Search</button>
-    <button class="home-btn" onclick="feelingLucky()">I'm Feeling Lucky</button>
+    <button class="home-btn" onclick="runSearch(document.getElementById('homeInput').value)">I'm Feeling Lucky</button>
   </div>
-
   <div class="home-suggestions">
-    <div class="sug-chip" onclick="runSearch('weather today')">🌤 Weather</div>
+    <div class="sug-chip" onclick="runSearch('weather today Port Orchard WA')">🌤 Weather</div>
     <div class="sug-chip" onclick="runSearch('AI news 2026')">🤖 AI News</div>
     <div class="sug-chip" onclick="runSearch('latest tech news')">💻 Tech</div>
-    <div class="sug-chip" onclick="runSearch('space exploration')">🚀 Space</div>
+    <div class="sug-chip" onclick="runSearch('space exploration 2026')">🚀 Space</div>
     <div class="sug-chip" onclick="runSearch('world news today')">🌍 World News</div>
-    <div class="sug-chip" onclick="runSearch('science discoveries')">🔬 Science</div>
+    <div class="sug-chip" onclick="runSearch('science discoveries 2026')">🔬 Science</div>
     <div class="sug-chip" onclick="runSearch('health wellness tips')">❤️ Health</div>
-    <div class="sug-chip" onclick="runSearch('financial markets')">📈 Finance</div>
+    <div class="sug-chip" onclick="runSearch('stock market today')">📈 Finance</div>
   </div>
 </div>
 
-<!-- ─── RESULTS PAGE ─── -->
+<!-- RESULTS PAGE -->
 <div id="page">
   <div class="top-bar">
     <a class="top-logo" onclick="goHome()" href="#">
-      <span class="tl-safe">Safe</span><span class="tl-surf">Surf</span>
+      <span class="tl-s">S</span><span class="tl-a">a</span><span class="tl-f">f</span><span class="tl-e">e</span><span class="tl-S">S</span><span class="tl-u">u</span><span class="tl-r">r</span><span class="tl-ff">f</span>
     </a>
-
     <div class="top-search-wrap">
       <div class="top-search-inner">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" style="color:var(--muted);flex-shrink:0">
@@ -448,7 +266,7 @@ body {
         </svg>
         <input id="topInput" type="text" placeholder="Search" autocomplete="off" spellcheck="false"/>
         <button class="x-btn" id="topClear" onclick="clearTop()">✕</button>
-        <button class="search-go" onclick="runSearch(document.getElementById('topInput').value)" title="Search">
+        <button class="search-go" onclick="runSearch(document.getElementById('topInput').value)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
@@ -457,19 +275,18 @@ body {
     </div>
   </div>
 
-  <!-- filter tabs row -->
-  <div style="background:var(--card); border-bottom:1px solid var(--border-light); display:flex; align-items:flex-end; padding: 0 20px 0 194px; overflow-x:auto; scrollbar-width:none;">
+  <div class="tabs-row">
     <button class="ftab active" data-tab="web" onclick="switchTab('web')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       All
     </button>
-    <button class="ftab" data-tab="images" onclick="switchTab('images')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      Images
-    </button>
     <button class="ftab" data-tab="news" onclick="switchTab('news')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a4 4 0 0 1-4 4z"/><path d="M10 9h8M10 13h8M10 17h4"/></svg>
       News
+    </button>
+    <button class="ftab" data-tab="images" onclick="switchTab('images')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Images
     </button>
     <button class="ftab" data-tab="videos" onclick="switchTab('videos')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
@@ -481,65 +298,55 @@ body {
     </button>
     <div class="ftab-sep"></div>
     <button class="ftab" data-tab="shopping" onclick="switchTab('shopping')">Shopping</button>
-    <button class="ftab" data-tab="books" onclick="switchTab('books')">Books</button>
     <button class="ftab" data-tab="more" onclick="switchTab('more')">More ▾</button>
   </div>
 
-  <!-- tools bar -->
   <div class="tools-bar">
-    <button class="tool-btn" onclick="toggleFilter('time')">
+    <button class="tool-btn" id="filterTime" onclick="cycleTimeFilter()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Any time ▾
+      <span id="filterTimeLabel">Any time</span> ▾
     </button>
-    <button class="tool-btn" onclick="toggleFilter('type')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    <button class="tool-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/></svg>
       All results ▾
     </button>
-    <button class="tool-btn" onclick="toggleFilter('verbatim')">Verbatim</button>
-    <button class="tool-btn" onclick="toggleFilter('tools')" style="margin-left:auto">
+    <button class="tool-btn" style="margin-left:auto">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
       Tools
     </button>
   </div>
 
   <div class="result-count" id="resultCount"></div>
-
   <div class="content-wrap">
-    <div class="results-col" id="resultsCol">
-      <div class="loader"><div class="spinner"></div></div>
-    </div>
+    <div class="results-col" id="resultsCol"><div class="loader"><div class="spinner"></div></div></div>
     <div class="sidebar" id="sidebar"></div>
   </div>
 </div>
 
 <script>
-/* ──────────────────────────────────────────────────
-   STATE
-   ────────────────────────────────────────────────── */
+/* ── STATE ── */
 let currentQuery = '';
 let currentTab   = 'web';
 let currentPage  = 1;
 const PAGE_SIZE  = 10;
-let cachedResults = {};
+let allResults   = [];   // full parsed array from AI
+let timeFilter   = 'any';
+const timeOptions = ['any','hour','day','week','month','year'];
+const timeLabels  = {'any':'Any time','hour':'Past hour','day':'Past 24 hours','week':'Past week','month':'Past month','year':'Past year'};
 
-/* ──────────────────────────────────────────────────
-   NAVIGATION
-   ────────────────────────────────────────────────── */
+/* ── NAV ── */
 function goHome() {
   document.getElementById('home').style.display = '';
   document.getElementById('page').style.display = 'none';
   document.getElementById('homeInput').value = '';
   document.title = 'SafeSurf';
 }
-
 function showPage() {
   document.getElementById('home').style.display = 'none';
   document.getElementById('page').style.display = '';
 }
 
-/* ──────────────────────────────────────────────────
-   SEARCH ENTRY POINTS
-   ────────────────────────────────────────────────── */
+/* ── INPUTS ── */
 document.getElementById('homeInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.value.trim()) runSearch(e.target.value.trim());
 });
@@ -554,311 +361,284 @@ function clearTop() {
   document.getElementById('topClear').classList.remove('show');
   document.getElementById('topInput').focus();
 }
-function feelingLucky() {
-  const q = document.getElementById('homeInput').value.trim();
-  if (q) runSearch(q);
+function switchTab(tab) { currentTab = tab; currentPage = 1; renderCurrentTab(); updateTabUI(); }
+function updateTabUI() {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.toggle('active', t.dataset.tab === currentTab));
 }
-function voiceSearch() {
-  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-    alert('Voice search not supported in this browser.'); return;
-  }
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const r = new SR();
-  r.onresult = e => { const t = e.results[0][0].transcript; document.getElementById('homeInput').value = t; runSearch(t); };
-  r.start();
+function cycleTimeFilter() {
+  const i = timeOptions.indexOf(timeFilter);
+  timeFilter = timeOptions[(i+1) % timeOptions.length];
+  document.getElementById('filterTimeLabel').textContent = timeLabels[timeFilter];
+  if (currentQuery) runSearch(currentQuery, 1);
 }
 
-/* ──────────────────────────────────────────────────
-   MAIN SEARCH FUNCTION
-   ────────────────────────────────────────────────── */
-async function runSearch(q, page = 1, tab = currentTab) {
-  if (!q.trim()) return;
+/* ── MAIN SEARCH ── */
+async function runSearch(q, page=1, tab=currentTab) {
+  if (!q || !q.trim()) return;
   currentQuery = q.trim();
   currentPage  = page;
   currentTab   = tab;
+  allResults   = [];
 
   showPage();
   document.getElementById('topInput').value = q;
   document.getElementById('topClear').classList.add('show');
   document.title = q + ' – SafeSurf';
-
-  // Highlight active tab
-  document.querySelectorAll('.ftab').forEach(t => {
-    t.classList.toggle('active', t.dataset.tab === tab);
-  });
-
+  updateTabUI();
   setLoading();
 
-  const cacheKey = `${tab}:${q}:${page}`;
-  if (cachedResults[cacheKey]) {
-    renderResults(cachedResults[cacheKey], q, page, tab);
-    return;
-  }
-
+  const t0 = Date.now();
   try {
-    const data = await fetchDDG(q);
-    cachedResults[cacheKey] = data;
-    renderResults(data, q, page, tab);
-  } catch (err) {
-    document.getElementById('resultsCol').innerHTML = `<div class="error-msg">⚠️ Couldn't load results. Check your connection and try again.<br><small>${err.message}</small></div>`;
+    await fetchAndRender(q, tab, page, t0);
+  } catch(err) {
+    document.getElementById('resultsCol').innerHTML =
+      `<div class="error-msg">⚠️ Search failed: ${escH(err.message)}</div>`;
     document.getElementById('sidebar').innerHTML = '';
     document.getElementById('resultCount').textContent = '';
   }
 }
 
-function switchTab(tab) {
-  currentTab = tab;
-  runSearch(currentQuery, 1, tab);
+/* ── FETCH VIA CLAUDE API WITH WEB SEARCH ── */
+async function fetchAndRender(q, tab, page, t0) {
+  const timeHint = timeFilter !== 'any'
+    ? ` Focus on results from the past ${timeLabels[timeFilter].toLowerCase().replace('past ','')}.`
+    : '';
+
+  const systemPrompt = `You are a web search engine results formatter. The user will give you a search query. Use your web_search tool to search for it, then return ONLY a JSON object (no markdown, no backticks, no explanation) in exactly this structure:
+
+{
+  "totalEstimate": "About 4,230,000 results",
+  "elapsedMs": 420,
+  "instantAnswer": { "title": "...", "text": "...", "source": "...", "url": "..." },
+  "knowledgePanel": { "title": "...", "subtitle": "...", "description": "...", "url": "...", "imageQuery": "..." },
+  "results": [
+    { "title": "...", "url": "...", "displayUrl": "...", "snippet": "...", "date": "..." }
+  ],
+  "relatedSearches": ["...", "..."]
 }
 
-function toggleFilter(type) {
-  // Placeholder for filter dropdowns
-  console.log('filter:', type);
-}
+Rules:
+- Always include at least 10 results in the results array, ideally 20-30 real results from your web search.
+- instantAnswer: fill only if there is a clear factual answer (definition, calculation, direct fact). Omit the key if not applicable.
+- knowledgePanel: fill only for well-known entities (people, places, companies, movies, etc). Omit if not applicable.
+- date in results: the publication date string if available, else empty string.
+- displayUrl: a shortened human-readable URL like "en.wikipedia.org › wiki › Topic"
+- relatedSearches: 6-8 related query suggestions.
+- Return ONLY valid JSON. Do not wrap in markdown code blocks.${timeHint}`;
 
-/* ──────────────────────────────────────────────────
-   DATA FETCHING (DuckDuckGo)
-   ────────────────────────────────────────────────── */
-async function fetchDDG(q) {
-  const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1&t=SafeSurf`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
+      system: systemPrompt,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      messages: [{ role: 'user', content: `Search query: ${q}` }]
+    })
+  });
+
+  if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`);
   const data = await res.json();
-  return data;
+
+  // Extract the text content block
+  const textBlock = (data.content || []).find(b => b.type === 'text');
+  if (!textBlock) throw new Error('No text response from search API');
+
+  let parsed;
+  try {
+    // Strip any accidental markdown fences
+    const clean = textBlock.text.replace(/^```[a-z]*\n?/,'').replace(/\n?```$/,'').trim();
+    parsed = JSON.parse(clean);
+  } catch(e) {
+    throw new Error('Could not parse search results: ' + e.message);
+  }
+
+  allResults = parsed.results || [];
+  const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
+
+  // Count line
+  document.getElementById('resultCount').textContent =
+    `${parsed.totalEstimate || `About ${fmtNum(allResults.length * 3100)} results`} (${elapsed} seconds)`;
+
+  renderTab(parsed, tab, page);
 }
 
-/* ──────────────────────────────────────────────────
-   RENDERING
-   ────────────────────────────────────────────────── */
+/* ── RENDER DISPATCHER ── */
+function renderTab(parsed, tab, page) {
+  if (tab === 'web')    renderWeb(parsed, page);
+  else if (tab === 'news')   renderNews(parsed);
+  else if (tab === 'images') renderImages(parsed);
+  else renderComingSoon(tab);
+  renderSidebar(parsed);
+}
+
+function renderCurrentTab() {
+  // Re-render from cache (no re-fetch)
+  if (!allResults.length) return;
+  // We don't have full parsed object cached here, just re-search
+  runSearch(currentQuery, currentPage, currentTab);
+}
+
+/* ── WEB RESULTS ── */
+function renderWeb(parsed, page) {
+  const all = parsed.results || [];
+  const total = all.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const slice = all.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
+
+  let h = '';
+
+  // Instant answer
+  const ia = parsed.instantAnswer;
+  if (ia && ia.text && page === 1) {
+    h += `<div class="infobox">
+      <h3>${escH(ia.title || currentQuery)}</h3>
+      <p>${escH(ia.text)}</p>
+      ${ia.url ? `<a class="infobox-src" href="${escA(ia.url)}" target="_blank">${escH(ia.source || ia.url)} ↗</a>` : ''}
+    </div>`;
+  }
+
+  if (!slice.length) {
+    h += `<div class="empty">No results found for <strong>${escH(currentQuery)}</strong>.</div>`;
+  } else {
+    slice.forEach(item => {
+      const domain = domainOf(item.url);
+      const displayUrl = item.displayUrl || domain;
+      h += `<div class="web-result">
+        <div class="wr-url">
+          <img class="wr-favicon" src="https://www.google.com/s2/favicons?domain=${escA(domain)}&sz=32"
+               onerror="this.style.display='none'" alt="">
+          <span class="wr-breadcrumb">${escH(displayUrl)}</span>
+        </div>
+        <div class="wr-title" onclick="window.open('${escA(item.url)}','_blank')">${escH(item.title)}</div>
+        ${item.date ? `<span class="wr-snippet" style="font-size:13px;color:var(--muted)">${escH(item.date)} — </span>` : ''}
+        <div class="wr-snippet">${escH(item.snippet)}</div>
+      </div>`;
+    });
+  }
+
+  // Related searches
+  if ((parsed.relatedSearches || []).length && page === 1) {
+    h += `<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border-light)">
+      <div style="font-size:13px;font-weight:500;margin-bottom:12px;color:var(--text)">Related searches</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${(parsed.relatedSearches||[]).map(r =>
+          `<div onclick="runSearch('${escQ(r)}')" style="padding:8px 16px;border:1px solid var(--border);border-radius:20px;font-size:14px;cursor:pointer;background:var(--card);transition:background .15s" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background='var(--card)'">${escH(r)}</div>`
+        ).join('')}
+      </div>
+    </div>`;
+  }
+
+  h += renderPagination(page, Math.min(totalPages, 20));
+
+  document.getElementById('resultsCol').innerHTML = h;
+  window.scrollTo(0,0);
+}
+
+/* ── NEWS ── */
+function renderNews(parsed) {
+  const items = parsed.results || [];
+  const icons = ['📰','📡','🌐','📺','📻','🗞️','💬','🔔'];
+  let h = items.slice(0,30).map((item, i) => {
+    const domain = domainOf(item.url);
+    return `<div class="news-card" onclick="window.open('${escA(item.url)}','_blank')">
+      <div class="news-icon">${icons[i%icons.length]}</div>
+      <div class="news-body">
+        <div class="news-source">${escH(domain)}</div>
+        <div class="news-title">${escH(item.title)}</div>
+        <div class="news-date">${escH(item.date || 'Recent')}</div>
+      </div>
+    </div>`;
+  }).join('');
+  if (!h) h = `<div class="empty">No news results for <strong>${escH(currentQuery)}</strong>.</div>`;
+  document.getElementById('resultsCol').innerHTML = h;
+}
+
+/* ── IMAGES ── */
+function renderImages(parsed) {
+  const items = parsed.results || [];
+  // Build image grid by linking to pages (we don't have real image URLs from text search)
+  let h = `<div class="image-grid">`;
+  items.slice(0,40).forEach(item => {
+    const domain = domainOf(item.url);
+    const color = stringToColor(domain);
+    h += `<div class="img-card" onclick="window.open('${escA(item.url)}','_blank')" style="background:${color}22;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;text-align:center">
+      <img class="wr-favicon" src="https://www.google.com/s2/favicons?domain=${escA(domain)}&sz=64" style="width:32px;height:32px;border-radius:6px" onerror="this.style.display='none'">
+      <div style="font-size:11px;color:var(--muted);word-break:break-word">${escH(item.title.slice(0,60))}</div>
+      <div class="img-caption">${escH(domain)}</div>
+    </div>`;
+  });
+  h += '</div>';
+  if (!items.length) h = `<div class="empty">No image results for <strong>${escH(currentQuery)}</strong>.</div>`;
+  document.getElementById('resultsCol').innerHTML = h;
+  document.getElementById('sidebar').innerHTML = '';
+}
+
+function renderComingSoon(tab) {
+  document.getElementById('resultsCol').innerHTML =
+    `<div class="empty"><strong>${cap(tab)}</strong> tab — try <a href="#" onclick="switchTab('web')" style="color:var(--accent)">All</a>.</div>`;
+  document.getElementById('resultCount').textContent = '';
+}
+
+/* ── SIDEBAR ── */
+function renderSidebar(parsed) {
+  const kp = parsed.knowledgePanel;
+  const sb = document.getElementById('sidebar');
+  if (!kp || !kp.title) { sb.innerHTML = ''; return; }
+  sb.innerHTML = `<div class="knowledge-card">
+    <div class="kc-body">
+      <div class="kc-title">${escH(kp.title)}</div>
+      <div class="kc-type">${escH(kp.subtitle||'')}</div>
+      <div class="kc-desc">${escH(kp.description||'')}</div>
+    </div>
+    ${kp.url ? `<a class="kc-more" href="${escA(kp.url)}" target="_blank">More about ${escH(kp.title)} ↗</a>` : ''}
+  </div>`;
+}
+
+/* ── PAGINATION ── */
+function renderPagination(current, total) {
+  if (total <= 1) return '';
+  let h = '<div class="pagination"><span class="pag-logo">🏄</span>';
+  h += `<button class="pag-arrow" onclick="gotoPage(${current-1})" ${current<=1?'disabled':''}>← Prev</button>`;
+  paginationRange(current,total).forEach(p => {
+    if (p==='…') h += `<span class="pag-ellipsis">…</span>`;
+    else h += `<button class="pag-btn${p===current?' active':''}" onclick="gotoPage(${p})">${p}</button>`;
+  });
+  h += `<button class="pag-arrow" onclick="gotoPage(${current+1})" ${current>=total?'disabled':''}>Next →</button>`;
+  h += '</div>';
+  return h;
+}
+function gotoPage(p) {
+  currentPage = p;
+  // Re-render from cached allResults
+  const fakeP = { results: allResults, relatedSearches: [] };
+  renderWeb(fakeP, p);
+}
+function paginationRange(cur,total) {
+  if (total<=7) return Array.from({length:total},(_,i)=>i+1);
+  const r = new Set([1,total,cur,cur-1,cur+1].filter(x=>x>=1&&x<=total));
+  const s = [...r].sort((a,b)=>a-b);
+  const out=[];
+  for(let i=0;i<s.length;i++){if(i>0&&s[i]-s[i-1]>1)out.push('…');out.push(s[i]);}
+  return out;
+}
+
+/* ── HELPERS ── */
 function setLoading() {
   document.getElementById('resultsCol').innerHTML = '<div class="loader"><div class="spinner"></div></div>';
   document.getElementById('sidebar').innerHTML = '';
   document.getElementById('resultCount').textContent = '';
 }
-
-function renderResults(data, q, page, tab) {
-  if (tab === 'web')   renderWeb(data, q, page);
-  else if (tab === 'images') renderImages(data, q);
-  else if (tab === 'news')   renderNews(data, q);
-  else renderComingSoon(tab);
-
-  renderSidebar(data, q);
-}
-
-/* ─── WEB RESULTS ─── */
-function renderWeb(data, q, page) {
-  const all = collectWebResults(data);
-  const count = all.length;
-  const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
-  const slice = all.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
-
-  document.getElementById('resultCount').textContent =
-    count ? `About ${fmtNum(count * 47)} results (${(Math.random()*0.4+0.3).toFixed(2)} seconds)` : '';
-
-  let h = '';
-
-  // Instant answer box
-  if ((data.Answer || data.AbstractText || data.Definition) && page === 1) {
-    const text = data.Answer || data.AbstractText || data.Definition;
-    const src  = data.AnswerType || data.AbstractSource || data.DefinitionSource;
-    const url  = data.AbstractURL || data.DefinitionURL || '';
-    h += `<div class="infobox">
-      <h3>${escH(data.Heading || q)}</h3>
-      <p>${escH(text)}</p>
-      ${src ? `<a class="infobox-src" href="${escA(url)}" target="_blank">${escH(src)} ↗</a>` : ''}
-    </div>`;
-  }
-
-  if (!slice.length) {
-    h += `<div class="empty">No results found for <strong>${escH(q)}</strong>. Try different keywords.</div>`;
-  } else {
-    slice.forEach((item, i) => {
-      const d = domainOf(item.url);
-      h += `<div class="web-result">
-        <div class="wr-url">
-          <img class="wr-favicon" src="https://www.google.com/s2/favicons?domain=${d}&sz=32" onerror="this.style.display='none'" alt="">
-          <span class="wr-breadcrumb">${escH(d)} › ...</span>
-          <button class="wr-menu-btn" title="More options">⋮</button>
-        </div>
-        <div class="wr-title" onclick="open('${escA(item.url)}','_blank')">${escH(item.title)}</div>
-        <div class="wr-snippet">${escH(item.snippet)}</div>
-        ${item.date ? `<div class="wr-date">${escH(item.date)}</div>` : ''}
-      </div>`;
-    });
-  }
-
-  // Pagination
-  if (totalPages > 1 || count > PAGE_SIZE) {
-    const safeTotal = Math.min(totalPages, 20);
-    h += renderPagination(page, safeTotal);
-  }
-
-  document.getElementById('resultsCol').innerHTML = h;
-  window.scrollTo(0, 0);
-}
-
-function collectWebResults(data) {
-  const items = [];
-  const seen = new Set();
-
-  const add = (title, snippet, url, date) => {
-    if (!url || seen.has(url)) return;
-    seen.add(url);
-    items.push({ title: title || snippet.split(' ').slice(0,8).join(' '), snippet, url, date });
-  };
-
-  if (data.AbstractText && data.AbstractURL) {
-    add(data.Heading || '', data.AbstractText, data.AbstractURL);
-  }
-
-  const walk = (topics) => {
-    (topics||[]).forEach(t => {
-      if (t.Text && t.FirstURL) {
-        const parts = t.Text.split(' - ');
-        add(parts[0], t.Text, t.FirstURL);
-      }
-      if (t.Topics) walk(t.Topics);
-    });
-  };
-  walk(data.RelatedTopics);
-
-  // Pad with plausible results if too few (DuckDuckGo returns limited data)
-  if (items.length < 3 && data.Heading) {
-    const q = data.Heading;
-    const fakeUrls = [
-      `https://en.wikipedia.org/wiki/${encodeURIComponent(q.replace(/ /g,'_'))}`,
-      `https://www.britannica.com/search?query=${encodeURIComponent(q)}`,
-      `https://www.reddit.com/search/?q=${encodeURIComponent(q)}`,
-    ];
-    fakeUrls.forEach(u => add(q + ' – Reference', `Find information about ${q} and related topics.`, u));
-  }
-
-  return items;
-}
-
-function renderPagination(current, total) {
-  let h = '<div class="pagination"><span class="pag-logo">🏄</span>';
-  h += `<button class="pag-arrow" onclick="runSearch('${escQ(currentQuery)}', ${current-1})" ${current<=1?'disabled':''}>← Prev</button>`;
-  
-  const pages = paginationRange(current, total);
-  pages.forEach(p => {
-    if (p === '…') h += `<span class="pag-ellipsis">…</span>`;
-    else h += `<button class="pag-btn ${p===current?'active':''}" onclick="runSearch('${escQ(currentQuery)}', ${p})">${p}</button>`;
-  });
-
-  h += `<button class="pag-arrow" onclick="runSearch('${escQ(currentQuery)}', ${current+1})" ${current>=total?'disabled':''}>Next →</button>`;
-  h += '</div>';
-  return h;
-}
-
-function paginationRange(cur, total) {
-  if (total <= 7) return Array.from({length:total},(_,i)=>i+1);
-  const r = new Set([1, total, cur, cur-1, cur+1].filter(x=>x>=1&&x<=total));
-  const sorted = [...r].sort((a,b)=>a-b);
-  const out = [];
-  for (let i=0;i<sorted.length;i++) {
-    if (i>0 && sorted[i]-sorted[i-1]>1) out.push('…');
-    out.push(sorted[i]);
-  }
-  return out;
-}
-
-/* ─── IMAGES ─── */
-function renderImages(data, q) {
-  const topics = data.RelatedTopics || [];
-  const imgs = topics
-    .flatMap(t => t.Topics ? t.Topics : [t])
-    .filter(t => t.Icon && t.Icon.URL)
-    .map(t => ({ src: t.Icon.URL, caption: t.Text ? t.Text.split(' - ')[0] : '', url: t.FirstURL }));
-
-  document.getElementById('resultCount').textContent = imgs.length
-    ? `${fmtNum(imgs.length * 180)} images` : '';
-
-  let h = '';
-  if (!imgs.length) {
-    h = `<div class="empty">No images found for <strong>${escH(q)}</strong>.<br>Try the Web tab for text results.</div>`;
-  } else {
-    h = '<div class="image-grid">' + imgs.map(img =>
-      `<div class="img-card" onclick="open('${escA(img.url)}','_blank')">
-        <img src="${escA(img.src)}" alt="${escA(img.caption)}" loading="lazy" onerror="this.parentElement.style.display='none'">
-        <div class="img-caption">${escH(img.caption)}</div>
-      </div>`
-    ).join('') + '</div>';
-  }
-  document.getElementById('resultsCol').innerHTML = h;
-  document.getElementById('sidebar').innerHTML = '';
-}
-
-/* ─── NEWS ─── */
-function renderNews(data, q) {
-  const topics = (data.RelatedTopics||[]).flatMap(t => t.Topics||[t]).filter(t=>t.Text&&t.FirstURL);
-  document.getElementById('resultCount').textContent = topics.length
-    ? `Top stories for "${escH(q)}"` : '';
-
-  let h = '';
-  if (!topics.length) {
-    h = `<div class="empty">No news results for <strong>${escH(q)}</strong>.</div>`;
-  } else {
-    h = topics.slice(0,30).map(t => {
-      const d = domainOf(t.FirstURL);
-      const icon = t.Icon && t.Icon.URL ? t.Icon.URL : `https://www.google.com/s2/favicons?domain=${d}&sz=64`;
-      return `<div class="news-card" onclick="open('${escA(t.FirstURL)}','_blank')">
-        <img class="news-thumb" src="${escA(icon)}" alt="" onerror="this.style.display='none'">
-        <div class="news-body">
-          <div class="news-source">${escH(d)}</div>
-          <div class="news-title">${escH(t.Text.split(' - ')[0])}</div>
-          <div class="news-date">${randomRecent()}</div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-  document.getElementById('resultsCol').innerHTML = h;
-}
-
-function renderComingSoon(tab) {
-  document.getElementById('resultsCol').innerHTML =
-    `<div class="empty"><strong>${cap(tab)}</strong> search coming soon. Try the <a href="#" onclick="switchTab('web')" style="color:var(--accent)">All</a> tab.</div>`;
-  document.getElementById('resultCount').textContent = '';
-}
-
-/* ─── SIDEBAR / KNOWLEDGE CARD ─── */
-function renderSidebar(data, q) {
-  const sb = document.getElementById('sidebar');
-  if (!data.Heading || !data.AbstractText) { sb.innerHTML = ''; return; }
-
-  const imgUrl = data.Image ? `https://duckduckgo.com${data.Image}` : '';
-
-  let facts = '';
-  (data.Infobox && data.Infobox.content || []).slice(0, 8).forEach(row => {
-    facts += `<div class="kc-fact"><span class="kc-fact-label">${escH(row.label)}</span><span class="kc-fact-value">${escH(String(row.value))}</span></div>`;
-  });
-
-  sb.innerHTML = `<div class="knowledge-card">
-    ${imgUrl ? `<img class="kc-img" src="${escA(imgUrl)}" alt="${escA(data.Heading)}" onerror="this.style.display='none'">` : ''}
-    <div class="kc-body">
-      <div class="kc-title">${escH(data.Heading)}</div>
-      <div class="kc-type">${escH(data.Type||'')}</div>
-      <div class="kc-desc">${escH(data.AbstractText)}</div>
-      ${facts ? `<div class="kc-facts">${facts}</div>` : ''}
-    </div>
-    ${data.AbstractURL ? `<a class="kc-more" href="${escA(data.AbstractURL)}" target="_blank">More about ${escH(data.Heading)} ↗</a>` : ''}
-  </div>`;
-}
-
-/* ──────────────────────────────────────────────────
-   HELPERS
-   ────────────────────────────────────────────────── */
-function domainOf(url) {
-  try { return new URL(url).hostname.replace(/^www\./,''); } catch { return url; }
-}
-function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function escA(s) { return String(s).replace(/"/g,'&quot;'); }
-function escQ(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
-function fmtNum(n) { return Math.round(n).toLocaleString(); }
-function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-function randomRecent() {
-  const opts = ['2 hours ago','4 hours ago','1 day ago','3 days ago','5 days ago','1 week ago'];
-  return opts[Math.floor(Math.random()*opts.length)];
+function domainOf(url) { try{return new URL(url).hostname.replace(/^www\./,'');}catch{return url;} }
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escA(s){return String(s).replace(/"/g,'&quot;');}
+function escQ(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+function fmtNum(n){return Math.round(n).toLocaleString();}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function stringToColor(s) {
+  let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%360;
+  return `hsl(${h},60%,50%)`;
 }
 </script>
 </body>
