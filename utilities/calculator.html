@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Calculator</title>
+<style>
+  :root{
+    --bg: #000000;
+    --display-color: #ffffff;
+    --key-dark: #333333;
+    --key-dark-active: #737373;
+    --key-mid: #a5a5a5;
+    --key-mid-text: #000000;
+    --key-mid-active: #d9d9d9;
+    --key-accent: #ff9f0a;
+    --key-accent-active: #ffc16d;
+    --key-accent-text: #ffffff;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    font-family: var(--font);
+    overflow: hidden;
+    user-select: none;
+  }
+
+  #app {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ---------- Top bar (history + mode toggle) ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 0 20px;
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    color: #8a8a8a;
+    font-size: 20px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s ease, color .15s ease;
+  }
+  .icon-btn:hover { color: #d0d0d0; }
+  .icon-btn:active { background: rgba(255,255,255,0.08); }
+  .icon-btn.active { color: var(--key-accent); }
+
+  /* ---------- Display ---------- */
+  .display-wrap {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px 24px 6px 24px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .history-strip {
+    max-height: 0;
+    opacity: 0;
+    overflow-y: auto;
+    transition: max-height .25s ease, opacity .2s ease;
+    text-align: right;
+    color: #6e6e6e;
+    font-size: 15px;
+    line-height: 1.9;
+    scrollbar-width: thin;
+  }
+  .history-strip.open { max-height: 140px; opacity: 1; margin-bottom: 8px; }
+  .history-strip::-webkit-scrollbar { width: 4px; }
+  .history-strip::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+  .history-empty { color: #4a4a4a; font-style: italic; }
+  .history-row { cursor: pointer; padding: 2px 0; }
+  .history-row:hover { color: #a8a8a8; }
+  .history-expr { font-size: 13px; opacity: .8; }
+  .history-result { font-size: 17px; color: #e8e8e8; }
+
+  .display {
+    text-align: right;
+    color: var(--display-color);
+    font-weight: 200;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    letter-spacing: -1px;
+    transition: font-size .12s ease;
+  }
+  .display-sub {
+    text-align: right;
+    color: #6e6e6e;
+    font-size: 15px;
+    min-height: 20px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .mem-indicator {
+    position: absolute;
+    left: 24px;
+    bottom: 8px;
+    color: #6e6e6e;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  /* ---------- Keypad ---------- */
+  .keypad {
+    flex-shrink: 0;
+    display: grid;
+    gap: 8px;
+    padding: 8px 12px 16px 12px;
+  }
+
+  .keypad.basic {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+  }
+
+  .keypad.scientific {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+  }
+
+  .key {
+    border: none;
+    outline: none;
+    border-radius: 999px;
+    font-size: 26px;
+    font-weight: 400;
+    height: 100%;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: filter .1s ease, transform .05s ease;
+    color: var(--display-color);
+    background: var(--key-dark);
+  }
+  .key:active { transform: scale(0.94); }
+  .key.pressed { filter: brightness(1.5); }
+
+  .key.light { background: var(--key-mid); color: var(--key-mid-text); }
+  .key.light:active, .key.light.pressed { background: var(--key-mid-active); }
+  .key.dark:active, .key.dark.pressed { background: var(--key-dark-active); }
+
+  .key.accent { background: var(--key-accent); color: var(--key-accent-text); }
+  .key.accent:active, .key.accent.pressed { background: var(--key-accent-active); }
+  .key.accent.toggled { background: #ffffff; color: var(--key-accent); }
+
+  .key.zero {
+    aspect-ratio: auto;
+    grid-column: span 2;
+    border-radius: 40px;
+    justify-content: flex-start;
+    padding-left: 28px;
+  }
+
+  .key.small-text { font-size: 22px; }
+  .key.tiny-text { font-size: 19px; }
+
+  .keypad.scientific .key { font-size: 20px; max-height: 62px; }
+  .keypad.scientific .key.zero { justify-content: flex-start; padding-left: 22px; }
+
+  sup { font-size: 0.6em; }
+
+  @media (max-height: 700px) {
+    .key { max-height: 64px; }
+    .keypad.scientific .key { max-height: 52px; }
+  }
+  @media (max-height: 600px) {
+    .key { max-height: 54px; font-size: 22px;}
+    .keypad.scientific .key { max-height: 44px; font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="topbar">
+    <button class="icon-btn" id="historyBtn" title="History" aria-label="Toggle history">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+    </button>
+    <button class="icon-btn" id="modeBtn" title="Scientific mode" aria-label="Toggle scientific mode">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="display-wrap">
+    <div class="history-strip" id="historyStrip">
+      <div class="history-empty">No history yet</div>
+    </div>
+    <div class="display-sub" id="displaySub"></div>
+    <div class="display" id="display">0</div>
+    <div class="mem-indicator" id="memIndicator"></div>
+  </div>
+
+  <div class="keypad basic" id="keypad"></div>
+</div>
+
+<script>
+(function(){
+
+  /* ================= State ================= */
+  const state = {
+    current: "0",
+    previous: null,
+    operator: null,
+    overwrite: true,
+    memory: 0,
+    hasMemory: false,
+    lastOperator: null,
+    lastOperand: null,
+    isScientific: false,
+    isDegree: true,
+    isInverse: false,
+    history: [],
+    justEvaluated: false
+  };
+
+  const displayEl = document.getElementById('display');
+  const subEl = document.getElementById('displaySub');
+  const memEl = document.getElementById('memIndicator');
+  const keypadEl = document.getElementById('keypad');
+  const historyStrip = document.getElementById('historyStrip');
+  const historyBtn = document.getElementById('historyBtn');
+  const modeBtn = document.getElementById('modeBtn');
+
+  const MAX_DIGITS = 9;
+
+  /* ================= Number formatting ================= */
+  function formatNumber(numStr) {
+    if (numStr === "Error" || numStr === "Infinity" || numStr === "-Infinity") return "Error";
+    let n = Number(numStr);
+    if (!isFinite(n)) return "Error";
+
+    // Determine display precision based on magnitude, mimic Apple calculator style
+    let out;
+    const absN = Math.abs(n);
+
+    if (absN !== 0 && (absN >= 1e15 || absN < 1e-9)) {
+      out = n.toExponential(6).replace(/e\+?(-?)(\d+)/, 'e$1$2');
+      return out;
+    }
+
+    // Use the raw string when it's mid-edit (has trailing dot or trailing zeros post decimal)
+    if (typeof numStr === 'string' && (numStr.endsWith('.') || /\.\d*0$/.test(numStr))) {
+      // preserve user's in-progress typing, just add thousands separators to integer part
+      let [intPart, decPart] = numStr.replace('-', '').split('.');
+      intPart = addThousands(intPart);
+      let sign = numStr.startsWith('-') ? '-' : '';
+      return sign + intPart + (decPart !== undefined ? '.' + decPart : '');
+    }
+
+    let str = trimFloat(n);
+    let [intPart, decPart] = str.replace('-', '').split('.');
+    intPart = addThousands(intPart);
+    let sign = n < 0 ? '-' : '';
+    return sign + intPart + (decPart ? '.' + decPart : '');
+  }
+
+  function trimFloat(n) {
+    // limit total significant digits to keep it readable
+    let s = n.toPrecision(10);
+    if (s.indexOf('e') === -1) {
+      s = parseFloat(s).toString();
+    } else {
+      s = parseFloat(n.toFixed(10)).toString();
+    }
+    return s;
+  }
+
+  function addThousands(intPart) {
+    return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  /* ================= Display update ================= */
+  function updateDisplay() {
+    let text = formatNumber(state.current);
+    displayEl.textContent = text;
+
+    // shrink font if too long
+    let len = text.replace(/,/g, '').length;
+    let size;
+    if (state.isScientific) {
+      size = len > 12 ? 40 : len > 9 ? 48 : 60;
+    } else {
+      size = len > 9 ? (len > 12 ? 34 : 46) : 70;
+    }
+    displayEl.style.fontSize = size + 'px';
+
+    // sub display: pending expression
+    if (state.operator && state.previous !== null) {
+      let opSym = OP_SYMBOLS[state.operator] || state.operator;
+      subEl.textContent = formatNumber(state.previous) + ' ' + opSym;
+    } else {
+      subEl.textContent = '';
+    }
+
+    memEl.textContent = state.hasMemory ? 'M' : '';
+  }
+
+  const OP_SYMBOLS = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+
+  /* ================= History ================= */
+  function pushHistory(expr, result) {
+    state.history.unshift({ expr, result });
+    if (state.history.length > 50) state.history.pop();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (state.history.length === 0) {
+      historyStrip.innerHTML = '<div class="history-empty">No history yet</div>';
+      return;
+    }
+    historyStrip.innerHTML = state.history.map((h, i) =>
+      `<div class="history-row" data-idx="${i}">
+         <div class="history-expr">${escapeHtml(h.expr)}</div>
+         <div class="history-result">${escapeHtml(formatNumber(h.result))}</div>
+       </div>`
+    ).join('');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  historyStrip.addEventListener('click', (e) => {
+    const row = e.target.closest('.history-row');
+    if (!row) return;
+    const idx = Number(row.dataset.idx);
+    const h = state.history[idx];
+    if (h) {
+      state.current = String(h.result);
+      state.overwrite = true;
+      state.operator = null;
+      state.previous = null;
+      state.justEvaluated = true;
+      updateDisplay();
+    }
+  });
+
+  historyBtn.addEventListener('click', () => {
+    historyStrip.classList.toggle('open');
+    historyBtn.classList.toggle('active');
+  });
+
+  /* ================= Math helpers ================= */
+  function toRad(deg) { return deg * Math.PI / 180; }
+  function toDeg(rad) { return rad * 180 / Math.PI; }
+
+  function factorial(n) {
+    if (n < 0) return NaN;
+    if (Math.floor(n) !== n) {
+      // Gamma function approximation for non-integers (Lanczos)
+      return gamma(n + 1);
+    }
+    if (n > 170) return Infinity;
+    let r = 1;
+    for (let i = 2; i <= n; i++) r *= i;
+    return r;
+  }
+
+  function gamma(x) {
+    const g = 7;
+    const p = [
+      0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+      771.32342877765313, -176.61502916214059, 12.507343278686905,
+      -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
+    ];
+    if (x < 0.5) {
+      return Math.PI / (Math.sin(Math.PI * x) * gamma(1 - x));
+    }
+    x -= 1;
+    let a = p[0];
+    const t = x + g + 0.5;
+    for (let i = 1; i < g + 2; i++) a += p[i] / (x + i);
+    return Math.sqrt(2 * Math.PI) * Math.pow(t, x + 0.5) * Math.exp(-t) * a;
+  }
+
+  function applyOperator(a, b, op) {
+    a = Number(a); b = Number(b);
+    switch (op) {
+      case '+': return a + b;
+      case '-': return a - b;
+      case '*': return a * b;
+      case '/': return b === 0 ? NaN : a / b;
+      case 'pow': return Math.pow(a, b);
+      case 'root': return Math.pow(a, 1 / b);
+      default: return b;
+    }
+  }
+
+  /* ================= Core input handlers ================= */
+  function inputDigit(d) {
+    if (state.overwrite || state.current === "0" || state.justEvaluated) {
+      if (state.justEvaluated) {
+        state.operator = null;
+        state.previous = null;
+      }
+      state.current = d;
+      state.overwrite = false;
+      state.justEvaluated = false;
+    } else {
+      if (state.current.replace('-', '').replace('.', '').length >= MAX_DIGITS) return;
+      state.current += d;
+    }
+    updateDisplay();
+  }
+
+  function inputDot() {
+    if (state.overwrite || state.justEvaluated) {
+      state.current = "0.";
+      state.overwrite = false;
+      state.justEvaluated = false;
+      state.operator = state.justEvaluated ? null : state.operator;
+    } else if (!state.current.includes('.')) {
+      state.current += '.';
+    }
+    updateDisplay();
+  }
+
+  function inputOperator(op) {
+    if (state.operator && !state.overwrite) {
+      compute();
+    }
+    state.previous = state.current;
+    state.operator = op;
+    state.overwrite = true;
+    state.justEvaluated = false;
+    updateDisplay();
+  }
+
+  function compute() {
+    if (state.operator == null || state.previous == null) return;
+    const a = Number(state.previous);
+    const b = Number(state.current);
+    const result = applyOperator(a, b, state.operator);
+    const expr = `${formatNumber(state.previous)} ${OP_SYMBOLS[state.operator] || state.operator} ${formatNumber(state.current)}`;
+
+    state.lastOperator = state.operator;
+    state.lastOperand = state.current;
+
+    if (isNaN(result)) {
+      state.current = "Error";
+    } else {
+      state.current = String(result);
+    }
+    pushHistory(expr, state.current);
+    state.operator = null;
+    state.previous = null;
+    state.overwrite = true;
+    state.justEvaluated = true;
+    updateDisplay();
+  }
+
+  function equals() {
+    if (state.operator == null) {
+      // repeat last operation (Apple behavior: pressing = repeatedly repeats last op)
+      if (state.lastOperator && state.lastOperand != null) {
+        const a = Number(state.current);
+        const b = Number(state.lastOperand);
+        const result = applyOperator(a, b, state.lastOperator);
+        const expr = `${formatNumber(state.current)} ${OP_SYMBOLS[state.lastOperator]} ${formatNumber(state.lastOperand)}`;
+        state.current = isNaN(result) ? "Error" : String(result);
+        pushHistory(expr, state.current);
+        state.overwrite = true;
+        state.justEvaluated = true;
+        updateDisplay();
+      }
+      return;
+    }
+    compute();
+  }
+
+  function clearAll() {
+    state.current = "0";
+    state.previous = null;
+    state.operator = null;
+    state.overwrite = true;
+    state.justEvaluated = false;
+    updateDisplay();
+    setClearLabel();
+  }
+
+  function clearEntry() {
+    state.current = "0";
+    state.overwrite = true;
+    updateDisplay();
+  }
+
+  function toggleSign() {
+    if (state.current === "0") return;
+    if (state.current.startsWith('-')) state.current = state.current.slice(1);
+    else state.current = '-' + state.current;
+    updateDisplay();
+  }
+
+  function percent() {
+    const cur = Number(state.current);
+    if (state.operator && state.previous != null) {
+      const base = Number(state.previous);
+      let val;
+      if (state.operator === '+' || state.operator === '-') {
+        val = base * (cur / 100);
+      } else {
+        val = cur / 100;
+      }
+      state.current = String(val);
+    } else {
+      state.current = String(cur / 100);
+    }
+    state.overwrite = true;
+    updateDisplay();
+  }
+
+  function backspace() {
+    if (state.overwrite || state.justEvaluated) return;
+    if (state.current.length <= 1 || (state.current.length === 2 && state.current.startsWith('-'))) {
+      state.current = "0";
+      state.overwrite = true;
+    } else {
+      state.current = state.current.slice(0, -1);
+    }
+    updateDisplay();
+  }
+
+  /* ---- Scientific unary functions ---- */
+  function applyUnary(fn) {
+    const x = Number(state.current);
+    let result;
+    let label = fn;
+    try {
+      switch (fn) {
+        case 'sin': result = Math.sin(state.isDegree ? toRad(x) : x); break;
+        case 'cos': result = Math.cos(state.isDegree ? toRad(x) : x); break;
+        case 'tan': result = Math.tan(state.isDegree ? toRad(x) : x); break;
+        case 'asin': result = state.isDegree ? toDeg(Math.asin(x)) : Math.asin(x); break;
+        case 'acos': result = state.isDegree ? toDeg(Math.acos(x)) : Math.acos(x); break;
+        case 'atan': result = state.isDegree ? toDeg(Math.atan(x)) : Math.atan(x); break;
+        case 'sinh': result = Math.sinh(x); break;
+        case 'cosh': result = Math.cosh(x); break;
+        case 'tanh': result = Math.tanh(x); break;
+        case 'ln': result = Math.log(x); break;
+        case 'log10': result = Math.log10(x); break;
+        case 'sqrt': result = Math.sqrt(x); break;
+        case 'cbrt': result = Math.cbrt(x); break;
+        case 'square': result = x * x; break;
+        case 'cube': result = x * x * x; break;
+        case 'inv': result = 1 / x; break;
+        case 'exp': result = Math.exp(x); break;
+        case 'pow10': result = Math.pow(10, x); break;
+        case 'fact': result = factorial(x); break;
+        case 'neg': result = -x; break;
+        default: result = x;
+      }
+    } catch (e) {
+      result = NaN;
+    }
+    const expr = `${fn}(${formatNumber(state.current)})`;
+    state.current = (result === undefined || isNaN(result) || !isFinite(result)) ? "Error" : String(result);
+    pushHistory(expr, state.current);
+    state.overwrite = true;
+    state.justEvaluated = true;
+    updateDisplay();
+  }
+
+  function insertConstant(name) {
+    if (name === 'pi') state.current = String(Math.PI);
+    else if (name === 'e') state.current = String(Math.E);
+    state.overwrite = false;
+    state.justEvaluated = false;
+    updateDisplay();
+  }
+
+  /* ---- Memory ---- */
+  function memClear() { state.memory = 0; state.hasMemory = false; updateDisplay(); }
+  function memRecall() {
+    state.current = String(state.memory);
+    state.overwrite = true;
+    state.justEvaluated = true;
+    updateDisplay();
+  }
+  function memAdd() { state.memory += Number(state.current); state.hasMemory = true; state.overwrite = true; updateDisplay(); }
+  function memSub() { state.memory -= Number(state.current); state.hasMemory = true; state.overwrite = true; updateDisplay(); }
+
+  /* ================= Keypad building ================= */
+  function setClearLabel() {
+    const acBtn = document.querySelector('[data-action="clear"]');
+    if (!acBtn) return;
+    acBtn.textContent = (state.current === "0" && !state.operator) ? "AC" : "C";
+  }
+
+  const basicLayout = [
+    { label: () => (state.current === "0" && !state.operator) ? "AC" : "C", action: "clear", cls: "light", dataAction: "clear" },
+    { label: "±", action: "sign", cls: "light" },
+    { label: "%", action: "percent", cls: "light" },
+    { label: "÷", action: "op:/", cls: "accent" },
+
+    { label: "7", action: "digit:7", cls: "dark" },
+    { label: "8", action: "digit:8", cls: "dark" },
+    { label: "9", action: "digit:9", cls: "dark" },
+    { label: "×", action: "op:*", cls: "accent" },
+
+    { label: "4", action: "digit:4", cls: "dark" },
+    { label: "5", action: "digit:5", cls: "dark" },
+    { label: "6", action: "digit:6", cls: "dark" },
+    { label: "−", action: "op:-", cls: "accent" },
+
+    { label: "1", action: "digit:1", cls: "dark" },
+    { label: "2", action: "digit:2", cls: "dark" },
+    { label: "3", action: "digit:3", cls: "dark" },
+    { label: "+", action: "op:+", cls: "accent" },
+
+    { label: "0", action: "digit:0", cls: "dark zero" },
+    { label: ".", action: "dot", cls: "dark" },
+    { label: "=", action: "equals", cls: "accent" },
+  ];
+
+  const sciLayout = [
+    { label: "(2nd)", action: "inverse", cls: "light tiny-text", id: "inverseBtn" },
+    { label: "x²", action: "unary:square", cls: "light tiny-text", alt: { label: "x³", action: "unary:cube" } },
+    { label: "x³", action: "unary:cube", cls: "light tiny-text", hidden: true },
+    { label: "x<sup>y</sup>", action: "op:pow", cls: "light tiny-text" },
+    { label: "e<sup>x</sup>", action: "unary:exp", cls: "light tiny-text", alt: { label: "10<sup>x</sup>", action: "unary:pow10" } },
+    { label: "10<sup>x</sup>", action: "unary:pow10", cls: "light tiny-text", hidden: true },
+
+    { label: "¹⁄x", action: "unary:inv", cls: "light tiny-text" },
+    { label: "√x", action: "unary:sqrt", cls: "light tiny-text", alt: { label: "∛x", action: "unary:cbrt" } },
+    { label: "∛x", action: "unary:cbrt", cls: "light tiny-text", hidden: true },
+    { label: "ʸ√x", action: "op:root", cls: "light tiny-text" },
+    { label: "ln", action: "unary:ln", cls: "light tiny-text" },
+
+    { label: "x!", action: "unary:fact", cls: "light tiny-text" },
+    { label: "sin", action: "unary:sin", cls: "light tiny-text", alt: { label: "sin⁻¹", action: "unary:asin" } },
+    { label: "sin⁻¹", action: "unary:asin", cls: "light tiny-text", hidden: true },
+    { label: "cos", action: "unary:cos", cls: "light tiny-text", alt: { label: "cos⁻¹", action: "unary:acos" } },
+    { label: "cos⁻¹", action: "unary:acos", cls: "light tiny-text", hidden: true },
+
+    { label: "tan", action: "unary:tan", cls: "light tiny-text", alt: { label: "tan⁻¹", action: "unary:atan" } },
+    { label: "tan⁻¹", action: "unary:atan", cls: "light tiny-text", hidden: true },
+    { label: "log", action: "unary:log10", cls: "light tiny-text" },
+    { label: "π", action: "const:pi", cls: "light tiny-text" },
+    { label: "e", action: "const:e", cls: "light tiny-text" },
+
+    { label: "Rad", action: "toggle-deg", cls: "light tiny-text", id: "degBtn" },
+    { label: "sinh", action: "unary:sinh", cls: "light tiny-text" },
+    { label: "cosh", action: "unary:cosh", cls: "light tiny-text" },
+    { label: "tanh", action: "unary:tanh", cls: "light tiny-text" },
+    { label: "EE", action: "ee", cls: "light tiny-text" },
+
+    { label: "mc", action: "mem:clear", cls: "light tiny-text" },
+    { label: "m+", action: "mem:add", cls: "light tiny-text" },
+    { label: "m-", action: "mem:sub", cls: "light tiny-text" },
+    { label: "mr", action: "mem:recall", cls: "light tiny-text" },
+    { label: "⌫", action: "backspace", cls: "light tiny-text" },
+  ];
+
+  function buildBasic() {
+    keypadEl.className = 'keypad basic';
+    keypadEl.innerHTML = '';
+    basicLayout.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'key ' + item.cls;
+      btn.innerHTML = typeof item.label === 'function' ? item.label() : item.label;
+      btn.dataset.action = item.action;
+      if (item.dataAction) btn.dataset.action = item.dataAction;
+      keypadEl.appendChild(btn);
+    });
+  }
+
+  function buildScientific() {
+    keypadEl.className = 'keypad scientific';
+    keypadEl.innerHTML = '';
+
+    // Row order for a 5-col grid: sci funcs (5 cols x 5 rows) + basic pad merges at bottom in Apple layout,
+    // but we do simplified vertical stack: scientific rows on top area via separate rows, then basic keys.
+    const frag = document.createDocumentFragment();
+
+    sciLayout.forEach(item => {
+      if (item.hidden) return;
+      const btn = document.createElement('button');
+      btn.className = 'key ' + item.cls;
+      btn.innerHTML = item.label;
+      btn.dataset.action = item.action;
+      if (item.id) btn.id = item.id;
+      if (item.alt) {
+        btn.dataset.altLabel = item.alt.label;
+        btn.dataset.altAction = item.alt.action;
+        btn.dataset.baseLabel = item.label;
+        btn.dataset.baseAction = item.action;
+      }
+      frag.appendChild(btn);
+    });
+
+    // basic row keys reused, but arranged 5-wide: AC, +/-, %, ÷ then blank... 
+    // Simplify: append standard basic layout keys too (they'll wrap into remaining grid rows)
+    const basicForSci = [
+      { label: () => (state.current === "0" && !state.operator) ? "AC" : "C", action: "clear", cls: "light", dataAction: "clear" },
+      { label: "±", action: "sign", cls: "light" },
+      { label: "%", action: "percent", cls: "light" },
+      { label: "÷", action: "op:/", cls: "accent" },
+      { label: "(", action: "noop", cls: "light", hiddenReal: true },
+
+      { label: "7", action: "digit:7", cls: "dark" },
+      { label: "8", action: "digit:8", cls: "dark" },
+      { label: "9", action: "digit:9", cls: "dark" },
+      { label: "×", action: "op:*", cls: "accent" },
+      { label: ")", action: "noop", cls: "light", hiddenReal: true },
+
+      { label: "4", action: "digit:4", cls: "dark" },
+      { label: "5", action: "digit:5", cls: "dark" },
+      { label: "6", action: "digit:6", cls: "dark" },
+      { label: "−", action: "op:-", cls: "accent" },
+      { label: "", action: "noop", cls: "dark", spacer: true },
+
+      { label: "1", action: "digit:1", cls: "dark" },
+      { label: "2", action: "digit:2", cls: "dark" },
+      { label: "3", action: "digit:3", cls: "dark" },
+      { label: "+", action: "op:+", cls: "accent" },
+      { label: "", action: "noop", cls: "dark", spacer: true },
+
+      { label: "0", action: "digit:0", cls: "dark" },
+      { label: ".", action: "dot", cls: "dark" },
+      { label: "=", action: "equals", cls: "accent" },
+    ];
+
+    basicForSci.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'key ' + item.cls;
+      btn.innerHTML = typeof item.label === 'function' ? item.label() : item.label;
+      btn.dataset.action = item.dataAction || item.action;
+      if (item.spacer) btn.style.visibility = 'hidden';
+      frag.appendChild(btn);
+    });
+
+    keypadEl.appendChild(frag);
+    updateSciToggleLabels();
+  }
+
+  function updateSciToggleLabels() {
+    const degBtn = document.getElementById('degBtn');
+    if (degBtn) degBtn.textContent = state.isDegree ? 'Rad' : 'Deg';
+    const invBtn = document.getElementById('inverseBtn');
+    if (invBtn) invBtn.textContent = state.isInverse ? '1st' : '2nd';
+
+    document.querySelectorAll('[data-alt-label]').forEach(btn => {
+      if (state.isInverse) {
+        btn.innerHTML = btn.dataset.altLabel;
+        btn.dataset.action = btn.dataset.altAction;
+      } else {
+        btn.innerHTML = btn.dataset.baseLabel;
+        btn.dataset.action = btn.dataset.baseAction;
+      }
+    });
+  }
+
+  function rebuildKeypad() {
+    if (state.isScientific) buildScientific(); else buildBasic();
+    setClearLabel();
+  }
+
+  /* ================= Action dispatch ================= */
+  function handleAction(action, btnEl) {
+    if (!action || action === 'noop') return;
+
+    if (action.startsWith('digit:')) { inputDigit(action.split(':')[1]); }
+    else if (action === 'dot') { inputDot(); }
+    else if (action.startsWith('op:')) { inputOperator(action.split(':')[1]); }
+    else if (action === 'equals') { equals(); }
+    else if (action === 'clear') { clearAll(); }
+    else if (action === 'sign') { toggleSign(); }
+    else if (action === 'percent') { percent(); }
+    else if (action === 'backspace') { backspace(); }
+    else if (action.startsWith('unary:')) { applyUnary(action.split(':')[1]); }
+    else if (action.startsWith('const:')) { insertConstant(action.split(':')[1]); }
+    else if (action === 'toggle-deg') { state.isDegree = !state.isDegree; updateSciToggleLabels(); }
+    else if (action === 'inverse') { state.isInverse = !state.isInverse; updateSciToggleLabels(); }
+    else if (action.startsWith('mem:')) {
+      const m = action.split(':')[1];
+      if (m === 'clear') memClear();
+      else if (m === 'add') memAdd();
+      else if (m === 'sub') memSub();
+      else if (m === 'recall') memRecall();
+    }
+    else if (action === 'ee') {
+      // scientific notation entry: append 'e' marker — simplified: multiply by 10 and mark pending exponent via prompt-free approach
+      if (!state.current.includes('e')) {
+        state.current = state.current + 'e';
+        state.overwrite = false;
+      }
+    }
+
+    setClearLabel();
+    updateDisplay();
+  }
+
+  keypadEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.key');
+    if (!btn) return;
+    flashKey(btn);
+    handleAction(btn.dataset.action, btn);
+  });
+
+  function flashKey(btn) {
+    btn.classList.add('pressed');
+    setTimeout(() => btn.classList.remove('pressed'), 120);
+  }
+
+  function flashKeyForAction(action) {
+    const btn = keypadEl.querySelector(`[data-action="${CSS.escape(action)}"]`);
+    if (btn) flashKey(btn);
+  }
+
+  /* ================= Mode toggle ================= */
+  modeBtn.addEventListener('click', () => {
+    state.isScientific = !state.isScientific;
+    modeBtn.classList.toggle('active', state.isScientific);
+    rebuildKeypad();
+    updateDisplay();
+  });
+
+  /* ================= Keyboard support ================= */
+  window.addEventListener('keydown', (e) => {
+    const key = e.key;
+    let action = null;
+
+    if (/^[0-9]$/.test(key)) action = 'digit:' + key;
+    else if (key === '.') action = 'dot';
+    else if (key === '+') action = 'op:+';
+    else if (key === '-') action = 'op:-';
+    else if (key === '*') action = 'op:*';
+    else if (key === '/') { action = 'op:/'; e.preventDefault(); }
+    else if (key === 'Enter' || key === '=') { action = 'equals'; e.preventDefault(); }
+    else if (key === 'Backspace') action = 'backspace';
+    else if (key === 'Escape') action = 'clear';
+    else if (key === '%') action = 'percent';
+
+    if (action) {
+      handleAction(action);
+      flashKeyForAction(action);
+    }
+  });
+
+  /* ================= Init ================= */
+  buildBasic();
+  updateDisplay();
+  renderHistory();
+
+})();
+</script>
+</body>
+</html>
