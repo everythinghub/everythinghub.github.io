@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Radar — Live Weather</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root{
+    --glass: rgba(30,30,36,0.55);
+    --glass-strong: rgba(24,24,30,0.72);
+    --stroke: rgba(255,255,255,0.14);
+    --text: #f5f6fa;
+    --text-dim: rgba(235,235,245,0.62);
+    --text-faint: rgba(235,235,245,0.4);
+    --blue: #0A84FF;
+    --radius-lg: 22px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; margin:0; background:#05060a; }
+  body{ font-family:var(--font); color:var(--text); overflow:hidden; }
+
+  #map{ position:fixed; inset:0; z-index:0; background:#0b0d12; }
+  .leaflet-tile-pane{ filter:saturate(1.02); }
+  .leaflet-control-attribution{
+    background:rgba(10,10,14,0.55) !important;
+    color:var(--text-faint) !important;
+    font-family:var(--font);
+    font-size:9px !important;
+    backdrop-filter:blur(6px);
+  }
+  .leaflet-control-attribution a{ color:var(--text-dim) !important; }
+  .leaflet-control-zoom{ display:none; }
+
+  .ui{
+    position:fixed; inset:0; z-index:10;
+    pointer-events:none;
+    display:flex; flex-direction:column;
+    padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
+  }
+  .glass{
+    background:var(--glass);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border:1px solid var(--stroke);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+
+  /* ---- top row: search + locate ---- */
+  .top-row{
+    display:flex; gap:10px; align-items:flex-start;
+    pointer-events:auto;
+  }
+  .search-wrap{
+    flex:1; position:relative;
+    border-radius:var(--radius-md);
+    display:flex; align-items:center; gap:8px;
+    padding:11px 14px;
+  }
+  .search-wrap svg{ flex:none; opacity:.55; }
+  .search-wrap input{
+    flex:1; background:none; border:none; outline:none;
+    color:var(--text); font-family:var(--font);
+    font-size:15px; font-weight:500;
+  }
+  .search-wrap input::placeholder{ color:var(--text-faint); }
+  .icon-btn{
+    width:44px; height:44px; flex:none;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--blue);
+    cursor:pointer;
+    border:1px solid var(--stroke);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .icon-btn:active{ transform:scale(0.92); }
+
+  .suggestions{
+    position:absolute; top:52px; left:0; right:0;
+    border-radius:var(--radius-md);
+    overflow:hidden;
+    display:none;
+    max-height:240px; overflow-y:auto;
+  }
+  .suggestions.show{ display:block; }
+  .suggestions div{
+    padding:10px 14px; font-size:13.5px; color:var(--text-dim);
+    border-bottom:1px solid var(--stroke);
+    cursor:pointer;
+  }
+  .suggestions div:last-child{ border-bottom:none; }
+  .suggestions div:hover{ background:rgba(255,255,255,0.06); color:var(--text); }
+
+  /* ---- location / condition card ---- */
+  .condition-card{
+    pointer-events:auto;
+    margin-top:12px;
+    align-self:flex-start;
+    border-radius:var(--radius-lg);
+    padding:16px 20px;
+    min-width:200px;
+    max-width:280px;
+    display:none;
+  }
+  .condition-card.show{ display:block; }
+  .condition-card .place{ font-size:17px; font-weight:600; letter-spacing:.2px; }
+  .condition-card .sub{ font-size:12px; color:var(--text-dim); margin-top:1px; }
+  .condition-card .temp-row{ display:flex; align-items:center; gap:12px; margin-top:8px; }
+  .condition-card .temp{ font-size:40px; font-weight:200; line-height:1; }
+  .condition-card .cond{ font-size:13px; color:var(--text-dim); max-width:120px; line-height:1.3; }
+  .condition-card .feels{ font-size:11.5px; color:var(--text-faint); margin-top:8px; }
+
+  /* ---- header pill: RADAR title + time ---- */
+  .radar-header{
+    pointer-events:auto;
+    align-self:center;
+    margin-top:12px;
+    border-radius:999px;
+    padding:9px 20px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .live-dot{
+    width:7px; height:7px; border-radius:50%;
+    background:#32d74b;
+    box-shadow:0 0 6px 1px #32d74b;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+  .radar-header .label{
+    font-size:11px; letter-spacing:1.5px; color:var(--text-dim); text-transform:uppercase;
+  }
+  .radar-header .time{
+    font-size:14px; font-weight:600; color:var(--text);
+  }
+
+  .spacer{ flex:1; min-height:0; }
+
+  /* ---- bottom cluster ---- */
+  .bottom{
+    pointer-events:auto;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .legend{
+    display:flex; align-items:center; gap:10px;
+    border-radius:999px;
+    padding:8px 16px;
+    font-size:11px; color:var(--text-dim);
+  }
+  .legend .bar{
+    width:150px; height:6px; border-radius:3px;
+    background: linear-gradient(90deg,
+      #1e5fae 0%, #2fa4d8 15%, #34c9a3 30%, #6fd35a 45%,
+      #eee75c 58%, #f2ad3d 70%, #ea6a3d 82%, #d63b5c 92%, #a339c9 100%);
+  }
+
+  .timeline{
+    width:100%; max-width:640px;
+    border-radius:var(--radius-lg);
+    padding:12px 16px 10px;
+  }
+  .timeline-top{
+    display:flex; align-items:center; gap:12px;
+  }
+  .play-btn{
+    width:36px; height:36px; flex:none; border-radius:50%;
+    background:var(--blue);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; border:none;
+  }
+  .play-btn svg{ fill:#fff; }
+  .track-wrap{
+    flex:1; position:relative; height:28px; display:flex; align-items:center;
+    cursor:pointer;
+  }
+  .track-bg{
+    position:absolute; left:0; right:0; height:4px; border-radius:2px;
+    background:rgba(255,255,255,0.14);
+  }
+  .track-fill{
+    position:absolute; left:0; height:4px; border-radius:2px;
+    background:var(--blue);
+    width:0%;
+  }
+  .now-mark{
+    position:absolute; top:2px; width:2px; height:24px;
+    background:rgba(255,255,255,0.35);
+  }
+  .handle{
+    position:absolute; top:50%; width:16px; height:16px; border-radius:50%;
+    background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.4);
+    transform:translate(-50%,-50%);
+    left:0%;
+  }
+  .timeline-labels{
+    display:flex; justify-content:space-between;
+    font-size:10.5px; color:var(--text-faint);
+    margin-top:6px; padding:0 2px;
+  }
+  .timeline-labels .now{ color:var(--text-dim); font-weight:600; }
+
+  .loading{
+    position:fixed; inset:0; z-index:20;
+    display:flex; align-items:center; justify-content:center;
+    background:#05060a;
+    flex-direction:column; gap:14px;
+    transition:opacity .5s ease;
+  }
+  .loading.hide{ opacity:0; pointer-events:none; }
+  .loading .ring{
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid rgba(255,255,255,0.15);
+    border-top-color: var(--blue);
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .loading span{ font-size:12px; letter-spacing:1.5px; color:var(--text-faint); text-transform:uppercase; }
+
+  @media (max-width: 480px){
+    .condition-card{ max-width:calc(100vw - 28px); }
+    .legend .bar{ width:100px; }
+    .radar-header .label{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="loading" id="loading">
+  <div class="ring"></div>
+  <span>Loading radar</span>
+</div>
+
+<div class="ui">
+  <div class="top-row">
+    <div class="search-wrap glass">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="text" placeholder="Search for a city or airport" autocomplete="off">
+      <div class="suggestions glass" id="suggestions"></div>
+    </div>
+    <div class="icon-btn glass" id="locateBtn" title="Use current location">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+
+  <div class="condition-card glass" id="conditionCard">
+    <div class="place" id="placeName">—</div>
+    <div class="sub" id="placeSub">Local conditions</div>
+    <div class="temp-row">
+      <div class="temp" id="temp">--°</div>
+      <div class="cond" id="cond">—</div>
+    </div>
+    <div class="feels" id="feels"></div>
+  </div>
+
+  <div class="radar-header glass">
+    <div class="live-dot"></div>
+    <span class="label">Precipitation</span>
+    <span class="time" id="headerTime">Loading…</span>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="bottom">
+    <div class="legend glass">
+      <span>Light</span>
+      <div class="bar"></div>
+      <span>Heavy</span>
+    </div>
+
+    <div class="timeline glass">
+      <div class="timeline-top">
+        <button class="play-btn" id="playBtn" title="Play">
+          <svg id="playIcon" width="14" height="14" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="track-wrap" id="trackWrap">
+          <div class="track-bg"></div>
+          <div class="track-fill" id="trackFill"></div>
+          <div class="now-mark" id="nowMark"></div>
+          <div class="handle" id="handle"></div>
+        </div>
+      </div>
+      <div class="timeline-labels">
+        <span id="labelStart">—</span>
+        <span class="now" id="labelNow">now</span>
+        <span id="labelEnd">—</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  // ---------------- config ----------------
+  var DEFAULT_CENTER = [41.8825, -87.8434]; // used until the user searches or shares their location
+  var DEFAULT_ZOOM = 8;
+  var RADAR_OPACITY = 0.78;
+  var TILE_SIZE = window.devicePixelRatio >= 2 ? 512 : 256;
+  var COLOR_SCHEME = 8;   // "Dark Sky" palette — the scheme Apple Weather's radar uses
+  var TILE_OPTIONS = '1_1'; // smoothed, snow-aware
+  var ANIM_DELAY_MS = 600;
+  var API_URL = 'https://api.rainviewer.com/public/weather-maps.json';
+
+  // ---------------- map ----------------
+  var map = L.map('map', {
+    center: DEFAULT_CENTER,
+    zoom: DEFAULT_ZOOM,
+    zoomControl: false,
+    attributionControl: true,
+    worldCopyJump: true
+  });
+
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 20
+  }).addTo(map);
+
+  // ---------------- radar state ----------------
+  var frames = [];
+  var nowIndex = 0;
+  var currentIndex = 0;
+  var host = '';
+  var layerCache = {};
+  var currentLayer = null;
+  var isPlaying = false;
+  var timer = null;
+  var isDragging = false;
+
+  var loadingEl = document.getElementById('loading');
+  var headerTime = document.getElementById('headerTime');
+  var trackFill = document.getElementById('trackFill');
+  var handle = document.getElementById('handle');
+  var nowMark = document.getElementById('nowMark');
+  var trackWrap = document.getElementById('trackWrap');
+  var playBtn = document.getElementById('playBtn');
+  var playIcon = document.getElementById('playIcon');
+  var labelStart = document.getElementById('labelStart');
+  var labelEnd = document.getElementById('labelEnd');
+
+  function frameUrl(frame){
+    return host + frame.path + '/' + TILE_SIZE + '/{z}/{x}/{y}/' + COLOR_SCHEME + '/' + TILE_OPTIONS + '.png';
+  }
+
+  function getLayer(frame){
+    if(layerCache[frame.path]) return layerCache[frame.path];
+    var l = L.tileLayer(frameUrl(frame), { tileSize: TILE_SIZE, opacity: 0 });
+    layerCache[frame.path] = l;
+    return l;
+  }
+
+  function formatTime(unixSeconds){
+    var d = new Date(unixSeconds * 1000);
+    return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function showFrame(index){
+    if(!frames.length) return;
+    index = Math.max(0, Math.min(frames.length - 1, index));
+    currentIndex = index;
+    var frame = frames[index];
+    var layer = getLayer(frame);
+
+    if(!map.hasLayer(layer)) layer.addTo(map);
+    layer.setOpacity(RADAR_OPACITY);
+
+    if(currentLayer && currentLayer !== layer){
+      var stale = currentLayer;
+      stale.setOpacity(0);
+      setTimeout(function(){
+        if(stale !== currentLayer && map.hasLayer(stale)) map.removeLayer(stale);
+      }, 250);
+    }
+    currentLayer = layer;
+
+    // UI
+    var pct = frames.length > 1 ? (index / (frames.length - 1)) * 100 : 0;
+    trackFill.style.width = pct + '%';
+    handle.style.left = pct + '%';
+
+    var label = formatTime(frame.time);
+    if(index === nowIndex) label += ' · Now';
+    else if(index > nowIndex) label += ' · Forecast';
+    headerTime.textContent = label;
+  }
+
+  function stepFrame(dir){
+    var next = currentIndex + dir;
+    if(next > frames.length - 1) next = 0;
+    if(next < 0) next = frames.length - 1;
+    showFrame(next);
+  }
+
+  function play(){
+    if(isPlaying || frames.length < 2) return;
+    isPlaying = true;
+    playIcon.innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+    timer = setInterval(function(){ stepFrame(1); }, ANIM_DELAY_MS);
+  }
+  function pause(){
+    isPlaying = false;
+    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    clearInterval(timer);
+  }
+  playBtn.addEventListener('click', function(){ isPlaying ? pause() : play(); });
+
+  function scrubToClientX(clientX){
+    var rect = trackWrap.getBoundingClientRect();
+    var frac = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    var idx = Math.round(frac * (frames.length - 1));
+    pause();
+    showFrame(idx);
+  }
+  trackWrap.addEventListener('mousedown', function(e){ isDragging = true; scrubToClientX(e.clientX); });
+  window.addEventListener('mousemove', function(e){ if(isDragging) scrubToClientX(e.clientX); });
+  window.addEventListener('mouseup', function(){ isDragging = false; });
+  trackWrap.addEventListener('touchstart', function(e){ isDragging = true; scrubToClientX(e.touches[0].clientX); }, {passive:true});
+  trackWrap.addEventListener('touchmove', function(e){ if(isDragging) scrubToClientX(e.touches[0].clientX); }, {passive:true});
+  trackWrap.addEventListener('touchend', function(){ isDragging = false; });
+
+  function loadRadar(){
+    fetch(API_URL).then(function(r){ return r.json(); }).then(function(data){
+      host = data.host;
+      var past = data.radar && data.radar.past ? data.radar.past : [];
+      var nowcast = data.radar && data.radar.nowcast ? data.radar.nowcast : [];
+      frames = past.concat(nowcast);
+      nowIndex = past.length - 1;
+
+      if(frames.length){
+        labelStart.textContent = formatTime(frames[0].time);
+        labelEnd.textContent = formatTime(frames[frames.length-1].time);
+        var nowPct = frames.length > 1 ? (nowIndex/(frames.length-1))*100 : 0;
+        nowMark.style.left = nowPct + '%';
+        showFrame(nowIndex);
+      }
+      loadingEl.classList.add('hide');
+    }).catch(function(err){
+      headerTime.textContent = 'Radar unavailable';
+      loadingEl.classList.add('hide');
+      console.error('RainViewer fetch failed', err);
+    });
+  }
+
+  // refresh frame list periodically so radar stays live
+  loadRadar();
+  setInterval(loadRadar, 5 * 60 * 1000);
+
+  // ---------------- current conditions card ----------------
+  var conditionCard = document.getElementById('conditionCard');
+  var placeName = document.getElementById('placeName');
+  var placeSub = document.getElementById('placeSub');
+  var tempEl = document.getElementById('temp');
+  var condEl = document.getElementById('cond');
+  var feelsEl = document.getElementById('feels');
+
+  var WCODE = {
+    0:'Clear sky',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',
+    45:'Fog',48:'Freezing fog',
+    51:'Light drizzle',53:'Drizzle',55:'Dense drizzle',
+    56:'Freezing drizzle',57:'Freezing drizzle',
+    61:'Light rain',63:'Rain',65:'Heavy rain',
+    66:'Freezing rain',67:'Freezing rain',
+    71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',
+    80:'Rain showers',81:'Rain showers',82:'Violent showers',
+    85:'Snow showers',86:'Snow showers',
+    95:'Thunderstorm',96:'Thunderstorm, hail',99:'Thunderstorm, hail'
+  };
+
+  function showWeather(lat, lon, name, sub){
+    placeName.textContent = name;
+    placeSub.textContent = sub || 'Local conditions';
+    conditionCard.classList.add('show');
+    tempEl.textContent = '--°';
+    condEl.textContent = 'Loading…';
+    feelsEl.textContent = '';
+
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon +
+      '&current=temperature_2m,apparent_temperature,weather_code&temperature_unit=fahrenheit';
+    fetch(url).then(function(r){ return r.json(); }).then(function(data){
+      var c = data.current;
+      if(!c) return;
+      tempEl.textContent = Math.round(c.temperature_2m) + '°';
+      condEl.textContent = WCODE[c.weather_code] || 'Conditions unavailable';
+      feelsEl.textContent = 'Feels like ' + Math.round(c.apparent_temperature) + '°';
+    }).catch(function(){
+      condEl.textContent = 'Conditions unavailable';
+    });
+  }
+
+  // ---------------- search (Nominatim) ----------------
+  var searchInput = document.getElementById('searchInput');
+  var suggestions = document.getElementById('suggestions');
+  var searchDebounce = null;
+
+  searchInput.addEventListener('input', function(){
+    var q = searchInput.value.trim();
+    clearTimeout(searchDebounce);
+    if(q.length < 3){ suggestions.classList.remove('show'); return; }
+    searchDebounce = setTimeout(function(){
+      fetch('https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&q=' + encodeURIComponent(q))
+        .then(function(r){ return r.json(); })
+        .then(function(results){
+          if(!results.length){ suggestions.classList.remove('show'); return; }
+          suggestions.innerHTML = '';
+          results.forEach(function(res){
+            var div = document.createElement('div');
+            div.textContent = res.display_name;
+            div.addEventListener('click', function(){
+              selectPlace(parseFloat(res.lat), parseFloat(res.lon), shortName(res));
+            });
+            suggestions.appendChild(div);
+          });
+          suggestions.classList.add('show');
+        }).catch(function(){ suggestions.classList.remove('show'); });
+    }, 400);
+  });
+
+  function shortName(res){
+    var a = res.address || {};
+    var main = a.city || a.town || a.village || a.hamlet || a.county || res.display_name.split(',')[0];
+    var region = a.state || a.country || '';
+    return { main: main, sub: region };
+  }
+
+  function selectPlace(lat, lon, nameObj){
+    suggestions.classList.remove('show');
+    searchInput.value = nameObj.main;
+    map.setView([lat, lon], 9, { animate: true });
+    showWeather(lat, lon, nameObj.main, nameObj.sub);
+  }
+
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.search-wrap')) suggestions.classList.remove('show');
+  });
+
+  // ---------------- locate me ----------------
+  document.getElementById('locateBtn').addEventListener('click', function(){
+    if(!navigator.geolocation){ return; }
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat = pos.coords.latitude, lon = pos.coords.longitude;
+      map.setView([lat, lon], 9, { animate: true });
+      fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon)
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+          var nameObj = shortName(res);
+          searchInput.value = nameObj.main;
+          showWeather(lat, lon, nameObj.main, nameObj.sub);
+        }).catch(function(){
+          showWeather(lat, lon, 'My Location', '');
+        });
+    }, function(){ /* denied or unavailable — silently ignore */ });
+  });
+
+})();
+</script>
+</body>
+</html>
