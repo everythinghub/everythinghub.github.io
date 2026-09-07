@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Rack · AI Workout Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14171c;
+    --panel:#1b1f26;
+    --panel-2:#21262f;
+    --edge:#2b313b;
+    --text:#eceef2;
+    --muted:#8a93a3;
+    --accent:#c4f135;
+    --accent-ink:#1a2000;
+    --accent2:#4de0ff;
+    --danger:#ff6b6b;
+    --warn:#ffb020;
+    --radius:10px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:var(--bg); color:var(--text); font-family:'Inter',sans-serif;}
+  body{display:flex; justify-content:center; min-height:100vh;}
+  #app-shell{width:100%; max-width:480px; min-height:100vh; background:var(--bg); display:flex; flex-direction:column; position:relative; border-left:1px solid var(--edge); border-right:1px solid var(--edge);}
+  h1,h2,h3,.display{font-family:'Big Shoulders Display',sans-serif; font-weight:800; letter-spacing:0.2px; line-height:1;}
+  button{font-family:inherit; cursor:pointer;}
+  input,textarea,select{font-family:inherit;}
+  ::selection{background:var(--accent); color:var(--accent-ink);}
+
+  /* ---------- top bar ---------- */
+  #topbar{display:flex; align-items:center; justify-content:space-between; padding:16px 18px 10px; flex-shrink:0;}
+  #topbar .word{font-size:22px; display:flex; align-items:baseline; gap:6px;}
+  #topbar .word span{color:var(--accent);}
+  #streak-pill{display:flex; align-items:center; gap:6px; background:var(--panel); border:1px solid var(--edge); border-radius:20px; padding:6px 12px; font-size:13px; color:var(--muted);}
+  #streak-pill b{color:var(--text); font-weight:700;}
+
+  /* ---------- scroll region ---------- */
+  #view{flex:1; overflow-y:auto; padding:0 18px 100px;}
+  #view::-webkit-scrollbar{display:none;}
+
+  /* ---------- onboarding ---------- */
+  .onb-hero{padding:18px 0 6px;}
+  .onb-hero h1{font-size:38px; margin:0 0 6px;}
+  .onb-hero p{color:var(--muted); font-size:14px; margin:0; max-width:34ch;}
+  .step-track{display:flex; gap:4px; margin:18px 0 22px;}
+  .step-track i{flex:1; height:3px; border-radius:2px; background:var(--edge);}
+  .step-track i.on{background:var(--accent);}
+  .field-label{font-size:12px; color:var(--muted); margin:0 0 10px; font-weight:600;}
+  .chip-grid{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px;}
+  .chip{border:1px solid var(--edge); background:var(--panel); color:var(--text); border-radius:999px; padding:9px 14px; font-size:13.5px; transition:.12s;}
+  .chip.sel{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:600;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:22px;}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field label{font-size:12px; color:var(--muted); font-weight:600;}
+  .field input, .field textarea{background:var(--panel); border:1px solid var(--edge); color:var(--text); border-radius:var(--radius); padding:12px 13px; font-size:15px; outline:none;}
+  .field input:focus, .field textarea:focus{border-color:var(--accent);}
+  .field textarea{resize:vertical; min-height:64px;}
+  .stepper{display:flex; align-items:center; gap:14px; background:var(--panel); border:1px solid var(--edge); border-radius:var(--radius); padding:8px 14px; width:fit-content;}
+  .stepper button{background:var(--panel-2); border:1px solid var(--edge); color:var(--text); width:30px; height:30px; border-radius:8px; font-size:18px; line-height:1;}
+  .stepper .val{font-family:'Big Shoulders Display'; font-size:22px; min-width:22px; text-align:center;}
+  .big-btn{width:100%; padding:16px; border:none; border-radius:var(--radius); background:var(--accent); color:var(--accent-ink); font-weight:700; font-size:15.5px; margin-top:6px;}
+  .big-btn:disabled{opacity:.5;}
+  .ghost-btn{width:100%; padding:14px; border:1px solid var(--edge); border-radius:var(--radius); background:transparent; color:var(--muted); font-size:14px; margin-top:10px;}
+  .err-box{background:rgba(255,107,107,.1); border:1px solid var(--danger); color:#ffb3b3; padding:12px 14px; border-radius:var(--radius); font-size:13.5px; margin:10px 0;}
+
+  /* loading */
+  .loading-wrap{padding:60px 10px; text-align:center;}
+  .spin{width:36px; height:36px; border-radius:50%; border:3px solid var(--edge); border-top-color:var(--accent); margin:0 auto 18px; animation:sp .8s linear infinite;}
+  @keyframes sp{to{transform:rotate(360deg);}}
+  .loading-wrap p{color:var(--muted); font-size:14px;}
+
+  /* ---------- day tabs (today/plan) ---------- */
+  .day-tabs{display:flex; gap:8px; overflow-x:auto; padding:14px 0 4px; margin-bottom:4px;}
+  .day-tab{flex-shrink:0; padding:9px 15px; border-radius:999px; border:1px solid var(--edge); background:var(--panel); color:var(--muted); font-size:13px; font-weight:600;}
+  .day-tab.on{background:var(--text); color:var(--bg); border-color:var(--text);}
+
+  .focus-head{margin:14px 0 4px;}
+  .focus-head h2{font-size:26px; margin:0;}
+  .focus-head p{color:var(--muted); font-size:13px; margin:4px 0 0;}
+
+  .ex-card{background:var(--panel); border:1px solid var(--edge); border-left:4px solid var(--accent2); border-radius:var(--radius); padding:14px 14px 12px; margin:12px 0;}
+  .ex-card.done{border-left-color:var(--accent); opacity:.72;}
+  .ex-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .ex-top h3{font-size:18px; margin:0;}
+  .ex-meta{color:var(--muted); font-size:12.5px; margin-top:3px;}
+  .ex-target{font-size:12.5px; color:var(--accent2); margin-top:6px; font-variant-numeric:tabular-nums;}
+  .ex-cue{font-size:12.5px; color:var(--muted); margin-top:6px; font-style:italic;}
+  .set-row{display:flex; align-items:center; gap:10px; margin-top:12px;}
+  .set-dots{display:flex; gap:6px;}
+  .set-dot{width:26px; height:26px; border-radius:7px; border:1px solid var(--edge); background:var(--panel-2); color:var(--muted); font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:700;}
+  .set-dot.filled{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  .set-count{margin-left:auto; font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums;}
+
+  .finish-bar{position:sticky; bottom:0; background:linear-gradient(180deg, rgba(20,23,28,0) 0%, var(--bg) 30%); padding:18px 0 6px;}
+
+  .timer-toast{position:fixed; left:50%; transform:translateX(-50%); bottom:96px; background:var(--panel-2); border:1px solid var(--accent2); border-radius:999px; padding:10px 18px; display:flex; align-items:center; gap:12px; font-size:14px; z-index:50; box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .timer-toast b{font-family:'Big Shoulders Display'; font-size:18px; color:var(--accent2); font-variant-numeric:tabular-nums;}
+  .timer-toast button{background:none; border:none; color:var(--muted); font-size:13px; text-decoration:underline;}
+
+  /* progress */
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0 6px;}
+  .stat-box{background:var(--panel); border:1px solid var(--edge); border-radius:var(--radius); padding:16px;}
+  .stat-box .num{font-family:'Big Shoulders Display'; font-size:34px; color:var(--accent);}
+  .stat-box .lbl{color:var(--muted); font-size:12px; margin-top:2px;}
+  .hist-item{border-bottom:1px solid var(--edge); padding:14px 0;}
+  .hist-item .d1{display:flex; justify-content:space-between; font-size:14px; font-weight:600;}
+  .hist-item .d2{color:var(--muted); font-size:12.5px; margin-top:3px;}
+  .empty-note{color:var(--muted); font-size:13.5px; padding:30px 4px; text-align:center;}
+
+  /* coach chat */
+  .chat-wrap{display:flex; flex-direction:column; padding-top:14px;}
+  .bubble{max-width:82%; padding:11px 14px; border-radius:14px; font-size:14px; line-height:1.4; margin:5px 0;}
+  .bubble.ai{background:var(--panel); border:1px solid var(--edge); align-self:flex-start; border-bottom-left-radius:4px;}
+  .bubble.me{background:var(--accent); color:var(--accent-ink); align-self:flex-end; border-bottom-right-radius:4px; font-weight:500;}
+  .quick-row{display:flex; gap:8px; margin:14px 0 6px; flex-wrap:wrap;}
+  .quick-chip{border:1px solid var(--edge); background:var(--panel); color:var(--text); border-radius:999px; padding:8px 13px; font-size:13px;}
+  .diff-meter{display:flex; align-items:center; gap:10px; margin:6px 0 14px;}
+  .diff-track{flex:1; height:6px; background:var(--edge); border-radius:3px; overflow:hidden;}
+  .diff-fill{height:100%; background:var(--accent);}
+  .diff-num{font-family:'Big Shoulders Display'; font-size:16px; color:var(--accent); min-width:26px; text-align:right;}
+
+  /* bottom nav */
+  #bottomnav{display:flex; border-top:1px solid var(--edge); background:var(--bg); position:sticky; bottom:0; flex-shrink:0;}
+  .nav-btn{flex:1; background:none; border:none; color:var(--muted); padding:12px 4px 10px; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11px; font-weight:600;}
+  .nav-btn.on{color:var(--accent);}
+  .nav-btn svg{width:20px; height:20px;}
+
+  /* chat input bar */
+  #chatbar{display:flex; gap:8px; position:sticky; bottom:0; background:var(--bg); padding:10px 0 14px;}
+  #chatbar input{flex:1; background:var(--panel); border:1px solid var(--edge); color:var(--text); border-radius:999px; padding:12px 16px; font-size:14px; outline:none;}
+  #chatbar input:focus{border-color:var(--accent);}
+  #chatbar button{background:var(--accent); border:none; color:var(--accent-ink); width:42px; height:42px; border-radius:50%; font-size:16px; flex-shrink:0;}
+  #chatbar button:disabled{opacity:.5;}
+
+  .toast{position:fixed; left:50%; top:16px; transform:translateX(-50%); background:var(--panel-2); border:1px solid var(--edge); padding:10px 18px; border-radius:999px; font-size:13.5px; z-index:100; box-shadow:0 8px 20px rgba(0,0,0,.4);}
+</style>
+</head>
+<body>
+<div id="app-shell">
+  <div id="topbar">
+    <div class="word">rack<span>.</span></div>
+    <div id="streak-pill" style="display:none;">🔥 <b id="streak-num">0</b> day streak</div>
+  </div>
+  <div id="view"></div>
+  <div id="bottomnav" style="display:none;"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+/* ---------------- Firebase ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyApJK_Mshs7Xj6b_9zSu9LO1xMf-5OxBVU",
+  authDomain: "chat-4b3f7.firebaseapp.com",
+  databaseURL: "https://chat-4b3f7-default-rtdb.firebaseio.com",
+  projectId: "chat-4b3f7",
+  storageBucket: "chat-4b3f7.firebasestorage.app",
+  messagingSenderId: "105718800152",
+  appId: "1:105718800152:web:3454b5f1694fa77dbf886d",
+  measurementId: "G-NP2XVS109Z"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+/* ---------------- Gemini ---------------- */
+const GEMINI_API_KEY = "AIzaSyB5fwV4jBISCLkWJcScvex9RYcbjrxZbA0";
+const GEMINI_MODEL = "gemini-3.6-flash";
+
+async function callGemini(promptText){
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [{ text: promptText }] }],
+      generationConfig: { responseMimeType: "application/json", temperature: 0.7 }
+    })
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data?.error?.message || "The AI request failed.");
+  const raw = data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join("\n") || "";
+  const cleaned = raw.replace(/```json|```/g,"").trim();
+  return JSON.parse(cleaned);
+}
+
+const PLAN_SCHEMA_NOTE = `Respond with ONLY a JSON object, no markdown, matching exactly this shape:
+{
+  "reply": "one short friendly sentence (max 25 words) describing the plan or change you made",
+  "difficultyLevel": <integer 1-10>,
+  "summary": "one short paragraph (max 40 words) describing the overall plan",
+  "days": [
+    {
+      "label": "Day 1",
+      "focus": "e.g. Push (chest, shoulders, triceps)",
+      "exercises": [
+        {
+          "name": "exercise name",
+          "equipment": "which of the user's available equipment this uses",
+          "sets": <integer>,
+          "reps": "e.g. 8-10",
+          "restSeconds": <integer>,
+          "targetWeight": "concrete suggested load given the user's available weights, or 'bodyweight'",
+          "cue": "one short coaching cue, max 12 words"
+        }
+      ]
+    }
+  ]
+}
+Only use exercises that are actually possible with the equipment and weights the user listed. Keep exercise count per day between 4 and 7.`;
+
+/* ---------------- State ---------------- */
+let uid = null;
+let profile = null;
+let plan = null;
+let history = [];
+let view = "loading"; // loading | onboarding | app
+let tab = "today";     // today | plan | progress | coach
+let activeDay = 0;
+let sessionSets = {};  // exerciseName -> completed set count, resets per session
+let chatLog = [];
+let onbStep = 0;
+let onbData = { equipment:[], weights:"", age:"", weight:"", goal:"", experience:"", days:4, notes:"" };
+let restTimer = null;
+
+const EQUIP_OPTIONS = ["Barbell","Dumbbells","Kettlebells","Cable machine","Squat rack","Flat bench","Adjustable bench","Pull-up bar","Resistance bands","Treadmill","Stationary bike","Rowing machine","Smith machine","Leg press","Bodyweight only"];
+const GOAL_OPTIONS = ["Build muscle","Get stronger","Lose fat","General fitness"];
+const EXP_OPTIONS = ["New to lifting","Some experience","Very experienced"];
+
+const viewEl = document.getElementById("view");
+const navEl = document.getElementById("bottomnav");
+const streakPill = document.getElementById("streak-pill");
+const streakNum = document.getElementById("streak-num");
+
+function toast(msg){
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+/* ---------------- Auth + load ---------------- */
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
+    uid = user.uid;
+    await loadUser();
+  } else {
+    signInAnonymously(auth).catch(e=>{
+      render(`<div class="loading-wrap"><div class="err-box">Couldn't connect (${e.message}). Check that Anonymous auth is enabled in your Firebase console, then reload.</div></div>`);
+    });
+  }
+});
+
+async function loadUser(){
+  const ref = doc(db,"users",uid);
+  const snap = await getDoc(ref);
+  if(snap.exists() && snap.data().plan){
+    const d = snap.data();
+    profile = d.profile; plan = d.plan; chatLog = d.chatLog || [{role:"ai", text: plan.reply || plan.summary}];
+    view = "app";
+    await loadHistory();
+  } else {
+    view = "onboarding";
+  }
+  renderAll();
+}
+
+async function loadHistory(){
+  const q = query(collection(db,"users",uid,"history"), orderBy("date","desc"));
+  const snap = await getDocs(q);
+  history = snap.docs.map(d=>({id:d.id, ...d.data()}));
+}
+
+async function saveUserDoc(){
+  await setDoc(doc(db,"users",uid), { profile, plan, chatLog, updatedAt: serverTimestamp() }, { merge:true });
+}
+
+/* ---------------- Render dispatch ---------------- */
+function renderAll(){
+  if(view === "onboarding"){ navEl.style.display="none"; streakPill.style.display="none"; renderOnboarding(); }
+  else if(view === "loading"){ navEl.style.display="none"; streakPill.style.display="none"; render(`<div class="loading-wrap"><div class="spin"></div><p>Setting things up…</p></div>`); }
+  else { navEl.style.display="flex"; streakPill.style.display="flex"; renderNav(); renderTab(); updateStreak(); }
+}
+function render(html){ viewEl.innerHTML = html; viewEl.scrollTop = 0; }
+
+/* ================= ONBOARDING ================= */
+function renderOnboarding(){
+  const steps = ["equip","weights","about","goal","review"];
+  const key = steps[onbStep];
+  let body = "";
+
+  if(key === "equip"){
+    body = `
+      <div class="onb-hero"><h1>What's in<br/>your gym?</h1><p>Pick everything you have access to. We'll only program things you can actually do.</p></div>
+      <p class="field-label">Equipment</p>
+      <div class="chip-grid" id="equip-grid">
+        ${EQUIP_OPTIONS.map(e=>`<button class="chip ${onbData.equipment.includes(e)?'sel':''}" data-e="${e}">${e}</button>`).join("")}
+      </div>
+      <button class="big-btn" id="next-btn" ${onbData.equipment.length?"":"disabled"}>Continue</button>`;
+  }
+  else if(key === "weights"){
+    body = `
+      <div class="onb-hero"><h1>What weights<br/>can you load?</h1><p>Rough ranges are fine — e.g. "dumbbells up to 50lb per hand, barbell plates 2.5–45lb".</p></div>
+      <div class="field"><label>Available weights / loads</label>
+        <textarea id="weights-in" placeholder="e.g. Dumbbells 5–50lb, barbell + plates up to 225lb total">${onbData.weights}</textarea>
+      </div>
+      <button class="big-btn" id="next-btn">Continue</button>
+      <button class="ghost-btn" id="back-btn">Back</button>`;
+  }
+  else if(key === "about"){
+    body = `
+      <div class="onb-hero"><h1>A bit<br/>about you</h1><p>Used to size up your working weights safely.</p></div>
+      <div class="row2">
+        <div class="field"><label>Age</label><input id="age-in" type="number" min="12" max="100" value="${onbData.age}" placeholder="28"></div>
+        <div class="field"><label>Body weight (lb)</label><input id="weight-in" type="number" min="60" max="600" value="${onbData.weight}" placeholder="170"></div>
+      </div>
+      <p class="field-label">Training experience</p>
+      <div class="chip-grid">${EXP_OPTIONS.map(e=>`<button class="chip ${onbData.experience===e?'sel':''}" data-exp="${e}">${e}</button>`).join("")}</div>
+      <div class="field"><label>Any injuries or things to avoid? (optional)</label><textarea id="notes-in" placeholder="e.g. cranky left shoulder, avoid overhead pressing">${onbData.notes}</textarea></div>
+      <button class="big-btn" id="next-btn" ${onbData.age && onbData.weight && onbData.experience ? "":"disabled"}>Continue</button>
+      <button class="ghost-btn" id="back-btn">Back</button>`;
+  }
+  else if(key === "goal"){
+    body = `
+      <div class="onb-hero"><h1>What's the<br/>goal?</h1></div>
+      <div class="chip-grid">${GOAL_OPTIONS.map(g=>`<button class="chip ${onbData.goal===g?'sel':''}" data-goal="${g}">${g}</button>`).join("")}</div>
+      <p class="field-label">Days per week</p>
+      <div class="stepper"><button id="days-minus">–</button><span class="val" id="days-val">${onbData.days}</span><button id="days-plus">+</button></div>
+      <br/>
+      <button class="big-btn" id="next-btn" ${onbData.goal?"":"disabled"}>Review</button>
+      <button class="ghost-btn" id="back-btn">Back</button>`;
+  }
+  else if(key === "review"){
+    body = `
+      <div class="onb-hero"><h1>Ready to<br/>build your plan</h1><p>${onbData.days}x/week · ${onbData.goal} · ${onbData.experience}</p></div>
+      <p class="field-label">Equipment</p>
+      <div class="chip-grid">${onbData.equipment.map(e=>`<span class="chip sel">${e}</span>`).join("")}</div>
+      <button class="big-btn" id="gen-btn">Generate my plan</button>
+      <button class="ghost-btn" id="back-btn">Back</button>
+      <div id="gen-error"></div>`;
+  }
+
+  const track = steps.map((s,i)=>`<i class="${i<=onbStep?'on':''}"></i>`).join("");
+  render(`<div class="step-track">${track}</div>${body}`);
+
+  // wire events
+  document.querySelectorAll("#equip-grid .chip").forEach(b=>b.onclick=()=>{
+    const e = b.dataset.e;
+    onbData.equipment = onbData.equipment.includes(e) ? onbData.equipment.filter(x=>x!==e) : [...onbData.equipment, e];
+    renderOnboarding();
+  });
+  document.querySelectorAll("[data-exp]").forEach(b=>b.onclick=()=>{ onbData.experience=b.dataset.exp; renderOnboarding(); });
+  document.querySelectorAll("[data-goal]").forEach(b=>b.onclick=()=>{ onbData.goal=b.dataset.goal; renderOnboarding(); });
+  const back = document.getElementById("back-btn"); if(back) back.onclick=()=>{ onbStep--; renderOnboarding(); };
+  const next = document.getElementById("next-btn");
+  if(next) next.onclick=()=>{
+    if(key==="weights") onbData.weights = document.getElementById("weights-in").value.trim();
+    if(key==="about"){ onbData.age=document.getElementById("age-in").value; onbData.weight=document.getElementById("weight-in").value; onbData.notes=document.getElementById("notes-in").value.trim(); }
+    onbStep++; renderOnboarding();
+  };
+  const dm = document.getElementById("days-minus"); if(dm) dm.onclick=()=>{ onbData.days=Math.max(2,onbData.days-1); renderOnboarding(); };
+  const dp = document.getElementById("days-plus"); if(dp) dp.onclick=()=>{ onbData.days=Math.min(6,onbData.days+1); renderOnboarding(); };
+  const gen = document.getElementById("gen-btn"); if(gen) gen.onclick=generatePlan;
+}
+
+async function generatePlan(){
+  render(`<div class="loading-wrap"><div class="spin"></div><p>Building your program from your equipment…</p></div>`);
+  profile = { ...onbData };
+  const prompt = `You are an experienced, safety-conscious strength coach building a personalized workout program.
+
+Client profile:
+- Age: ${profile.age}
+- Body weight: ${profile.weight} lb
+- Training experience: ${profile.experience}
+- Goal: ${profile.goal}
+- Training days per week: ${profile.days}
+- Available equipment: ${profile.equipment.join(", ")}
+- Available weights/loads: ${profile.weights || "not specified, assume standard gym increments"}
+- Injuries / things to avoid: ${profile.notes || "none noted"}
+
+Design a ${profile.days}-day-per-week split appropriate for their experience and goal, using only their equipment. Balance muscle groups sensibly across the week and set a starting difficultyLevel (1=very easy/beginner, 10=elite) that matches their stated experience.
+
+${PLAN_SCHEMA_NOTE}`;
+
+  try{
+    const result = await callGemini(prompt);
+    plan = result;
+    chatLog = [{role:"ai", text: plan.reply || plan.summary}];
+    activeDay = 0; sessionSets = {};
+    await saveUserDoc();
+    await loadHistory();
+    view = "app"; tab = "today";
+    renderAll();
+  }catch(e){
+    onbStep = 4;
+    renderOnboarding();
+    document.getElementById("gen-error").innerHTML = `<div class="err-box">${e.message}. Check your Gemini API key/quota, then try again.</div>`;
+  }
+}
+
+/* ================= NAV ================= */
+const ICONS = {
+  today: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v4M18 3v4M4 9h16M5 6h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1z"/></svg>`,
+  plan: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>`,
+  progress: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>`,
+  coach: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>`
+};
+function renderNav(){
+  const tabs = [["today","Today"],["plan","Plan"],["progress","Progress"],["coach","Coach"]];
+  navEl.innerHTML = tabs.map(([k,label])=>`<button class="nav-btn ${tab===k?'on':''}" data-tab="${k}">${ICONS[k]}<span>${label}</span></button>`).join("");
+  navEl.querySelectorAll(".nav-btn").forEach(b=>b.onclick=()=>{ tab=b.dataset.tab; renderTab(); renderNav(); });
+}
+function updateStreak(){
+  const dates = [...new Set(history.map(h=>h.dateKey))].sort().reverse();
+  let streak = 0;
+  let cursor = new Date();
+  for(let i=0;i<dates.length;i++){
+    const key = cursor.toISOString().slice(0,10);
+    if(dates.includes(key)){ streak++; cursor.setDate(cursor.getDate()-1); }
+    else if(i===0 && dates[0] === new Date(Date.now()-86400000).toISOString().slice(0,10)){ continue; }
+    else break;
+  }
+  streakNum.textContent = streak;
+}
+
+function renderTab(){
+  if(tab==="today") renderToday();
+  else if(tab==="plan") renderPlan();
+  else if(tab==="progress") renderProgress();
+  else renderCoach();
+}
+
+/* ================= TODAY ================= */
+function renderToday(){
+  const day = plan.days[activeDay];
+  const tabs = plan.days.map((d,i)=>`<button class="day-tab ${i===activeDay?'on':''}" data-i="${i}">${d.label}</button>`).join("");
+  const exCards = day.exercises.map(ex=>{
+    const done = sessionSets[ex.name] || 0;
+    const isDone = done >= ex.sets;
+    const dots = Array.from({length:ex.sets}).map((_,i)=>`<div class="set-dot ${i<done?'filled':''}">${i+1}</div>`).join("");
+    return `<div class="ex-card ${isDone?'done':''}">
+      <div class="ex-top"><h3>${ex.name}</h3></div>
+      <div class="ex-meta">${ex.equipment} · ${ex.sets} × ${ex.reps} · ${ex.restSeconds}s rest</div>
+      <div class="ex-target">Target: ${ex.targetWeight}</div>
+      ${ex.cue ? `<div class="ex-cue">"${ex.cue}"</div>` : ""}
+      <div class="set-row">
+        <div class="set-dots">${dots}</div>
+        <span class="set-count">${done}/${ex.sets} sets</span>
+        <button class="chip" style="margin-left:auto;" data-log="${ex.name}" data-rest="${ex.restSeconds}" ${isDone?"disabled":""}>Log set</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  render(`
+    <div class="day-tabs">${tabs}</div>
+    <div class="focus-head"><h2>${day.focus}</h2><p>${day.exercises.length} exercises</p></div>
+    ${exCards}
+    <div class="finish-bar"><button class="big-btn" id="finish-btn">Finish workout</button></div>
+  `);
+
+  document.querySelectorAll(".day-tab").forEach(b=>b.onclick=()=>{ activeDay=parseInt(b.dataset.i); sessionSets={}; renderToday(); });
+  document.querySelectorAll("[data-log]").forEach(b=>b.onclick=()=>{
+    const name = b.dataset.log;
+    sessionSets[name] = (sessionSets[name]||0)+1;
+    startRestTimer(parseInt(b.dataset.rest));
+    renderToday();
+  });
+  document.getElementById("finish-btn").onclick=finishWorkout;
+}
+
+function startRestTimer(seconds){
+  clearInterval(restTimer);
+  let remaining = seconds;
+  let el = document.getElementById("rest-toast");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "rest-toast"; el.className = "timer-toast";
+    document.body.appendChild(el);
+  }
+  const draw = ()=>{ el.innerHTML = `Rest <b>${remaining}s</b> <button id="skip-rest">skip</button>`; document.getElementById("skip-rest").onclick=()=>{ clearInterval(restTimer); el.remove(); }; };
+  draw();
+  restTimer = setInterval(()=>{
+    remaining--;
+    if(remaining<=0){ clearInterval(restTimer); el.remove(); return; }
+    draw();
+  },1000);
+}
+
+async function finishWorkout(){
+  const day = plan.days[activeDay];
+  const loggedExercises = day.exercises.filter(ex=>(sessionSets[ex.name]||0)>0).map(ex=>({name:ex.name, setsDone:sessionSets[ex.name]||0, setsPlanned:ex.sets}));
+  if(loggedExercises.length===0){ toast("Log at least one set first"); return; }
+  const now = new Date();
+  await addDoc(collection(db,"users",uid,"history"), {
+    date: serverTimestamp(),
+    dateKey: now.toISOString().slice(0,10),
+    dayLabel: day.label,
+    focus: day.focus,
+    exercises: loggedExercises
+  });
+  sessionSets = {};
+  await loadHistory();
+  toast("Workout saved 💪");
+  tab = "progress"; renderNav(); renderTab(); updateStreak();
+}
+
+/* ================= FULL PLAN ================= */
+function renderPlan(){
+  const body = plan.days.map(d=>`
+    <div class="focus-head"><h2>${d.label}</h2><p>${d.focus}</p></div>
+    ${d.exercises.map(ex=>`<div class="ex-card"><div class="ex-top"><h3>${ex.name}</h3></div><div class="ex-meta">${ex.equipment} · ${ex.sets} × ${ex.reps} · ${ex.restSeconds}s rest</div><div class="ex-target">Target: ${ex.targetWeight}</div></div>`).join("")}
+  `).join("");
+  render(`<div class="focus-head" style="margin-top:16px;"><h2>Full plan</h2><p>${plan.summary}</p></div>${body}`);
+}
+
+/* ================= PROGRESS ================= */
+function renderProgress(){
+  const totalSets = history.reduce((s,h)=>s+h.exercises.reduce((a,e)=>a+e.setsDone,0),0);
+  const stats = `<div class="stat-grid">
+    <div class="stat-box"><div class="num">${history.length}</div><div class="lbl">Workouts logged</div></div>
+    <div class="stat-box"><div class="num">${totalSets}</div><div class="lbl">Total sets done</div></div>
+  </div>`;
+  const list = history.length ? history.map(h=>`
+    <div class="hist-item"><div class="d1"><span>${h.focus}</span><span>${h.dateKey}</span></div><div class="d2">${h.exercises.length} exercises · ${h.exercises.reduce((a,e)=>a+e.setsDone,0)} sets</div></div>
+  `).join("") : `<p class="empty-note">No workouts logged yet — finish one from the Today tab and it'll show up here.</p>`;
+  render(`<div class="focus-head" style="margin-top:16px;"><h2>Progress</h2></div>${stats}${list}`);
+}
+
+/* ================= COACH ================= */
+function renderCoach(){
+  const bubbles = chatLog.map(m=>`<div class="bubble ${m.role==='ai'?'ai':'me'}">${m.text}</div>`).join("");
+  render(`
+    <div class="focus-head" style="margin-top:16px;"><h2>Coach</h2><p>Ask for changes any time — swap an exercise, change the split, adjust the difficulty.</p></div>
+    <div class="diff-meter"><div class="diff-track"><div class="diff-fill" style="width:${(plan.difficultyLevel||5)*10}%"></div></div><div class="diff-num">${plan.difficultyLevel||5}/10</div></div>
+    <div class="quick-row">
+      <button class="quick-chip" data-q="Make my workouts a bit easier">Easier</button>
+      <button class="quick-chip" data-q="Make my workouts harder / more challenging">Harder</button>
+      <button class="quick-chip" data-q="Swap out an exercise I'm not enjoying for an alternative">Swap an exercise</button>
+    </div>
+    <div class="chat-wrap" id="chat-log">${bubbles}</div>
+    <div id="chatbar">
+      <input id="chat-in" placeholder="e.g. I only have 30 minutes today" />
+      <button id="chat-send">➤</button>
+    </div>
+  `);
+  document.getElementById("chat-log").scrollTop = document.getElementById("chat-log").scrollHeight;
+  document.querySelectorAll(".quick-chip").forEach(b=>b.onclick=()=>sendCoachMessage(b.dataset.q));
+  document.getElementById("chat-send").onclick=()=>{
+    const v = document.getElementById("chat-in").value.trim();
+    if(v) sendCoachMessage(v);
+  };
+  document.getElementById("chat-in").addEventListener("keydown", e=>{ if(e.key==="Enter"){ const v=e.target.value.trim(); if(v) sendCoachMessage(v); }});
+}
+
+async function sendCoachMessage(text){
+  chatLog.push({role:"me", text});
+  renderCoach();
+  const sendBtn = document.getElementById("chat-send"); if(sendBtn) sendBtn.disabled = true;
+  const prompt = `You are the same coach who built this client's workout plan. Here is their profile and current plan as JSON:
+
+PROFILE: ${JSON.stringify(profile)}
+CURRENT PLAN: ${JSON.stringify(plan)}
+
+The client just said: "${text}"
+
+Update the plan to accommodate this request (this could mean changing difficulty, swapping exercises, changing volume, or restructuring days — use your judgment). Keep everything else about the plan the same unless the request implies otherwise, and keep using only their available equipment and weights.
+
+${PLAN_SCHEMA_NOTE}`;
+  try{
+    const result = await callGemini(prompt);
+    plan = result;
+    chatLog.push({role:"ai", text: plan.reply || "Updated your plan."});
+    if(activeDay >= plan.days.length) activeDay = 0;
+    await saveUserDoc();
+  }catch(e){
+    chatLog.push({role:"ai", text:`Sorry, I couldn't make that change (${e.message}). Try again?`});
+  }
+  renderCoach();
+}
+</script>
+</body>
+</html>
