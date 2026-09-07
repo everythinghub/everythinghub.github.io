@@ -381,10 +381,24 @@ function renderOnboarding(){
   const back = document.getElementById("back-btn"); if(back) back.onclick=()=>{ onbStep--; renderOnboarding(); };
   const next = document.getElementById("next-btn");
   if(next) next.onclick=()=>{
-    if(key==="weights") onbData.weights = document.getElementById("weights-in").value.trim();
-    if(key==="about"){ onbData.age=document.getElementById("age-in").value; onbData.weight=document.getElementById("weight-in").value; onbData.notes=document.getElementById("notes-in").value.trim(); }
     onbStep++; renderOnboarding();
   };
+  // keep typed values in onbData live, so a chip click (which re-renders) never wipes them out
+  const weightsIn = document.getElementById("weights-in");
+  if(weightsIn) weightsIn.oninput = ()=>{ onbData.weights = weightsIn.value; };
+  const ageIn = document.getElementById("age-in");
+  const weightIn = document.getElementById("weight-in");
+  const notesIn = document.getElementById("notes-in");
+  const syncAboutAndCheck = ()=>{
+    if(ageIn) onbData.age = ageIn.value;
+    if(weightIn) onbData.weight = weightIn.value;
+    if(notesIn) onbData.notes = notesIn.value;
+    const nextBtn = document.getElementById("next-btn");
+    if(nextBtn) nextBtn.disabled = !(onbData.age && onbData.weight && onbData.experience);
+  };
+  if(ageIn) ageIn.oninput = syncAboutAndCheck;
+  if(weightIn) weightIn.oninput = syncAboutAndCheck;
+  if(notesIn) notesIn.oninput = syncAboutAndCheck;
   const dm = document.getElementById("days-minus"); if(dm) dm.onclick=()=>{ onbData.days=Math.max(2,onbData.days-1); renderOnboarding(); };
   const dp = document.getElementById("days-plus"); if(dp) dp.onclick=()=>{ onbData.days=Math.min(6,onbData.days+1); renderOnboarding(); };
   const gen = document.getElementById("gen-btn"); if(gen) gen.onclick=generatePlan;
