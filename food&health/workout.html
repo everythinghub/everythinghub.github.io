@@ -168,24 +168,38 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 
-/* ---------------- Gemini ---------------- */
-const GEMINI_API_KEY = "AIzaSyB5fwV4jBISCLkWJcScvex9RYcbjrxZbA0";
-const GEMINI_MODEL = "gemini-3.6-flash";
+/* ---------------- OpenRouter (Llama) ---------------- */
+const OPENROUTER_API_KEY = "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";
+const OPENROUTER_MODEL = "meta-llama/llama-3-8b-instruct";
+const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
-async function callGemini(promptText){
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+async function callAI(promptText){
+  const res = await fetch(OPENROUTER_ENDPOINT, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+      "X-Title": "Rack Workout Planner"
+    },
     body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: promptText }] }],
-      generationConfig: { responseMimeType: "application/json", temperature: 0.7 }
+      model: OPENROUTER_MODEL,
+      temperature: 0.7,
+      messages: [
+        { role: "system", content: "You always respond with ONLY a raw JSON object. No markdown code fences, no commentary before or after, just the JSON object itself." },
+        { role: "user", content: promptText }
+      ]
     })
   });
   const data = await res.json();
   if(!res.ok) throw new Error(data?.error?.message || "The AI request failed.");
-  const raw = data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join("\n") || "";
-  const cleaned = raw.replace(/```json|```/g,"").trim();
-  return JSON.parse(cleaned);
+  const raw = data?.choices?.[0]?.message?.content || "";
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  const cleaned = jsonMatch ? jsonMatch[0] : raw.replace(/```json|```/g,"").trim();
+  try{
+    return JSON.parse(cleaned);
+  }catch(e){
+    throw new Error("The AI returned something that wasn't valid JSON. Try again.");
+  }
 }
 
 const PLAN_SCHEMA_NOTE = `Respond with ONLY a JSON object, no markdown, matching exactly this shape:
@@ -436,7 +450,7 @@ Design a ${profile.days}-day-per-week split appropriate for their experience and
 ${PLAN_SCHEMA_NOTE}`;
 
   try{
-    const result = await callGemini(prompt);
+    const result = await callAI(prompt);
     plan = result;
     chatLog = [{role:"ai", text: plan.reply || plan.summary}];
     activeDay = 0; sessionSets = {};
@@ -678,7 +692,7 @@ Update the plan to accommodate this request (this could mean changing difficulty
 
 ${PLAN_SCHEMA_NOTE}`;
   try{
-    const result = await callGemini(prompt);
+    const result = await callAI(prompt);
     plan = result;
     chatLog.push({role:"ai", text: plan.reply || "Updated your plan."});
     if(activeDay >= plan.days.length) activeDay = 0;
