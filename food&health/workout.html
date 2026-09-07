@@ -224,7 +224,8 @@ let activeDay = 0;
 let sessionSets = {};  // exerciseName -> completed set count, resets per session
 let chatLog = [];
 let onbStep = 0;
-let onbData = { equipment:[], weights:"", age:"", weight:"", goal:"", experience:"", days:4, notes:"" };
+let onbData = { equipment:[], customEquipment:[], weights:"", age:"", weight:"", goal:"", experience:"", days:4, notes:"" };
+let showCustomEquipInput = false;
 let restTimer = null;
 
 const EQUIP_OPTIONS = ["Barbell","Dumbbells","Kettlebells","Cable machine","Squat rack","Flat bench","Adjustable bench","Pull-up bar","Resistance bands","Treadmill","Stationary bike","Rowing machine","Smith machine","Leg press","Bodyweight only"];
@@ -298,8 +299,14 @@ function renderOnboarding(){
       <div class="onb-hero"><h1>What's in<br/>your gym?</h1><p>Pick everything you have access to. We'll only program things you can actually do.</p></div>
       <p class="field-label">Equipment</p>
       <div class="chip-grid" id="equip-grid">
-        ${EQUIP_OPTIONS.map(e=>`<button class="chip ${onbData.equipment.includes(e)?'sel':''}" data-e="${e}">${e}</button>`).join("")}
+        ${EQUIP_OPTIONS.concat(onbData.customEquipment).map(e=>`<button class="chip ${onbData.equipment.includes(e)?'sel':''}" data-e="${e}">${e}</button>`).join("")}
+        <button class="chip" id="add-equip-chip">+ Add other</button>
       </div>
+      ${showCustomEquipInput ? `
+        <div class="row2" style="grid-template-columns:1fr auto; margin-top:-10px;">
+          <input id="custom-equip-in" placeholder="e.g. Leg extension machine" />
+          <button class="chip sel" id="add-equip-confirm">Add</button>
+        </div>` : ""}
       <button class="big-btn" id="next-btn" ${onbData.equipment.length?"":"disabled"}>Continue</button>`;
   }
   else if(key === "weights"){
@@ -348,11 +355,27 @@ function renderOnboarding(){
   render(`<div class="step-track">${track}</div>${body}`);
 
   // wire events
-  document.querySelectorAll("#equip-grid .chip").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#equip-grid .chip[data-e]").forEach(b=>b.onclick=()=>{
     const e = b.dataset.e;
     onbData.equipment = onbData.equipment.includes(e) ? onbData.equipment.filter(x=>x!==e) : [...onbData.equipment, e];
     renderOnboarding();
   });
+  const addEquipChip = document.getElementById("add-equip-chip");
+  if(addEquipChip) addEquipChip.onclick = ()=>{ showCustomEquipInput = true; renderOnboarding(); setTimeout(()=>document.getElementById("custom-equip-in")?.focus(),0); };
+  const addEquipConfirm = document.getElementById("add-equip-confirm");
+  if(addEquipConfirm){
+    const commitCustomEquip = ()=>{
+      const v = document.getElementById("custom-equip-in").value.trim();
+      if(v && !onbData.customEquipment.includes(v)){
+        onbData.customEquipment.push(v);
+        onbData.equipment.push(v);
+      }
+      showCustomEquipInput = false;
+      renderOnboarding();
+    };
+    addEquipConfirm.onclick = commitCustomEquip;
+    document.getElementById("custom-equip-in").addEventListener("keydown", e=>{ if(e.key==="Enter") commitCustomEquip(); });
+  }
   document.querySelectorAll("[data-exp]").forEach(b=>b.onclick=()=>{ onbData.experience=b.dataset.exp; renderOnboarding(); });
   document.querySelectorAll("[data-goal]").forEach(b=>b.onclick=()=>{ onbData.goal=b.dataset.goal; renderOnboarding(); });
   const back = document.getElementById("back-btn"); if(back) back.onclick=()=>{ onbStep--; renderOnboarding(); };
@@ -412,7 +435,13 @@ const ICONS = {
 function renderNav(){
   const tabs = [["today","Today"],["plan","Plan"],["progress","Progress"],["coach","Coach"]];
   navEl.innerHTML = tabs.map(([k,label])=>`<button class="nav-btn ${tab===k?'on':''}" data-tab="${k}">${ICONS[k]}<span>${label}</span></button>`).join("");
-  navEl.querySelectorAll(".nav-btn").forEach(b=>b.onclick=()=>{ tab=b.dataset.tab; renderTab(); renderNav(); });
+  navEl.querySelectorAll(".nav-btn").forEach(b=>b.onclick=async ()=>{
+    tab=b.dataset.tab;
+    if(tab==="progress"){
+      try{ await loadHistory(); }catch(e){ console.error("History reload failed:", e); }
+    }
+    renderTab(); renderNav(); updateStreak();
+  });
 }
 function updateStreak(){
   const dates = [...new Set(history.map(h=>h.dateKey))].sort().reverse();
@@ -428,10 +457,15 @@ function updateStreak(){
 }
 
 function renderTab(){
-  if(tab==="today") renderToday();
-  else if(tab==="plan") renderPlan();
-  else if(tab==="progress") renderProgress();
-  else renderCoach();
+  try{
+    if(tab==="today") renderToday();
+    else if(tab==="plan") renderPlan();
+    else if(tab==="progress") renderProgress();
+    else renderCoach();
+  }catch(e){
+    console.error("Tab render failed:", tab, e);
+    render(`<div class="loading-wrap"><div class="err-box">This tab hit a snag (${e.message}). Try switching tabs again, or reload the page.</div></div>`);
+  }
 }
 
 /* ================= TODAY ================= */
@@ -519,24 +553,41 @@ function renderPlan(){
 
 /* ================= PROGRESS ================= */
 function renderProgress(){
-  const totalSets = history.reduce((s,h)=>s+h.exercises.reduce((a,e)=>a+e.setsDone,0),0);
+  const safeHistory = Array.isArray(history) ? history : [];
+  const totalSets = safeHistory.reduce((s,h)=>s+(h.exercises||[]).reduce((a,e)=>a+(e.setsDone||0),0),0);
   const stats = `<div class="stat-grid">
-    <div class="stat-box"><div class="num">${history.length}</div><div class="lbl">Workouts logged</div></div>
+    <div class="stat-box"><div class="num">${safeHistory.length}</div><div class="lbl">Workouts logged</div></div>
     <div class="stat-box"><div class="num">${totalSets}</div><div class="lbl">Total sets done</div></div>
   </div>`;
-  const list = history.length ? history.map(h=>`
-    <div class="hist-item"><div class="d1"><span>${h.focus}</span><span>${h.dateKey}</span></div><div class="d2">${h.exercises.length} exercises · ${h.exercises.reduce((a,e)=>a+e.setsDone,0)} sets</div></div>
+  const list = safeHistory.length ? safeHistory.map(h=>`
+    <div class="hist-item"><div class="d1"><span>${h.focus||"Workout"}</span><span>${h.dateKey||""}</span></div><div class="d2">${(h.exercises||[]).length} exercises · ${(h.exercises||[]).reduce((a,e)=>a+(e.setsDone||0),0)} sets</div></div>
   `).join("") : `<p class="empty-note">No workouts logged yet — finish one from the Today tab and it'll show up here.</p>`;
   render(`<div class="focus-head" style="margin-top:16px;"><h2>Progress</h2></div>${stats}${list}`);
 }
 
 /* ================= COACH ================= */
+let showAddEquip = false;
+let pendingNewEquip = [];
+
 function renderCoach(){
   const bubbles = chatLog.map(m=>`<div class="bubble ${m.role==='ai'?'ai':'me'}">${m.text}</div>`).join("");
+  const equipChips = (profile.equipment||[]).map(e=>`<button class="chip sel" data-remove-eq="${e}">${e} ✕</button>`).join("");
+  const pendingChips = pendingNewEquip.map(e=>`<button class="chip" data-remove-pending="${e}">${e} ✕</button>`).join("");
+
   render(`
     <div class="focus-head" style="margin-top:16px;"><h2>Coach</h2><p>Ask for changes any time — swap an exercise, change the split, adjust the difficulty.</p></div>
     <div class="diff-meter"><div class="diff-track"><div class="diff-fill" style="width:${(plan.difficultyLevel||5)*10}%"></div></div><div class="diff-num">${plan.difficultyLevel||5}/10</div></div>
-    <div class="quick-row">
+
+    <p class="field-label" style="margin-top:6px;">Your equipment</p>
+    <div class="chip-grid">${equipChips}${pendingChips}<button class="chip" id="show-add-equip">+ Add machine</button></div>
+    ${showAddEquip ? `
+      <div class="row2" style="grid-template-columns:1fr auto; margin-top:-6px;">
+        <input id="new-equip-in" placeholder="e.g. Leg press machine" />
+        <button class="chip sel" id="add-equip-app-confirm">Add</button>
+      </div>` : ""}
+    ${pendingNewEquip.length ? `<button class="big-btn" id="apply-equip-btn" style="margin-top:12px;">Update plan with new equipment</button>` : ""}
+
+    <div class="quick-row" style="margin-top:18px;">
       <button class="quick-chip" data-q="Make my workouts a bit easier">Easier</button>
       <button class="quick-chip" data-q="Make my workouts harder / more challenging">Harder</button>
       <button class="quick-chip" data-q="Swap out an exercise I'm not enjoying for an alternative">Swap an exercise</button>
@@ -554,6 +605,36 @@ function renderCoach(){
     if(v) sendCoachMessage(v);
   };
   document.getElementById("chat-in").addEventListener("keydown", e=>{ if(e.key==="Enter"){ const v=e.target.value.trim(); if(v) sendCoachMessage(v); }});
+
+  document.querySelectorAll("[data-remove-eq]").forEach(b=>b.onclick=()=>{
+    profile.equipment = profile.equipment.filter(x=>x!==b.dataset.removeEq);
+    saveUserDoc(); renderCoach();
+  });
+  document.querySelectorAll("[data-remove-pending]").forEach(b=>b.onclick=()=>{
+    pendingNewEquip = pendingNewEquip.filter(x=>x!==b.dataset.removePending);
+    renderCoach();
+  });
+  const showAdd = document.getElementById("show-add-equip");
+  if(showAdd) showAdd.onclick = ()=>{ showAddEquip = true; renderCoach(); setTimeout(()=>document.getElementById("new-equip-in")?.focus(),0); };
+  const addConfirm = document.getElementById("add-equip-app-confirm");
+  if(addConfirm){
+    const commit = ()=>{
+      const v = document.getElementById("new-equip-in").value.trim();
+      if(v && !pendingNewEquip.includes(v) && !(profile.equipment||[]).includes(v)) pendingNewEquip.push(v);
+      showAddEquip = false;
+      renderCoach();
+    };
+    addConfirm.onclick = commit;
+    document.getElementById("new-equip-in").addEventListener("keydown", e=>{ if(e.key==="Enter") commit(); });
+  }
+  const applyBtn = document.getElementById("apply-equip-btn");
+  if(applyBtn) applyBtn.onclick = async ()=>{
+    profile.equipment = [...(profile.equipment||[]), ...pendingNewEquip];
+    const added = pendingNewEquip.join(", ");
+    pendingNewEquip = [];
+    await saveUserDoc();
+    sendCoachMessage(`I now also have access to this equipment: ${added}. Please update my plan to make good use of it where it helps.`);
+  };
 }
 
 async function sendCoachMessage(text){
